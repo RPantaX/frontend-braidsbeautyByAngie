@@ -6,166 +6,160 @@
       "email": "john.due@gmail.com"
     }
   ],
-  "heroes": [
-    {
-      "id": "dc-batman",
-      "superhero": "Batman",
-      "publisher": "DC Comics",
-      "alter_ego": "Bruce Wayne",
-      "first_appearance": "Detective Comics #27",
-      "characters": "Bruce Wayne"
-    },
-    {
-      "id": "dc-superman",
-      "superhero": "Superman",
-      "publisher": "DC Comics",
-      "alter_ego": "Kal-El",
-      "first_appearance": "Action Comics #1",
-      "characters": "Kal-El"
-    },
-    {
-      "id": "dc-flash",
-      "superhero": "Flash",
-      "publisher": "DC Comics",
-      "alter_ego": "Jay Garrick",
-      "first_appearance": "Flash Comics #1",
-      "characters": "Jay Garrick, Barry Allen, Wally West, Bart Allen"
-    },
-    {
-      "id": "dc-green",
-      "superhero": "Green Lantern",
-      "publisher": "DC Comics",
-      "alter_ego": "Alan Scott",
-      "first_appearance": "All-American Comics #16",
-      "characters": "Alan Scott, Hal Jordan, Guy Gardner, John Stewart, Kyle Raynor, Jade, Sinestro, Simon Baz"
-    },
-    {
-      "id": "dc-arrow",
-      "superhero": "Green Arrow",
-      "publisher": "DC Comics",
-      "alter_ego": "Oliver Queen",
-      "first_appearance": "More Fun Comics #73",
-      "characters": "Oliver Queen"
-    },
-    {
-      "id": "dc-wonder",
-      "superhero": "Wonder Woman",
-      "publisher": "DC Comics",
-      "alter_ego": "Princess Diana",
-      "first_appearance": "All Star Comics #8",
-      "characters": "Princess Diana"
-    },
-    {
-      "id": "dc-martian",
-      "superhero": "Martian Manhunter",
-      "publisher": "DC Comics",
-      "alter_ego": "J\"onn J\"onzz",
-      "first_appearance": "Detective Comics #225",
-      "characters": "Martian Manhunter"
-    },
-    {
-      "id": "dc-robin",
-      "superhero": "Robin/Nightwing",
-      "publisher": "DC Comics",
-      "alter_ego": "Dick Grayson",
-      "first_appearance": "Detective Comics #38",
-      "characters": "Dick Grayson"
-    },
-    {
-      "id": "dc-blue",
-      "superhero": "Blue Beetle",
-      "publisher": "DC Comics",
-      "alter_ego": "Dan Garret",
-      "first_appearance": "Mystery Men Comics #1",
-      "characters": "Dan Garret, Ted Kord, Jaime Reyes"
-    },
-    {
-      "id": "dc-black",
-      "superhero": "Black Canary",
-      "publisher": "DC Comics",
-      "alter_ego": "Dinah Drake",
-      "first_appearance": "Flash Comics #86",
-      "characters": "Dinah Drake, Dinah Lance"
-    },
-    {
-      "id": "marvel-spider",
-      "superhero": "Spider Man",
-      "publisher": "Marvel Comics",
-      "alter_ego": "Peter Parker",
-      "first_appearance": "Amazing Fantasy #15",
-      "characters": "Peter Parker"
-    },
-    {
-      "id": "marvel-captain",
-      "superhero": "Captain America",
-      "publisher": "Marvel Comics",
-      "alter_ego": "Steve Rogers",
-      "first_appearance": "Captain America Comics #1",
-      "characters": "Steve Rogers"
-    },
-    {
-      "id": "marvel-iron",
-      "superhero": "Iron Man",
-      "publisher": "Marvel Comics",
-      "alter_ego": "Tony Stark",
-      "first_appearance": "Tales of Suspense #39",
-      "characters": "Tony Stark"
-    },
-    {
-      "id": "marvel-thor",
-      "superhero": "Thor",
-      "publisher": "Marvel Comics",
-      "alter_ego": "Thor Odinson",
-      "first_appearance": "Journey into Myster #83",
-      "characters": "Thor Odinson"
-    },
-    {
-      "id": "marvel-hulk",
-      "superhero": "Hulk",
-      "publisher": "Marvel Comics",
-      "alter_ego": "Bruce Banner",
-      "first_appearance": "The Incredible Hulk #1",
-      "characters": "Bruce Banner"
-    },
-    {
-      "id": "marvel-wolverine",
-      "superhero": "Wolverine",
-      "publisher": "Marvel Comics",
-      "alter_ego": "James Howlett",
-      "first_appearance": "The Incredible Hulk #180",
-      "characters": "James Howlett"
-    },
-    {
-      "id": "marvel-daredevil",
-      "superhero": "Daredevil",
-      "publisher": "Marvel Comics",
-      "alter_ego": "Matthew Michael Murdock",
-      "first_appearance": "Daredevil #1",
-      "characters": "Matthew Michael Murdock"
-    },
-    {
-      "id": "marvel-hawkeye",
-      "superhero": "Hawkeye",
-      "publisher": "Marvel Comics",
-      "alter_ego": "Clinton Francis Barton",
-      "first_appearance": "Tales of Suspense #57",
-      "characters": "Clinton Francis Barton"
-    },
-    {
-      "id": "marvel-cyclops",
-      "superhero": "Cyclops",
-      "publisher": "Marvel Comics",
-      "alter_ego": "Scott Summers",
-      "first_appearance": "X-Men #1",
-      "characters": "Scott Summers"
-    },
-    {
-      "id": "marvel-silver",
-      "superhero": "Silver Surfer",
-      "publisher": "Marvel Comics",
-      "alter_ego": "Norrin Radd",
-      "first_appearance": "The Fantastic Four #48",
-      "characters": "Norrin Radd"
-    }
-  ]
+  "responseListPageableProduct": {
+    "responseProductList": [
+      {
+        "productId": 1,
+        "productName": "Shampoo",
+        "productDescription": "Shampoo natural para todo tipo de cabello.",
+        "productImage": "shampoo.jpg",
+        "responseCategory": {
+          "productCategoryId": 101,
+          "productCategoryName": "Hair Care",
+          "promotionDTOList": [
+            {
+              "promotionId": 501,
+              "promotionName": "Black Friday",
+              "promotionDescription": "Descuento del 20% en productos seleccionados.",
+              "promotionDiscountRate": 0.2,
+              "promotionStartDate": "2024-11-29T00:00:00.000Z",
+              "promotionEndDate": "2024-12-01T23:59:59.000Z"
+            }
+          ]
+        },
+        "responseProductItemDetails": [
+          {
+            "productItemId": 201,
+            "productItemSKU": "SKU-001",
+            "productItemQuantityInStock": 50,
+            "productItemImage": "shampoo-item.jpg",
+            "productItemPrice": 9.99,
+            "variations": [
+              {
+                "variationName": "Size",
+                "options": "250ml"
+              },
+              {
+                "variationName": "Fragrance",
+                "options": "Lavender"
+              }
+            ]
+          },
+          {
+            "productItemId": 202,
+            "productItemSKU": "SKU-002",
+            "productItemQuantityInStock": 20,
+            "productItemImage": "shampoo-large.jpg",
+            "productItemPrice": 15.99,
+            "variations": [
+              {
+                "variationName": "Size",
+                "options": "500ml"
+              },
+              {
+                "variationName": "Fragrance",
+                "options": "Rose"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "productId": 2,
+        "productName": "Conditioner",
+        "productDescription": "Acondicionador hidratante para cabello seco.",
+        "productImage": "conditioner.jpg",
+        "responseCategory": {
+          "productCategoryId": 102,
+          "productCategoryName": "Hair Care",
+          "promotionDTOList": [
+            {
+              "promotionId": 502,
+              "promotionName": "Holiday Sale",
+              "promotionDescription": "15% de descuento en todos los productos de cuidado capilar.",
+              "promotionDiscountRate": 0.15,
+              "promotionStartDate": "2024-12-15T00:00:00.000Z",
+              "promotionEndDate": "2024-12-31T23:59:59.000Z"
+            }
+          ]
+        },
+        "responseProductItemDetails": [
+          {
+            "productItemId": 203,
+            "productItemSKU": "SKU-003",
+            "productItemQuantityInStock": 40,
+            "productItemImage": "conditioner-item.jpg",
+            "productItemPrice": 12.99,
+            "variations": [
+              {
+                "variationName": "Size",
+                "options": "300ml"
+              },
+              {
+                "variationName": "Fragrance",
+                "options": "Coconut"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "productId": 3,
+        "productName": "Hair Oil",
+        "productDescription": "Aceite nutritivo para un cabello brillante y saludable.",
+        "productImage": "hairoil.jpg",
+        "responseCategory": {
+          "productCategoryId": 103,
+          "productCategoryName": "Hair Treatment",
+          "promotionDTOList": []
+        },
+        "responseProductItemDetails": [
+          {
+            "productItemId": 204,
+            "productItemSKU": "SKU-004",
+            "productItemQuantityInStock": 60,
+            "productItemImage": "hairoil-item.jpg",
+            "productItemPrice": 19.99,
+            "variations": [
+              {
+                "variationName": "Volume",
+                "options": "100ml"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "productId": 4,
+        "productName": "Hair Spray",
+        "productDescription": "Spray fijador para peinados duraderos.",
+        "productImage": "hairspray.jpg",
+        "responseCategory": {
+          "productCategoryId": 102,
+          "productCategoryName": "Hair Care",
+          "promotionDTOList": []
+        },
+        "responseProductItemDetails": [
+          {
+            "productItemId": 205,
+            "productItemSKU": "SKU-005",
+            "productItemQuantityInStock": 70,
+            "productItemImage": "hairspray-item.jpg",
+            "productItemPrice": 14.99,
+            "variations": [
+              {
+                "variationName": "Size",
+                "options": "200ml"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pageNumber": 1,
+    "pageSize": 4,
+    "totalPages": 1,
+    "totalElements": 4,
+    "end": true
+  }
 }

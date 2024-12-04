@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NewPageComponent } from './pages/new-page/new-page.component';
-import { SearchPageComponent } from './pages/search-page/search-page.component';
-import { ListPageComponent } from './pages/list-page/list-page.component';
-import { ProductPageComponent } from './pages/product-page/product-page.component';
+import { NewPageComponent } from './pages/products/new-page/new-page.component';
+import { SearchPageComponent } from './pages/products/search-page/search-page.component';
+import { ListPageComponent } from './pages/products/list-page/list-page.component';
+import { ProductPageComponent } from './pages/products/product-page/product-page.component';
 import { HomeComponent } from '../shared/pages/home/home.component';
 
 const routes: Routes = [
