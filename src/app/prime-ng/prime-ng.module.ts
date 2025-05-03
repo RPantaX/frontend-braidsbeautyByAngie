@@ -15,6 +15,10 @@ import { RippleModule } from 'primeng/ripple';
 import { SidebarModule } from 'primeng/sidebar';
 import { StyleClassModule } from 'primeng/styleclass';
 import { Sidebar } from 'primeng/sidebar';
+import { ChipModule } from 'primeng/chip';
+import { DividerModule } from 'primeng/divider';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TableModule } from 'primeng/table';
 
 @NgModule({
   exports: [
@@ -31,7 +35,11 @@ import { Sidebar } from 'primeng/sidebar';
     InputTextModule,
     RippleModule,
     SidebarModule,
-    StyleClassModule
+    StyleClassModule,
+    ChipModule,
+    DividerModule,
+    ProgressSpinnerModule,
+    TableModule
   ]
 })
 export class PrimeNgModule { }

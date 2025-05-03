@@ -1,0 +1,57 @@
+<div class="product-container">
+  <div class="product-header">
+    <img [src]="product.productImage! | productImage"
+         alt="{{ product.productName }}"
+         class="product-image" />
+
+    <div class="product-details">
+      <h2> Producto: {{ product.productName }}</h2>
+      <p>{{ product.productDescription }}</p>
+      <p><strong>Categoria:</strong> {{ product.responseCategory.productCategoryName }}</p>
+    </div>
+
+    <div class="product-actions">
+      <button
+      pButton
+      label="Editar"
+      icon="pi pi-pencil"
+      (click)="onUpdateProduct()"
+    ></button>
+
+    <button
+      pButton
+      label="Eliminar"
+      icon="pi pi-trash"
+      class="p-button-danger"
+      (click)="onDeleteProduct()"
+    ></button>
+    </div>
+  </div>
+
+  <hr class="center-line">
+  <item-product-list-page
+  [items]="product.responseProductItemDetails"
+  [productId]="product.productId"
+  (editItemProduct)="onEditItemProduct($event)"
+  (deleteItemProduct)="onDeleteItemProduct($event)"
+  ></item-product-list-page>
+</div>
+
+  <!-- Diálogo -->
+  <p-dialog
+    header="Detalles del producto"
+    [(visible)]="productDialog"
+    [style]="{ width: '450px' }"
+    [modal]="true"
+    styleClass="p-fluid"
+  >
+    <app-new-product-page
+      [entity]="selectedProduct"
+      [productId]="product.productId"
+      (closeDialog)="hideDialog()"
+      (refreshEntities)="reloadItemProducts()"
+      (dialogToDelete)="openDialogDelete()"
+    ></app-new-product-page>
+  </p-dialog>
+  <p-confirmDialog [style]="{ width: '450px' }" />
+

@@ -1,1 +1,28 @@
-<p>item-product-page works!</p>
+<p-toolbar styleClass="mb-4 gap-2">
+  <ng-template pTemplate="left">
+    <p-button
+      severity="success"
+      label="Nuevo"
+      icon="pi pi-plus"
+      class="mr-2"
+      routerLink="itemProduct/new"
+    />
+  </ng-template>
+</p-toolbar>
+<div class="product-container">
+
+  <div class="product-header">
+    <img [src]="product.productImage" alt="{{ product.productName }}" class="product-image" />
+    <div class="product-details">
+      <h2>{{ product.productName }}</h2>
+      <p>{{ product.productDescription }}</p>
+      <p><strong>Category:</strong> {{ product.responseCategory.productCategoryName }}</p>
+    </div>
+  </div>
+  <item-product-list-page
+  [items]="product.responseProductItemDetails"
+  (deleteItemProduct)="deleteItemProductHandler($event)"
+  (editItemProduct)="editItemProductHandler($event)"
+  ></item-product-list-page>
+
+</div>

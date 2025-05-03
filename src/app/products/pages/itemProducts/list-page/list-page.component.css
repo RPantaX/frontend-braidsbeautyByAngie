@@ -1,0 +1,34 @@
+.item-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.product-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.product-list-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  flex-grow: 1;
+}
+
+/* Estilos para el botón "Agregar nuevo ítem" */
+.add-item-button {
+  margin-left: 20px; /* Espacio entre el título y el botón */
+}
+
+/* Estilo para los botones de acción dentro de la tabla */
+.action-button {
+  margin-right: 10px; /* Espacio entre los botones */
+}
+
+/* Ajustes adicionales para los botones si es necesario */
+.p-button {
+  min-width: 120px; /* Asegura que los botones tengan el mismo ancho */
+}

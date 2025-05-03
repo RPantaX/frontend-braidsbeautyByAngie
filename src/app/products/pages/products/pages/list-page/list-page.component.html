@@ -1,0 +1,9 @@
+
+  <div class="grid">
+
+    <div *ngFor="let product of products.responseProductList"
+      class="col-fixed">
+      <app-card [product]="product"></app-card>
+    </div>
+
+  </div>

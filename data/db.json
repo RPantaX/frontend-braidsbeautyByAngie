@@ -154,6 +154,174 @@
             ]
           }
         ]
+      },
+      {
+        "productId": 5,
+        "productName": "Shampoo",
+        "productDescription": "Shampoo natural para todo tipo de cabello.",
+        "productImage": "shampoo.jpg",
+        "responseCategory": {
+          "productCategoryId": 101,
+          "productCategoryName": "Hair Care",
+          "promotionDTOList": [
+            {
+              "promotionId": 501,
+              "promotionName": "Black Friday",
+              "promotionDescription": "Descuento del 20% en productos seleccionados.",
+              "promotionDiscountRate": 0.2,
+              "promotionStartDate": "2024-11-29T00:00:00.000Z",
+              "promotionEndDate": "2024-12-01T23:59:59.000Z"
+            }
+          ]
+        },
+        "responseProductItemDetails": [
+          {
+            "productItemId": 201,
+            "productItemSKU": "SKU-001",
+            "productItemQuantityInStock": 50,
+            "productItemImage": "shampoo-item.jpg",
+            "productItemPrice": 9.99,
+            "variations": [
+              {
+                "variationName": "Size",
+                "options": "250ml"
+              },
+              {
+                "variationName": "Fragrance",
+                "options": "Lavender"
+              }
+            ]
+          },
+          {
+            "productItemId": 202,
+            "productItemSKU": "SKU-002",
+            "productItemQuantityInStock": 20,
+            "productItemImage": "shampoo-large.jpg",
+            "productItemPrice": 15.99,
+            "variations": [
+              {
+                "variationName": "Size",
+                "options": "500ml"
+              },
+              {
+                "variationName": "Fragrance",
+                "options": "Rose"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "productId": 6,
+        "productName": "Shampoo",
+        "productDescription": "Shampoo natural para todo tipo de cabello.",
+        "productImage": "shampoo.jpg",
+        "responseCategory": {
+          "productCategoryId": 101,
+          "productCategoryName": "Hair Care",
+          "promotionDTOList": [
+            {
+              "promotionId": 501,
+              "promotionName": "Black Friday",
+              "promotionDescription": "Descuento del 20% en productos seleccionados.",
+              "promotionDiscountRate": 0.2,
+              "promotionStartDate": "2024-11-29T00:00:00.000Z",
+              "promotionEndDate": "2024-12-01T23:59:59.000Z"
+            }
+          ]
+        },
+        "responseProductItemDetails": [
+          {
+            "productItemId": 201,
+            "productItemSKU": "SKU-001",
+            "productItemQuantityInStock": 50,
+            "productItemImage": "shampoo-item.jpg",
+            "productItemPrice": 9.99,
+            "variations": [
+              {
+                "variationName": "Size",
+                "options": "250ml"
+              },
+              {
+                "variationName": "Fragrance",
+                "options": "Lavender"
+              }
+            ]
+          },
+          {
+            "productItemId": 202,
+            "productItemSKU": "SKU-002",
+            "productItemQuantityInStock": 20,
+            "productItemImage": "shampoo-large.jpg",
+            "productItemPrice": 15.99,
+            "variations": [
+              {
+                "variationName": "Size",
+                "options": "500ml"
+              },
+              {
+                "variationName": "Fragrance",
+                "options": "Rose"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "productId": 7,
+        "productName": "Shampoo",
+        "productDescription": "Shampoo natural para todo tipo de cabello.",
+        "productImage": "shampoo.jpg",
+        "responseCategory": {
+          "productCategoryId": 101,
+          "productCategoryName": "Hair Care",
+          "promotionDTOList": [
+            {
+              "promotionId": 501,
+              "promotionName": "Black Friday",
+              "promotionDescription": "Descuento del 20% en productos seleccionados.",
+              "promotionDiscountRate": 0.2,
+              "promotionStartDate": "2024-11-29T00:00:00.000Z",
+              "promotionEndDate": "2024-12-01T23:59:59.000Z"
+            }
+          ]
+        },
+        "responseProductItemDetails": [
+          {
+            "productItemId": 201,
+            "productItemSKU": "SKU-001",
+            "productItemQuantityInStock": 50,
+            "productItemImage": "shampoo-item.jpg",
+            "productItemPrice": 9.99,
+            "variations": [
+              {
+                "variationName": "Size",
+                "options": "250ml"
+              },
+              {
+                "variationName": "Fragrance",
+                "options": "Lavender"
+              }
+            ]
+          },
+          {
+            "productItemId": 202,
+            "productItemSKU": "SKU-002",
+            "productItemQuantityInStock": 20,
+            "productItemImage": "shampoo-large.jpg",
+            "productItemPrice": 15.99,
+            "variations": [
+              {
+                "variationName": "Size",
+                "options": "500ml"
+              },
+              {
+                "variationName": "Fragrance",
+                "options": "Rose"
+              }
+            ]
+          }
+        ]
       }
     ],
     "pageNumber": 1,

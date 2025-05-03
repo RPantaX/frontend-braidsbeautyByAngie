@@ -6,7 +6,8 @@ import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideHttpClient ,withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient ,withInterceptorsFromDi } from '@angular/common/http';
+import { JwtInterceptor } from './auth/interceptor/JwtInterceptor';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,11 @@ import { provideHttpClient ,withInterceptorsFromDi } from '@angular/common/http'
 
   ],
   providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
+      multi: true
+    },
     provideClientHydration(),
     provideAnimationsAsync(),
     provideHttpClient(withInterceptorsFromDi())

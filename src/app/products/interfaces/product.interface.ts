@@ -1,5 +1,5 @@
 export interface ResponsePageableProducts {
-  responseProductList: ResponseProductList[];
+  responseProductList: ResponseProduct[];
   pageNumber:          number;
   pageSize:            number;
   totalPages:          number;
@@ -7,11 +7,11 @@ export interface ResponsePageableProducts {
   end:                 boolean;
 }
 
-export interface ResponseProductList {
+export interface ResponseProduct {
   productId:                  number;
   productName:                string;
   productDescription:         string;
-  productImage:               string;
+  productImage?:               string;
   responseCategory:           ResponseCategory;
   responseProductItemDetails: ResponseProductItemDetail[];
 }
@@ -19,16 +19,16 @@ export interface ResponseProductList {
 export interface ResponseCategory {
   productCategoryId:   number;
   productCategoryName: string;
-  promotionDTOList:    PromotionDTOList[];
+  promotionDTOList:    PromotionDTO[];
 }
 
-export interface PromotionDTOList {
+export interface PromotionDTO {
   promotionId:           number;
   promotionName:         string;
   promotionDescription:  string;
   promotionDiscountRate: number;
-  promotionStartDate:    Date;
-  promotionEndDate:      Date;
+  promotionStartDate:    string;
+  promotionEndDate:      string;
 }
 
 export interface ResponseProductItemDetail {
@@ -43,4 +43,11 @@ export interface ResponseProductItemDetail {
 export interface Variation {
   variationName: string;
   options:       string;
+}
+
+export interface SaveProduct {
+  productName:        string;
+  productDescription?: string;
+  productImage?:       string;
+  productCategoryId:  number;
 }

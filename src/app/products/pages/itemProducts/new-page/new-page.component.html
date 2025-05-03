@@ -1,1 +1,123 @@
-<p>new-page works!</p>
+<div class="form-wrapper">
+  <h2 class="form-title">Formulario de Producto</h2>
+
+  <form [formGroup]="entityForm" (ngSubmit)="submit()" class="form-grid">
+
+    <!-- DATOS PRINCIPALES -->
+    <div *ngIf="isEditMode" class="form-field">
+      <label for="productId">ID del Producto</label>
+      <input pInputText id="productId" formControlName="productId" readonly />
+    </div>
+
+    <div class="form-field">
+      <label for="productItemSKU">SKU del Producto *</label>
+      <input pInputText id="productItemSKU" formControlName="productItemSKU" />
+      <small class="p-error" *ngIf="isInvalid('productItemSKU')">
+        SKU requerido (máx. 100 caracteres).
+      </small>
+    </div>
+
+    <div class="form-field">
+      <label for="productItemQuantityInStock">Cantidad en Stock *</label>
+      <input pInputText id="productItemQuantityInStock" formControlName="productItemQuantityInStock" />
+      <small class="p-error" *ngIf="isInvalid('productItemQuantityInStock')">
+        Cantidad inválida (8-15 caracteres, decimal).
+      </small>
+    </div>
+
+    <div class="form-field">
+      <label for="productItemImage">URL de Imagen</label>
+      <input pInputText id="productItemImage" formControlName="productItemImage" />
+    </div>
+
+    <div class="form-field">
+      <label for="productItemPrice">Precio *</label>
+      <input pInputText id="productItemPrice" formControlName="productItemPrice" />
+      <small class="p-error" *ngIf="isInvalid('productItemPrice')">
+        Precio inválido (1-15 caracteres).
+      </small>
+    </div>
+
+    <!-- VARIACIONES -->
+    <div class="variation-container">
+      <!-- Columna izquierda -->
+      <div class="form-section">
+        <h3>Agregar Nueva Variación</h3>
+
+        <div class="form-field">
+          <label>Variación:</label>
+          <select formControlName="variationName">
+            <option value="">-- Seleccione la variación --</option>
+            @for (varia of variations(); track varia) {
+              <option [value]="varia.variationName">{{ varia.variationName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Opción:</label>
+          <select formControlName="variationOptionValue">
+            <option value="">-- Seleccione la opción --</option>
+            @for (option of optionVariations(); track option) {
+              <option [value]="option.variationOptionValue">{{ option.variationOptionValue }}</option>
+            }
+          </select>
+        </div>
+
+        <button
+          pButton
+          type="button"
+          label="Agregar Variación"
+          icon="pi pi-plus"
+          class="p-button-sm p-button-success full-width"
+          (click)="addToVariation()"
+          [disabled]="
+            entityForm.get('variationName')?.invalid ||
+            entityForm.get('variationOptionValue')?.invalid
+          ">
+        </button>
+      </div>
+
+      <!-- Columna derecha -->
+      <div class="form-section">
+        <h3>Variaciones Agregadas</h3>
+        <div formArrayName="requestVariations">
+          <ng-container *ngFor="let group of variationsArray.controls; let i = index">
+            <div [formGroupName]="i" class="variation-row">
+              <input pInputText formControlName="variationName" readonly class="half-width" />
+              <input pInputText formControlName="variationOptionValue" readonly class="half-width" />
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-danger p-button-rounded"
+                (click)="deleteVariation(i)">
+              </button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="form-actions">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        [routerLink]="['/products', 'edit', idProduct]">
+      </button>
+
+      <button
+        pButton
+        type="submit"
+        [label]="isEditMode ? 'Editar' : 'Guardar'"
+        icon="pi pi-check"
+        [disabled]="entityForm.invalid"
+        class="p-button-success">
+      </button>
+    </div>
+  </form>
+</div>

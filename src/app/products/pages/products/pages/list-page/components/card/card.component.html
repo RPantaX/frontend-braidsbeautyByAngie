@@ -1,0 +1,53 @@
+<p-card header="{{product.productName}}">
+  <ng-template pTemplate="header">
+      <img [alt]="product.productName" [src]="product.productImage! | productImage"/>
+  </ng-template>
+  <p>
+    <strong>Categoria: </strong> {{product.responseCategory.productCategoryName}}
+  </p>
+  <strong>Promociones: </strong>
+  <p *ngIf="product.responseCategory.promotionDTOList.length === 0; else promotionsList">
+    No hay promociones disponibles
+  </p>
+  <ng-template #promotionsList>
+    <p *ngFor="let promotion of product.responseCategory.promotionDTOList">
+      {{promotion.promotionName}} - Descuento de {{promotion.promotionDiscountRate | percent:'1.0-0'}}
+    </p>
+  </ng-template>
+  <ng-template pTemplate="content">
+    <p>
+      <strong>Items:</strong>
+    </p>
+    <p *ngIf="product.responseProductItemDetails.length === 0; else itemProductsList">
+      No hay items disponibles
+    </p>
+    <ng-template #itemProductsList>
+    <div class="card flex flex-column align-items-start gap-2">
+      <!-- Mostramos solo los primeros 3 -->
+      <p-chip *ngFor="let itemProduct of product.responseProductItemDetails.slice(0, 3)"
+              label="{{itemProduct.productItemSKU}}"
+              image="{{product.productImage! | productImage}}"
+              alt="Item product image">
+      </p-chip>
+
+      <!-- Si hay más de 3, mostramos un chip indicando cuántos más hay -->
+      <p-chip *ngIf="product.responseProductItemDetails.length > 3"
+              label="{{product.responseProductItemDetails.length - 3}}+"
+              class="bg-gray-200 text-gray-700 font-bold">
+      </p-chip>
+    </div>
+  </ng-template>
+  </ng-template>
+  <p-divider />
+
+  <ng-template pTemplate="footer" class="space">
+    <div class="flex justify-content-center flex-wrap">
+      <p-button icon="pi pi-trash" [rounded]="true" [text]="true" [raised]="true" [routerLink]="['/products/manage/edit', product.productId ]" class="m-2"/>
+
+
+      <p-button icon="pi pi-eye" [rounded]="true" [text]="true" [raised]="true" [routerLink]="['/products/manage/edit', product.productId ]" class="m-2"/>
+    </div>
+
+
+  </ng-template>
+</p-card>
