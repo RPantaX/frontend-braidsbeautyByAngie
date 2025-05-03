@@ -28,10 +28,11 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { DropdownModule } from 'primeng/dropdown';
 import { PipesModule } from '../../../../../shared/pipes/pipes.module';
-import { ProductsInModule } from '../../products-in.module';
 import { RouterModule, Routes } from '@angular/router';
 import { EditProductPageComponent } from './edit-product-page.component';
-import { ItemProductModule } from '../../../itemProducts/item-product.module';
+import { ItemProductModule } from '../../item-products/item-product.module';
+import { EditProductRoutingModule } from './edit-product-page.module.routing';
+import { NewProductPageModule } from '../../new-page/new-page.module';
 const routes: Routes = [
 	{
 		path: '',
@@ -71,9 +72,10 @@ const routes: Routes = [
     RadioButtonModule,
     ConfirmDialogModule,
     FloatLabelModule,
-
-    ProductsInModule,
     ItemProductModule,
+    EditProductRoutingModule,
+
+    NewProductPageModule
   ],
   exports: [],
   providers: [ConfirmationService,MessageService],

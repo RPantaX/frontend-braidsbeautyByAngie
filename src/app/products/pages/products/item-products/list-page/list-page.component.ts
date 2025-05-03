@@ -1,9 +1,9 @@
 import { ChangeDetectorRef, Component, Input } from '@angular/core';
-import { ItemProductList } from '../item-product-list';
-import { ResponseProductItemDetail } from '../../../interfaces/product.interface';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ItemProductService } from '../../../services/products/items-products.service';
 import { Router } from '@angular/router';
+import { ItemProductService } from '../../../../services/products/items-products.service';
+import { ItemProductList } from '../item-product-list';
+import { ResponseProductItemDetail } from '../../../../interfaces/product.interface';
 
 @Component({
   selector: 'item-product-list-page',

@@ -15,18 +15,17 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { NewPageComponent } from './new-page.component';
-import { PipesModule } from '../../../../shared/pipes/pipes.module';
-import { ActivatedRoute, RouterModule, Routes } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
+import { PipesModule } from '../../../../../../shared/pipes/pipes.module';
+import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-	{
-		path: '',
-		component: NewPageComponent,
-	},
+  {
+    path: '',
+    component: NewPageComponent,
+  },
 ];
-
 @NgModule({
   declarations: [
     NewPageComponent
@@ -49,6 +48,7 @@ const routes: Routes = [
     ConfirmDialogModule,
     FloatLabelModule,
     DropdownModule,
+
     RouterModule.forChild(routes),
   ],
   exports: [NewPageComponent],

@@ -8,7 +8,7 @@
     label="Agregar Nuevo Item"
     icon="pi pi-plus"
     class="add-item-button"
-    [routerLink]="['/itemProduct', 'new', productId]">
+    [routerLink]="['new']">
   </button>
 </div>
 
@@ -38,7 +38,7 @@
         </ng-container>
       </td>
       <td>
-        <button pButton label="Editar" icon="pi pi-pencil" class="action-button"  [routerLink]="['/itemProduct', 'edit', item.productItemId, productId]"></button>
+        <button pButton label="Editar" icon="pi pi-pencil" class="action-button"  [routerLink]="['edit', item.productItemId]"></button>
         <button pButton label="Eliminar" icon="pi pi-trash" class="p-button-danger action-button" (click)="onDeleteItemProduct(item)"></button>
       </td>
     </tr>

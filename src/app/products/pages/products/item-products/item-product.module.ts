@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ListItemProductPageComponent } from './list-page/list-page.component';
-import { ItemProductPageComponent } from './item-product-page/item-product-page.component';
-import { PipesModule } from '../../../shared/pipes/pipes.module';
+import { ItemProductPageComponent } from '../../itemProducts/item-product-page/item-product-page.component';
+import { PipesModule } from '../../../../shared/pipes/pipes.module';
 
 import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
@@ -22,23 +21,20 @@ import { ChipModule } from 'primeng/chip';
 import { DividerModule } from 'primeng/divider';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
-import { SearchPageComponent } from './search-page/search-page.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { ItemProductRoutingModule } from './item-product.routing';
-import { NewItemProductModule } from './new-page/new-page.module';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { ListItemProductPageComponent } from './list-page/list-page.component';
 
 
 @NgModule({
   declarations: [
     ListItemProductPageComponent,
     ItemProductPageComponent,
-    SearchPageComponent
   ],
   imports: [
     CommonModule,
@@ -67,9 +63,6 @@ import { ConfirmationService, MessageService } from 'primeng/api';
     RadioButtonModule,
     ConfirmDialogModule,
     FloatLabelModule,
-
-    NewItemProductModule,
-    ItemProductRoutingModule,
   ],
   exports: [ListItemProductPageComponent, ItemProductPageComponent],
   providers: [ConfirmationService,MessageService],

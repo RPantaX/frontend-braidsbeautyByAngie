@@ -4,10 +4,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { tap } from 'rxjs';
 
-import { ItemProductSave } from '../../../interfaces/item-product.interface';
-import { Variation, VariationOptionEntity } from '../../../interfaces/vatiations/variation.interface';
-import { ItemProductService } from '../../../services/products/items-products.service';
-import { VariationService } from '../../../services/products/variation.service';
+import { ItemProductService } from '../../../../../services/products/items-products.service';
+import { VariationService } from '../../../../../services/products/variation.service';
+import { ItemProductSave } from '../../../../../interfaces/item-product.interface';
+import { Variation, VariationOptionEntity } from '../../../../../interfaces/vatiations/variation.interface';
 
 @Component({
   selector: 'item-product-new-page',
@@ -58,7 +58,7 @@ export class NewPageComponent {
 
   private loadRouteParams(): void {
     this.idItemProduct = Number(this.route.snapshot.paramMap.get('idItemProduct'));
-    this.idProduct = Number(this.route.snapshot.paramMap.get('idProduct'));
+    this.idProduct = Number(this.route.snapshot.paramMap.get('id'));
 
     if (this.idItemProduct && this.idProduct) {
       this.isEditMode = true;

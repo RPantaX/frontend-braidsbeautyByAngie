@@ -29,6 +29,7 @@
   </div>
 
   <hr class="center-line">
+
   <item-product-list-page
   [items]="product.responseProductItemDetails"
   [productId]="product.productId"
@@ -45,6 +46,7 @@
     [modal]="true"
     styleClass="p-fluid"
   >
+
     <app-new-product-page
       [entity]="selectedProduct"
       [productId]="product.productId"
@@ -52,6 +54,7 @@
       (refreshEntities)="reloadItemProducts()"
       (dialogToDelete)="openDialogDelete()"
     ></app-new-product-page>
+
   </p-dialog>
   <p-confirmDialog [style]="{ width: '450px' }" />
 

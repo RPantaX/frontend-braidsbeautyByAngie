@@ -5,7 +5,11 @@ import { ProductsInModule } from './products/products-in.module';
 
 
 const routes: Routes = [
-
+  {
+    path: 'list',
+    loadChildren: (): Promise<typeof ProductsInModule> =>
+      import('./products/products-in.module').then((m) => m.ProductsInModule),
+  },
   {
     path: 'edit/:id',
     loadChildren: (): Promise<typeof EditProductModule> =>
