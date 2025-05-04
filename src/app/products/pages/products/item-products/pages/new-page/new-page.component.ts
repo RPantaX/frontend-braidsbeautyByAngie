@@ -141,7 +141,7 @@ export class NewPageComponent {
     this.showMessage('success', 'Éxito', message);
     this.entityForm.reset();
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-      this.router.navigate(['/products/edit/', this.idProduct]);
+      this.router.navigate(['/products/manage/edit/', this.idProduct]);
     });
   }
 

@@ -1,6 +1,6 @@
+
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ItemProductPageComponent } from '../../itemProducts/item-product-page/item-product-page.component';
 import { PipesModule } from '../../../../shared/pipes/pipes.module';
 
 import { MenuModule } from 'primeng/menu';
@@ -29,12 +29,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ListItemProductPageComponent } from './list-page/list-page.component';
+import { ItemProductComponent } from './item-product.component';
 
 
 @NgModule({
   declarations: [
     ListItemProductPageComponent,
-    ItemProductPageComponent,
+    ItemProductComponent,
   ],
   imports: [
     CommonModule,
@@ -64,7 +65,7 @@ import { ListItemProductPageComponent } from './list-page/list-page.component';
     ConfirmDialogModule,
     FloatLabelModule,
   ],
-  exports: [ListItemProductPageComponent, ItemProductPageComponent],
+  exports: [ListItemProductPageComponent, ItemProductComponent],
   providers: [ConfirmationService,MessageService],
 })
 export class ItemProductModule { }
