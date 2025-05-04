@@ -6,9 +6,6 @@ import { TemplateFollbackDirective } from '../../../../shared/directives/templat
   selector: '[itemProductList]' // <-- puedes poner cualquier selector aquí si quieres
 })
 export abstract class ItemProductList {
-  @Output() deleteItemProduct = new EventEmitter<ResponseProductItemDetail>();
-  @Output() editItemProduct = new EventEmitter<ResponseProductItemDetail>();
-
   @Input() items: ResponseProductItemDetail[] = [];
   @Input() productId: number = 0;
   @ContentChild(TemplateFollbackDirective) contentChild: TemplateFollbackDirective | null = null;

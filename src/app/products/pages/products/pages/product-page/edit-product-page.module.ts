@@ -33,6 +33,7 @@ import { EditProductPageComponent } from './edit-product-page.component';
 import { ItemProductModule } from '../../item-products/item-product.module';
 import { EditProductRoutingModule } from './edit-product-page.module.routing';
 import { NewProductPageModule } from '../../new-page/new-page.module';
+import { ListItemProductPageComponent } from '../../item-products/list-page/list-page.component';
 const routes: Routes = [
 	{
 		path: '',
@@ -75,7 +76,8 @@ const routes: Routes = [
     ItemProductModule,
     EditProductRoutingModule,
 
-    NewProductPageModule
+    NewProductPageModule,
+    ItemProductModule
   ],
   exports: [],
   providers: [ConfirmationService,MessageService],

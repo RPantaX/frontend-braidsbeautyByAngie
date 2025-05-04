@@ -81,15 +81,6 @@ export class EditProductPageComponent implements OnInit{
     });
   }
 
-  onEditItemProduct(item: ResponseProductItemDetail) {
-    console.log('Editar item en ProductPageComponent', item);
-    // Aquí puedes abrir un diálogo, redirigir o lo que necesites
-  }
-
-  onDeleteItemProduct(item: ResponseProductItemDetail) {
-    console.log('Eliminar item en ProductPageComponent', item);
-    // Aquí también puedes abrir un confirmDialog o eliminar directamente
-  }
   goBack():void{
     this.router.navigateByUrl('products/list')
   }

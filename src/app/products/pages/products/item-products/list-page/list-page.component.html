@@ -1,48 +1,93 @@
-<!-- Contenedor para el título y el botón "Agregar nuevo ítem" -->
-<div class="product-list-header">
-  <div class="product-list-title">
-    Items
-  </div>
-  <button
-    pButton
-    label="Agregar Nuevo Item"
-    icon="pi pi-plus"
-    class="add-item-button"
-    [routerLink]="['new']">
-  </button>
+<div class="card">
+  <p-toast></p-toast>
+  <p-toolbar styleClass="mb-4">
+      <ng-template pTemplate="start">
+          <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success mr-2" [routerLink]="['new']"></button>
+          <button pButton pRipple label="Eliminar" icon="pi pi-trash" class="p-button-danger" (click)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length"></button>
+      </ng-template>
+
+      <ng-template pTemplate="end">
+          <button pButton pRipple label="Exportar" icon="pi pi-upload" class="p-button-help" (click)="exportCSV()"></button>
+      </ng-template>
+  </p-toolbar>
+
+  <p-table
+      #dt
+      [value]="items"
+      [rows]="5"
+      [paginator]="true"
+      [globalFilterFields]="['productItemSKU', 'variations']"
+      [tableStyle]="{ 'min-width': '75rem' }"
+      [(selection)]="selectedProducts"
+      [rowHover]="true"
+      dataKey="productItemId"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+      [showCurrentPageReport]="true"
+  >
+      <ng-template pTemplate="caption">
+          <div class="flex align-items-center justify-content-between">
+              <h5 class="m-0">Administrar Items de Producto</h5>
+              <span class="p-input-icon-left">
+                  <i class="pi pi-search"></i>
+                  <input #inputSearch pInputText type="text" (input)="dt.filterGlobal(inputSearch.value, 'contains')" placeholder="Buscar..." />
+              </span>
+          </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+          <tr>
+              <th style="width: 3rem">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th>
+              <th>Imagen</th>
+              <th pSortableColumn="productItemSKU">SKU <p-sortIcon field="productItemSKU"></p-sortIcon></th>
+              <th pSortableColumn="productItemQuantityInStock">Stock <p-sortIcon field="productItemQuantityInStock"></p-sortIcon></th>
+              <th pSortableColumn="productItemPrice">Precio <p-sortIcon field="productItemPrice"></p-sortIcon></th>
+              <th>Variaciones</th>
+              <th style="width: 8rem"></th>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+          <tr>
+              <td>
+                  <p-tableCheckbox [value]="item"></p-tableCheckbox>
+              </td>
+              <td>
+                  <img [src]="item.productItemImage | productImage" [alt]="item.productItemSKU" width="50" class="shadow-2 border-round" />
+              </td>
+              <td>{{ item.productItemSKU }}</td>
+              <td>
+                  <p-tag [value]="getStockLabel(item.productItemQuantityInStock)" [severity]="getStockSeverity(item.productItemQuantityInStock)"></p-tag>
+                  <span class="ml-2">{{ item.productItemQuantityInStock }}</span>
+              </td>
+              <td>{{ item.productItemPrice | currencySoles }}</td>
+              <td>
+                  <span *ngFor="let v of item.variations; let i = index">
+                      <span *ngIf="i > 0">, </span>
+                      <span class="font-semibold">{{ v.variationName }}:</span> {{ v.options }}
+                  </span>
+              </td>
+              <td>
+                  <div class="flex gap-2 justify-content-center">
+                      <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" [routerLink]="['edit', item.productItemId]"></button>
+                      <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="onDeleteItemProduct(item)"></button>
+                  </div>
+              </td>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+          <div class="flex align-items-center justify-content-between">
+              Total: {{ items ? items.length : 0 }} productos.
+          </div>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+          <tr>
+              <td colspan="7" class="text-center p-4">
+                  No se encontraron registros.
+              </td>
+          </tr>
+      </ng-template>
+  </p-table>
+
+  <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+
 </div>
-
-<p-table [value]="items" *ngIf="items.length > 0">
-  <ng-template pTemplate="header">
-    <tr>
-      <th>Imagen</th>
-      <th>SKU</th>
-      <th>Stock</th>
-      <th>Precio</th>
-      <th>Variaciones</th>
-      <th>Acciones</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-item>
-    <tr>
-      <td>
-        <img [src]="item.productItemImage | productImage" alt="{{ item.productItemSKU }}" class="item-image" />
-      </td>
-      <td>{{ item.productItemSKU }}</td>
-      <td>{{ item.productItemQuantityInStock }}</td>
-      <td>{{ item.productItemPrice | currencySoles }}</td>
-      <td>
-        <ng-container *ngFor="let v of item.variations; let i = index">
-          <span *ngIf="i > 0">, </span>
-          {{ v.variationName }}: {{ v.options }}
-        </ng-container>
-      </td>
-      <td>
-        <button pButton label="Editar" icon="pi pi-pencil" class="action-button"  [routerLink]="['edit', item.productItemId]"></button>
-        <button pButton label="Eliminar" icon="pi pi-trash" class="p-button-danger action-button" (click)="onDeleteItemProduct(item)"></button>
-      </td>
-    </tr>
-  </ng-template>
-</p-table>
-
-<p *ngIf="items.length === 0">No items available.</p>
