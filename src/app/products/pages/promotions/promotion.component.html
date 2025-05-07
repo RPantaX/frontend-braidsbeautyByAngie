@@ -1,0 +1,43 @@
+<div class="promotion-container">
+  <!-- Header Section with Actions -->
+  <div class="promotion-header p-card">
+    <div class="p-d-flex p-jc-between p-ai-center">
+      <h1 class="promotion-title">Gestión de Promociones</h1>
+      <p-button
+        label="Nueva Promoción"
+        icon="pi pi-plus"
+        styleClass="p-button-success"
+        (click)="openNewPromotionDialog()">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- List Component -->
+  <app-promotion-list-page
+    [loading]="isLoading"
+    (deleteProduct)="confirmDeletePromotion($event)"
+    (selectedProduct)="openEditPromotionDialog($event)"
+    (refresh)="refreshPromotions()">
+  </app-promotion-list-page>
+
+  <!-- Dialog for Creating/Editing -->
+  <p-dialog
+    [(visible)]="promotionDialog"
+    [style]="{ width: '600px', height: '970px' }"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [header]="selectedPromotion ? 'Editar Promoción' : 'Nueva Promoción'"
+    styleClass="p-fluid promotion-dialog">
+
+    <app-new-promotion-page
+      [entity]="selectedPromotion"
+      [promotionId]="selectedPromotion?.promotionId || 0"
+      (closeDialog)="hidePromotionDialog()"
+      (refreshEntities)="refreshPromotions()">
+    </app-new-promotion-page>
+  </p-dialog>
+
+  <!-- Confirmation Dialog for Delete Actions -->
+  <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+</div>

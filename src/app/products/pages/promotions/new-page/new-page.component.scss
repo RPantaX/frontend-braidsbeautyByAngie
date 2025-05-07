@@ -1,0 +1,224 @@
+/* Main Promotion Component Styles */
+.promotion-container {
+  padding: 1rem;
+
+  .promotion-header {
+    margin-bottom: 1rem;
+    padding: 1rem;
+
+    .promotion-title {
+      font-size: 1.5rem;
+      margin: 0;
+      color: #495057;
+    }
+  }
+}
+
+/* List Component Styles */
+:host ::ng-deep {
+  .p-progressbar {
+    height: 0.5rem;
+    background-color: #D8DADC;
+
+    .p-progressbar-value {
+      background-color: #607D8B;
+    }
+  }
+
+  .p-column-filter-menu-button,
+  .p-column-filter-clear-button {
+    margin-left: 0.25rem;
+  }
+
+  .p-paginator {
+    .p-paginator-current {
+      margin-left: auto;
+    }
+  }
+
+  .p-datatable.p-datatable-customers {
+    .p-datatable-header {
+      padding: 1rem;
+      text-align: left;
+      font-size: 1.5rem;
+    }
+
+    .p-paginator {
+      padding: 1rem;
+    }
+
+    .p-datatable-thead > tr > th {
+      text-align: left;
+    }
+
+    .p-datatable-tbody > tr > td {
+      cursor: auto;
+    }
+  }
+
+  /* Chip styles for categories */
+  .p-chip {
+    &.category-chip {
+      font-size: 0.85rem;
+      padding: 0.25rem 0.5rem;
+      cursor: default;
+      transition: all 0.2s ease;
+
+      &.info {
+        background-color: #3F51B5;
+        color: #ffffff;
+      }
+
+      &.success {
+        background-color: #4CAF50;
+        color: #ffffff;
+      }
+
+      &.warning {
+        background-color: #FF9800;
+        color: #ffffff;
+      }
+
+      &.danger {
+        background-color: #F44336;
+        color: #ffffff;
+      }
+
+      &.primary {
+        background-color: #2196F3;
+        color: #ffffff;
+      }
+    }
+
+    &.more-categories {
+      background-color: #E0E0E0;
+      color: #616161;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #BDBDBD;
+      }
+    }
+  }
+
+  .discount-badge {
+    background-color: #FF5722;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+
+  .text-muted {
+    color: #9E9E9E;
+    font-style: italic;
+  }
+
+  /* Dialog enhancements */
+  .promotion-dialog {
+    .p-dialog-content {
+      padding: 1.5rem;
+    }
+  }
+  /* Responsive Datatable */
+  @media screen and (max-width: 960px) {
+    .p-datatable {
+      .p-datatable-thead > tr > th,
+      .p-datatable-tfoot > tr > td {
+        display: none !important;
+      }
+
+      .p-datatable-tbody > tr {
+        border-bottom: 1px solid var(--surface-d);
+
+        > td {
+          text-align: left;
+          display: block;
+          border: 0 none !important;
+          width: 100% !important;
+          float: left;
+          clear: left;
+
+          .p-column-title {
+            padding: 0.4rem;
+            min-width: 30%;
+            display: inline-block;
+            margin: -0.4rem 1rem -0.4rem -0.4rem;
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* New Promotion Component Styles */
+.p-fluid {
+  .field {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #495057;
+
+      .required-indicator {
+        color: #f44336;
+        margin-left: 0.25rem;
+      }
+    }
+  }
+
+  .id-display {
+    background-color: #f5f5f5;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+
+  .date-range-section {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+
+    h3 {
+      margin-top: 0;
+      font-size: 1rem;
+      color: #495057;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .selected-categories {
+    margin-top: -1rem;
+
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .p-text-muted {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+  }
+
+  .category-item {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0;
+  }
+}
