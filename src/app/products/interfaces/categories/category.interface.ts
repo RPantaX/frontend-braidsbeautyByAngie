@@ -15,16 +15,7 @@ export interface CategoryResponse {
 export interface ResponseCategory {
   productCategoryId:       number;
   productCategoryName:     string;
-  responseSubCategoryList: ResponseSubCategory[];
   promotionDTOList:        PromotionDTO[];
-  productDTOList:          ProductDTO[];
-}
-
-export interface ProductDTO {
-  productId:          number;
-  productName:        string;
-  productDescription: string;
-  productImage:       string;
 }
 
 export interface PromotionDTO {
@@ -36,7 +27,17 @@ export interface PromotionDTO {
   promotionEndDate:      Date;
 }
 
-export interface ResponseSubCategory {
-  productCategoryId:   number;
+
+export interface CategoryResponsePageable {
+  responseCategoryList: ResponseCategory[];
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  totalElements: number;
+  end: boolean;
+}
+
+export interface CategoryRegister {
   productCategoryName: string;
+  promotionListId:     number[];
 }

@@ -31,8 +31,8 @@ export class PromotionService {
     return this.http.get<PromotionDTO>(`${this.baseUrl}/${promotionId}`);
   }
 
-  getAllPromotions(): Observable<PromotionWithCategories[]> {
-    return this.http.get<PromotionWithCategories[]>(`${this.baseUrl}/list`);
+  getAllPromotions(): Observable<PromotionDTO[]> {
+    return this.http.get<PromotionDTO[]>(`${this.baseUrl}/list`);
   }
 
   createPromotion(promotion: any): Observable<PromotionDTO> {

@@ -1,1 +1,84 @@
-<p>new-page works!</p>
+<form [formGroup]="entityForm" (ngSubmit)="onSubmit()">
+  <!-- Category ID (Read only) -->
+  <div class="field" *ngIf="categoryId">
+    <label>ID de Categoría: {{categoryId}}</label>
+  </div>
+
+  <!-- Category Name -->
+  <div class="field">
+    <label for="productCategoryName">Nombre de la Categoría</label>
+    <input
+      type="text"
+      pInputText
+      id="productCategoryName"
+      formControlName="productCategoryName"
+      required
+      autofocus
+    />
+    <small class="p-error" *ngIf="entityForm.get('productCategoryName')?.invalid && entityForm.get('productCategoryName')?.touched">
+      El nombre es requerido y debe tener un máximo de 100 caracteres.
+    </small>
+  </div>
+
+  <!-- Promotions Selection -->
+  <div class="field">
+    <label for="promotionListId">Promociones</label>
+    <p-multiSelect
+      [options]="promotions"
+      formControlName="promotionListId"
+      optionLabel="promotionName"
+      optionValue="promotionId"
+      [filter]="true"
+      filterBy="promotionName"
+      placeholder="Selecciona las promociones"
+      [style]="{'width':'100%'}"
+      [panelStyle]="{'width':'100%'}"
+      (onChange)="onPromotionChange($event)"
+    >
+      <ng-template let-promotion pTemplate="item">
+        <div class="promotion-item">
+          <span>{{promotion.promotionName}}</span>
+          <small class="discount-badge" *ngIf="promotion.promotionDiscountRate !== undefined">
+            {{(promotion.promotionDiscountRate * 100).toFixed(0)}}%
+          </small>
+        </div>
+      </ng-template>
+    </p-multiSelect>
+    <small class="p-text-muted">Selecciona las promociones que quieres asociar a esta categoría.</small>
+  </div>
+
+  <!-- Selected Promotions Display -->
+  <div class="field selected-promotions" *ngIf="selectedPromotions && selectedPromotions.length > 0">
+    <label>Promociones seleccionadas:</label>
+    <div class="promotion-chips">
+      <ng-container *ngFor="let promotionId of selectedPromotions; let i = index">
+        <ng-container *ngFor="let promotion of promotions">
+          <p-chip
+            *ngIf="promotion.promotionId === promotionId"
+            [label]="promotion.promotionName"
+            [styleClass]="'promotion-chip'"
+            [removable]="true"
+            (onRemove)="removePromotion(promotionId)"
+          ></p-chip>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <p-button
+      label="Cancelar"
+      icon="pi pi-times"
+      [text]="true"
+      (click)="onCancel()"
+    ></p-button>
+    <p-button
+      label="{{ isEditMode ? 'Editar' : 'Guardar' }}"
+      icon="pi pi-check"
+      [text]="true"
+      type="submit"
+      [loading]="isSubmitting"
+    ></p-button>
+  </div>
+</form>

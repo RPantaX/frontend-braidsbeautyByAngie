@@ -1,0 +1,101 @@
+form {
+  padding: 1rem 0;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #495057;
+  }
+}
+
+.selected-promotions {
+  margin-top: -0.5rem;
+
+  .promotion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.p-text-muted {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.promotion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  .discount-badge {
+    background-color: #FF5722;
+    color: white;
+    padding: 0.1rem 0.4rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+  }
+}
+
+:host ::ng-deep {
+  .p-chip {
+    &.promotion-chip {
+      background-color: #3F51B5;
+      color: #ffffff;
+      font-size: 0.85rem;
+      padding: 0.25rem 0.5rem;
+      transition: all 0.2s ease;
+
+      .p-chip-remove-icon {
+        margin-left: 0.5rem;
+      }
+    }
+  }
+
+  .p-multiselect {
+    width: 100%;
+
+    .p-multiselect-label {
+      padding: 0.75rem;
+    }
+
+    .p-multiselect-panel {
+      .p-multiselect-items {
+        padding: 0.5rem;
+
+        .p-multiselect-item {
+          padding: 0.75rem;
+          border-radius: 4px;
+          margin-bottom: 0.25rem;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #f5f5f5;
+          }
+
+          &.p-highlight {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+          }
+        }
+      }
+    }
+  }
+}
