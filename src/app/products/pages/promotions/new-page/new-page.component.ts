@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, OnDestroy, SimpleChanges, input, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { PromotionService } from '../../../services/promotion.service';
@@ -15,8 +15,8 @@ import { Subject } from 'rxjs';
 export class NewPromotionPageComponent implements OnInit, OnChanges, OnDestroy {
   @Output() closeDialog = new EventEmitter<void>();
   @Output() refreshEntities = new EventEmitter<void>();
-  @Input() entity: PromotionDTO | null = null;
-  @Input() promotionId: number = 0;
+  entity = input.required<PromotionDTO | null>();
+  promotionId = input.required<number>();
 
   isEditMode: boolean = false;
   isSubmitting: boolean = false;
@@ -27,11 +27,10 @@ export class NewPromotionPageComponent implements OnInit, OnChanges, OnDestroy {
   // Subject for cleaning up subscriptions
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private fb: FormBuilder,
-    private promotionService: PromotionService,
-    private messageService: MessageService
-  ) {
+  fb = inject(FormBuilder);
+  messageService = inject(MessageService);
+  promotionService = inject(PromotionService);
+  constructor() {
     // Initialize form with FormBuilder
     this.entityForm = this.initializeForm();
   }
@@ -133,7 +132,7 @@ export class NewPromotionPageComponent implements OnInit, OnChanges, OnDestroy {
     this.isSubmitting = true;
 
     if (this.isEditMode && this.promotionId) {
-      this.updatePromotion(this.promotionId, promotion);
+      this.updatePromotion(this.promotionId(), promotion);
     } else {
       this.createPromotion(promotion);
     }

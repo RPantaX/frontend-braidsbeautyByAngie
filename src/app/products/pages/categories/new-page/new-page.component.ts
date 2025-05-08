@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, OnDestroy, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { CategoryService } from '../../../services/category.service';
@@ -28,11 +28,10 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
 
   // Subject for cleaning up subscriptions
   private destroy$ = new Subject<void>();
-
+  fb = inject(FormBuilder);
+  messageService = inject(MessageService);
+  categoryService = inject(CategoryService);
   constructor(
-    private fb: FormBuilder,
-    private categoryService: CategoryService,
-    private messageService: MessageService
   ) {
     // Initialize form with FormBuilder
     this.entityForm = this.initializeForm();

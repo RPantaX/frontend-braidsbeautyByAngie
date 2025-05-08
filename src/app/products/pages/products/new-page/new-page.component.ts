@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output,  } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output,  } from '@angular/core';
 import { SaveProduct } from '../../../interfaces/product.interface';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ProductsService } from '../../../services/products.service';
@@ -31,10 +31,11 @@ export class NewPageComponent {
         category: new FormControl<CategoryOption>({ productCategoryId: 0, productCategoryName: ''}),
       });
 
+      entidadService = inject(ProductsService);
+      messageService = inject(MessageService);
+      categoryService = inject(CategoryService);
+
       constructor(
-        private entidadService : ProductsService,
-        private messageService: MessageService,
-        private categoryService : CategoryService
       ){}
 
       get currentEntity(): SaveProduct{

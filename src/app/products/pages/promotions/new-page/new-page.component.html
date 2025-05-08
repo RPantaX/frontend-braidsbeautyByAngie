@@ -1,7 +1,7 @@
 <form [formGroup]="entityForm" (ngSubmit)="onSubmit()">
   <!-- Promotion ID (Read only) -->
   <div class="field" *ngIf="promotionId">
-    <label>ID de Promoción: {{promotionId}}</label>
+    <label>ID de Promoción: {{promotionId()}}</label>
   </div>
 
   <!-- Promotion Name -->

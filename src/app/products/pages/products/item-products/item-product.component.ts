@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { ResponseProduct, ResponseProductItemDetail } from '../../../interfaces/product.interface';
 import { ItemProductService } from '../../../services/products/items-products.service';
 import { ProductsService } from '../../../services/products.service';
@@ -44,11 +44,14 @@ export class ItemProductComponent implements OnInit {
   public selectedItemProduct!: ItemProductSave;
 
   itemProductDialogDelete: boolean = false;
-  constructor(
-    private itemProductService : ItemProductService,
-    private productsService: ProductsService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService){}
+
+  itemProductService = inject(ItemProductService);
+  productsService = inject(ProductsService);
+  messageService = inject(MessageService);
+  confirmationService = inject(ConfirmationService);
+
+  constructor(){}
+
   openNew() {
   }
   openDialogDelete(){

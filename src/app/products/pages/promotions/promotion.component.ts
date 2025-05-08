@@ -1,5 +1,5 @@
 // promotion.component.ts - Main Component (Enhanced)
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { PromotionService } from '../../services/promotion.service';
 import { PromotionDTO, PromotionWithCategories } from '../../interfaces/promotions/promotion.interface';
@@ -16,12 +16,11 @@ export class PromotionComponent implements OnInit {
   selectedPromotion: PromotionDTO | null = null;
   isLoading: boolean = false;
 
-  constructor(
-    private promotionService: PromotionService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
-    private readonly _changeDetectorRef: ChangeDetectorRef,
-  ) {}
+  private promotionService = inject(PromotionService);
+  private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmationService);
+
+  constructor() {}
 
   ngOnInit(): void {
     // Initial operations if needed

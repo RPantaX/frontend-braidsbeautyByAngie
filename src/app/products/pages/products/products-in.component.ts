@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ProductsService } from '../../services/products.service';
 import { ResponsePageableProducts, SaveProduct } from '../../interfaces/product.interface';
 
@@ -10,7 +10,10 @@ import { ResponsePageableProducts, SaveProduct } from '../../interfaces/product.
 export class ProductInComponent implements OnInit {
   productDialog: boolean = false;
   products!: ResponsePageableProducts;
-  constructor(private productsService : ProductsService) { }
+
+  productsService = inject(ProductsService);
+
+  constructor() { }
 
   ngOnInit(): void {
     this.loadPageableProducts();

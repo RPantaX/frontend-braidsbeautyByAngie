@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -17,12 +17,13 @@ export class EditProductPageComponent implements OnInit{
   productDialogDelete: boolean = false;
   public selectedProduct!: SaveProduct;
 
+  productService = inject(ProductsService);
+  messageService = inject(MessageService);
+  confirmationService = inject(ConfirmationService);
+  router = inject(Router);
+  activatedRoute = inject(ActivatedRoute);
+
   constructor(
-    private productService : ProductsService,
-    private activatedRoute : ActivatedRoute,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
-    private router: Router
   ){}
 
   ngOnInit(): void {

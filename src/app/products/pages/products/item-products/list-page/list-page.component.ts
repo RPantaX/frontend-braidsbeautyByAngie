@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { ItemProductService } from '../../../../services/products/items-products.service';
@@ -73,12 +73,13 @@ export class ListItemProductPageComponent extends ItemProductList implements OnI
   exportColumns!: ExportColumn[];
   selectedProducts!: ResponseProductItemDetail[] | null;
 
+  confirmationService = inject(ConfirmationService);
+  itemProductService = inject(ItemProductService);
+  messageService = inject(MessageService);
+  _changeDetectorRef = inject(ChangeDetectorRef);
+  router = inject(Router);
+
   constructor(
-    private confirmationService: ConfirmationService,
-    private itemProductService: ItemProductService,
-    private messageService: MessageService,
-    private readonly _changeDetectorRef: ChangeDetectorRef,
-    private router: Router
   ) {
     super();
   }

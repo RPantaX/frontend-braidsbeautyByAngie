@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -71,7 +71,11 @@ export class PromotionListComponent implements OnInit, OnDestroy {
 
   // Add a field to store the subscription
   private refreshSubscription!: Subscription;
-  constructor(private promotionService: PromotionService, private datePipe: DatePipe) {}
+
+  promotionService = inject(PromotionService);
+  datePipe = inject(DatePipe);
+
+  constructor() {}
 
   ngOnInit() {
     this.initializeStatuses();

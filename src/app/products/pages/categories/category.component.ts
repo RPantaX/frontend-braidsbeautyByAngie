@@ -1,5 +1,5 @@
 // category.component.ts - Main Component
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CategoryService } from '../../services/category.service';
 import { PromotionService } from '../../services/promotion.service';
@@ -19,12 +19,13 @@ export class CategoryComponent implements OnInit {
   selectedCategory: ResponseCategory | null = null;
   isLoading: boolean = false;
 
+  categoryService = inject(CategoryService);
+  promotionService = inject(PromotionService);
+  messageService = inject(MessageService);
+  confirmationService = inject(ConfirmationService);
+  _changeDetectorRef = inject(ChangeDetectorRef);
+
   constructor(
-    private categoryService: CategoryService,
-    private promotionService: PromotionService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
-    private readonly _changeDetectorRef: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {

@@ -34,12 +34,13 @@ export class NewPageComponent {
     variationOptionValue: [''],
   });
 
+  entidadService = inject(ItemProductService);
+  variatonService = inject(VariationService);
+  messageService = inject(MessageService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+
   constructor(
-    private entidadService: ItemProductService,
-    private messageService: MessageService,
-    private variatonService: VariationService,
-    private route: ActivatedRoute,
-    private router: Router
   ) {}
 
   ngOnInit(): void {
