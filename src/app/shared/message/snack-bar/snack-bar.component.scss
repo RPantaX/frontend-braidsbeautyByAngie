@@ -1,0 +1,17 @@
+:host {
+    display: flex;
+    align-items: center;
+   
+    > mat-icon {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        font-size: 30px !important;
+    }
+}
+
+p {
+    margin: 0;
+    flex: 1;
+}

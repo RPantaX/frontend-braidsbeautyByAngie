@@ -1,0 +1,30 @@
+<ng-container [ngSwitch]="options.type">
+	<ng-container *ngSwitchCase="information">
+		<mat-icon>info</mat-icon>
+	</ng-container>
+	<ng-container *ngSwitchCase="warning">
+		<mat-icon>warning</mat-icon>
+	</ng-container>
+	<ng-container *ngSwitchCase="error">
+		<mat-icon>error</mat-icon>
+	</ng-container>
+	<ng-container *ngSwitchCase="success">
+		<mat-icon>check</mat-icon>
+	</ng-container>
+	<ng-container *ngSwitchCase="loading">
+		<mat-icon>check</mat-icon>
+	</ng-container>
+</ng-container>
+
+<p>{{ options.message }}</p>
+
+<button
+	*ngIf="options.buttonClosed"
+	mat-icon-button
+	cdkFocusInitial
+	type="button"
+	CD
+	aria-label="cerrar"
+	(click)="close()">
+	<mat-icon>close</mat-icon>
+</button>
