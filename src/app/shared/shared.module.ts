@@ -3,6 +3,8 @@ import { Error404PageComponent } from './pages/error404-page/error404-page.compo
 import { HomeComponent } from './pages/home/home.component';
 import { PrimeNgModule } from '../prime-ng/prime-ng.module';
 import { CommonModule } from '@angular/common';
+import { LanguageComponent } from './pages/home/components/language/language.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
@@ -15,7 +17,10 @@ import { CommonModule } from '@angular/common';
   ],
   imports:[
     PrimeNgModule,
-    CommonModule
+    CommonModule,
+    TranslateModule,
+
+    LanguageComponent
   ]
 })
 export class SharedModule { }

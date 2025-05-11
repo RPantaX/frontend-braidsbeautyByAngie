@@ -34,7 +34,7 @@
                           <path d="M18.8321 8.27235L22.2245 7.94938L19.9629 5.68861H17.7013L18.8321 8.27235Z" fill="var(--primary-color-text)" />
                           <path d="M11.4013 8.27235L8.00893 7.94938L10.2705 5.68861H12.5321L11.4013 8.27235Z" fill="var(--primary-color-text)" />
                       </svg>
-                      <span class="font-semibold text-2xl text-primary">BraidsByAngie Management</span>
+                      <span class="font-semibold text-2xl text-primary">{{"home.title" | translate}}</span>
                   </span>
                   <span>
                       <p-button type="button" (onClick)="closeCallback($event)" icon="pi pi-times" rounded="true" outlined="true" styleClass="h-2rem w-2rem"></p-button>
@@ -52,7 +52,7 @@
                               leaveActiveClass="slideup"
                               class="p-3 flex align-items-center justify-content-between text-600 cursor-pointer p-ripple"
                           >
-                              <span class="font-medium">Mantenimiento</span>
+                              <span class="font-medium">{{ "home.modules.managment" | translate }}</span>
                               <i class="pi pi-chevron-down"></i>
                           </div>
                           <ul class="list-none p-0 m-0 overflow-hidden">
@@ -60,13 +60,13 @@
                                   <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
                                       routerLink="/home">
                                       <i class="pi pi-home mr-2"></i>
-                                      <span class="font-medium">Home</span>
+                                      <span class="font-medium">{{ "home.modules.home" | translate }}</span>
                                   </a>
                               </li>
                               <li>
                                   <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                       <i class="pi pi-truck mr-2"></i>
-                                      <span class="font-medium">Despacho</span>
+                                      <span class="font-medium">{{ "home.modules.delivery" | translate }}</span>
                                   </a>
                               </li>
                               <li>
@@ -80,7 +80,7 @@
                                       class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
                                   >
                                       <i class="pi pi-shop mr-2"></i>
-                                      <span class="font-medium">Productos</span>
+                                      <span class="font-medium">{{ "home.modules.products.title" | translate }}</span>
                                       <i class="pi pi-chevron-down ml-auto"></i>
                                   </a>
                                   <ul class="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
@@ -88,14 +88,14 @@
                                       <li>
                                           <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                               <i class="pi pi-sort-numeric-up mr-2"></i>
-                                              <span class="font-medium">Gestion de Stock</span>
+                                              <span class="font-medium">{{ "home.modules.products.managment.stock" | translate }}</span>
                                           </a>
                                       </li>
                                       <li>
                                         <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
                                             routerLink="/products/manage/list">
                                             <i class="pi pi-shopping-bag mr-2"></i>
-                                            <span class="font-medium">Gestion de Productos</span>
+                                            <span class="font-medium">{{ "home.modules.products.managment.products" | translate }}</span>
 
                                         </a>
                                     </li>
@@ -103,7 +103,7 @@
                                       <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
                                           routerLink="/products/promotions">
                                           <i class="pi pi-shopping-bag mr-2"></i>
-                                          <span class="font-medium">Gestion de Promociones</span>
+                                          <span class="font-medium">{{ "home.modules.products.managment.promotions" | translate }}</span>
 
                                       </a>
                                   </li>
@@ -111,7 +111,7 @@
                                     <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
                                         routerLink="/products/categories">
                                         <i class="pi pi-shopping-bag mr-2"></i>
-                                        <span class="font-medium">Gestion de Categorias</span>
+                                        <span class="font-medium">{{ "home.modules.products.managment.categories" | translate }}</span>
 
                                     </a>
                                 </li>
@@ -129,7 +129,7 @@
                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
                                 >
                                     <i class="pi pi-palette mr-2"></i>
-                                    <span class="font-medium">Peluqueria</span>
+                                    <span class="font-medium">{{ "home.modules.HairSalon.title" | translate }}</span>
                                     <i class="pi pi-chevron-down ml-auto"></i>
                                 </a>
                                 <ul class="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
@@ -137,13 +137,13 @@
                                     <li>
                                         <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                             <i class="pi pi-pencil mr-2"></i>
-                                            <span class="font-medium">Gestion de Servicios</span>
+                                            <span class="font-medium">{{ "home.modules.HairSalon.managment.services" | translate }}</span>
                                         </a>
                                     </li>
                                     <li>
                                       <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                           <i class="pi pi-calendar mr-2"></i>
-                                          <span class="font-medium">Gestion de Citas</span>
+                                          <span class="font-medium">{{ "home.modules.HairSalon.managment.appointments" | translate }}</span>
                                       </a>
                                   </li>
                                 </ul>
@@ -151,13 +151,13 @@
                             <li>
                               <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                   <i class="pi pi-receipt mr-2"></i>
-                                  <span class="font-medium">Ordenes</span>
+                                  <span class="font-medium">{{ "home.modules.orders.title" | translate }}</span>
                               </a>
                             </li>
                             <li>
                                   <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                       <i class="pi pi-cog mr-2"></i>
-                                      <span class="font-medium">Settings</span>
+                                      <span class="font-medium">{{ "home.modules.settings" | translate }}</span>
                                   </a>
                             </li>
                           </ul>
@@ -174,20 +174,20 @@
                               leaveActiveClass="slideup"
                               class="p-3 flex align-items-center justify-content-between text-600 cursor-pointer p-ripple"
                           >
-                              <span class="font-medium">Ventas</span>
+                              <span class="font-medium">{{ "home.modules.sales.title" | translate }}</span>
                               <i class="pi pi-chevron-down"></i>
                           </div>
                           <ul class="list-none p-0 m-0 overflow-hidden">
                               <li>
                                   <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                       <i class="pi pi-cart-minus mr-2"></i>
-                                      <span class="font-medium">Productos</span>
+                                      <span class="font-medium">{{ "home.modules.sales.managment.products" | translate }}</span>
                                   </a>
                               </li>
                               <li>
                                   <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                       <i class="pi pi-calendar mr-2"></i>
-                                      <span class="font-medium">Reserva de Servicios</span>
+                                      <span class="font-medium">{{ "home.modules.sales.managment.services" | translate }}</span>
                                   </a>
                               </li>
                           </ul>
@@ -204,7 +204,7 @@
                             leaveActiveClass="slideup"
                             class="p-3 flex align-items-center justify-content-between text-600 cursor-pointer p-ripple"
                         >
-                            <span class="font-medium">Administrador</span>
+                            <span class="font-medium">{{ "home.modules.administrator" | translate }}</span>
                             <i class="pi pi-chevron-down"></i>
                         </div>
                         <ul class="list-none p-0 m-0 overflow-hidden">
@@ -212,13 +212,13 @@
                                 <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
                                     routerLink="/users">
                                     <i class="pi pi-user mr-2"></i>
-                                    <span class="font-medium">Gestion de Usuarios</span>
+                                    <span class="font-medium">{{ "home.modules.users.managment" | translate }}</span>
                                 </a>
                             </li>
                             <li>
                                 <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                     <i class="pi pi-cog mr-2"></i>
-                                    <span class="font-medium">Settings</span>
+                                    <span class="font-medium">{{ "home.modules.settings" | translate }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -229,7 +229,7 @@
                   <hr class="mb-3 mx-3 border-top-1 border-none surface-border" />
                   <a pRipple class="m-3 flex align-items-center cursor-pointer p-3 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                       <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
-                      <span class="font-bold">Amy Elsner</span>
+                      <span class="font-bold">{{ "home.modules.users.userLogged" | translate : {user: "Usuario de prueba"} }}</span>
                   </a>
               </div>
           </div>
@@ -240,7 +240,10 @@
   </div>
 
   <div class="flex align-items-center justify-content-center w-8rem h-6rem">
-      <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
+    <div class=" p-1 m-1">
+      <app-language-selector></app-language-selector>
+    </div>
+      <p-avatar class=" p-2 m-2" image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
   </div>
 
 </div>

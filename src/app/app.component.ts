@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { TranslationService } from '../@core/services/translation.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'braidsbeautyByAngieManagementApp';
+  _translateService = inject(TranslationService);
+  constructor() {
+    this._translateService.changeLang('en');
+  }
 }

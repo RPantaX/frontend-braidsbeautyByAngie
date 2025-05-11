@@ -1,0 +1,55 @@
+{
+  "welcomeMessage": "Benvenuto, {{ firstName }}! Come stai oggi?",
+  "changeLanguage": "lingua",
+  "changeLanguageTo": "Cambia lingua in {{ language }}",
+  "home": {
+    "title": "Gestione BraidsByAngie",
+    "description": "Questa è la pagina iniziale",
+    "modules": {
+      "title": "Moduli",
+      "description": "Questa è la pagina dei moduli",
+      "managment": "Gestione",
+      "home": "Home",
+      "delivery": "Consegna",
+      "products": {
+        "title": "Prodotti",
+        "managment": {
+          "stock": "Gestione stock",
+          "products": "Gestione prodotti",
+          "categories": "Gestione categorie",
+          "promotions": "Gestione promozioni"
+        }
+      },
+      "HairSalon": {
+        "title": "Salone di Bellezza",
+        "description": "Questa è la pagina del salone",
+        "managment": {
+          "services": "Gestione servizi",
+          "appointments": "Gestione appuntamenti"
+        }
+      },
+      "orders": {
+        "title": "Ordini"
+      },
+      "settings": "Impostazioni",
+      "users": {
+        "title": "Utenti",
+        "managment": "Gestione utenti",
+        "userLogged": "{{ user }}"
+      },
+      "administrator": "Amministratore",
+      "sales": {
+        "title": "Vendite",
+        "managment": {
+          "products": "Gestione prodotti",
+          "services": "Gestione servizi"
+        }
+      }
+    }
+  },
+  "errors": {
+    "notFound": "Pagina non trovata",
+    "serverError": "Errore del server",
+    "unauthorized": "Non autorizzato"
+  }
+}

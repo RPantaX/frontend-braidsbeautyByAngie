@@ -1,0 +1,55 @@
+{
+  "welcomeMessage": "Welcome, {{ firstName }}! How are you today?",
+  "changeLanguage": "language",
+  "changeLanguageTo": "Change language to {{ language }}",
+  "home": {
+    "title": "BraidsByAngie Management",
+    "description": "This is the home page",
+    "modules": {
+      "title": "Modules",
+      "description": "This is the modules page",
+      "managment": "Management",
+      "home": "Home",
+      "delivery": "Delivery",
+      "products": {
+        "title": "Products",
+        "managment":{
+            "stock": "Stock managment",
+            "products": "Products managment",
+            "categories": "Categories managment",
+            "promotions": "Promotions managment"
+          }
+      },
+      "HairSalon": {
+        "title": "Hair Salon",
+        "description": "This is the hair salon page",
+        "managment": {
+          "services": "Services managment",
+          "appointments": "Appointments managment"
+        }
+      },
+      "orders": {
+        "title": "Orders"
+      },
+      "settings": "Settings",
+      "users": {
+        "title": "Users",
+        "managment": "Users managment",
+        "userLogged": "{{ user }}"
+      },
+      "administrator": "Administrator",
+      "sales":{
+        "title": "Sales",
+        "managment": {
+          "products": "Products managment",
+          "services": "Services managment"
+        }
+      }
+    }
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "serverError": "Server error",
+    "unauthorized": "Unauthorized"
+  }
+}
