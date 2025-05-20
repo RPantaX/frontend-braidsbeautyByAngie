@@ -20,12 +20,22 @@
           "promotions": "Gestão de promoções"
         }
       },
+      "reservations": {
+  "title": "Reservas",
+  "managment": {
+    "categories": "Gerenciamento de categorias",
+    "promotions": "Gerenciamento de promoções"
+  }
+},
+
       "HairSalon": {
         "title": "Salão de Beleza",
         "description": "Esta é a página do salão",
         "managment": {
           "services": "Gestão de serviços",
-          "appointments": "Gestão de agendamentos"
+          "appointments": "Gestão de agendamentos",
+              "categories": "Gerenciamento de categorias",
+    "promotions": "Gerenciamento de promoções"
         }
       },
       "orders": {

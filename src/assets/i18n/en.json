@@ -20,12 +20,21 @@
             "promotions": "Promotions managment"
           }
       },
+      "reservations": {
+        "title": "Reservations",
+        "managment": {
+          "categories": "Categories managment",
+          "promotions": "Promotions managment"
+        }
+      },
       "HairSalon": {
         "title": "Hair Salon",
         "description": "This is the hair salon page",
         "managment": {
           "services": "Services managment",
-          "appointments": "Appointments managment"
+          "appointments": "Appointments managment",
+                    "categories": "Categories managment",
+          "promotions": "Promotions managment"
         }
       },
       "orders": {

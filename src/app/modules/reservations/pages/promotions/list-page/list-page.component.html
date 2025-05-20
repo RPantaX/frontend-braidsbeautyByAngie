@@ -1,0 +1,224 @@
+<div class="card promotion-list-container">
+  <p-table
+    #dt
+    [value]="promotions"
+    dataKey="promotionDTO.promotionId"
+    [rows]="rows"
+    [rowsPerPageOptions]="[5, 10, 25, 50]"
+    [loading]="loading"
+    [paginator]="true"
+    [lazy]="true"
+    (onLazyLoad)="loadPromotions($event)"
+    [totalRecords]="totalRecords"
+    [globalFilterFields]="['promotionDTO.promotionName', 'promotionDTO.promotionDescription']"
+    [tableStyle]="{'min-width': '75rem'}"
+    styleClass="p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="table-header-container">
+        <p-button
+          label="Limpiar Filtros"
+          icon="pi pi-filter-slash"
+          styleClass="p-button-outlined p-button-secondary"
+          (click)="clear(dt)"
+        />
+
+        <p-iconField iconPosition="left" styleClass="global-search">
+          <p-inputIcon>
+            <i class="pi pi-search"></i>
+          </p-inputIcon>
+          <input
+            pInputText
+            type="text"
+            [(ngModel)]="searchValue"
+            (input)="onGlobalSearch(dt, $event)"
+            placeholder="Buscar promociones..."
+            class="search-input"
+          />
+        </p-iconField>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <!-- ID Column -->
+        <th pSortableColumn="promotionDTO.promotionId" style="min-width:5rem; width: 8%">
+          <div class="header-cell">
+            ID
+            <p-sortIcon field="promotionDTO.promotionId"></p-sortIcon>
+          </div>
+        </th>
+
+        <!-- Name Column -->
+        <th pSortableColumn="promotionDTO.promotionName" style="min-width:15rem; width: 20%">
+          <div class="header-cell">
+            Nombre
+            <p-sortIcon field="promotionDTO.promotionName"></p-sortIcon>
+            <p-columnFilter type="text" field="promotionDTO.promotionName" display="menu" />
+          </div>
+        </th>
+
+        <!-- Description Column -->
+        <th pSortableColumn="promotionDTO.promotionDescription" style="min-width:15rem; width: 22%">
+          <div class="header-cell">
+            Descripción
+            <p-sortIcon field="promotionDTO.promotionDescription"></p-sortIcon>
+            <p-columnFilter type="text" field="promotionDTO.promotionDescription" display="menu" />
+          </div>
+        </th>
+
+        <!-- Discount Column -->
+        <th pSortableColumn="promotionDTO.promotionDiscountRate" style="min-width:8rem; width: 10%">
+          <div class="header-cell">
+            Descuento
+            <p-sortIcon field="promotionDTO.promotionDiscountRate"></p-sortIcon>
+          </div>
+        </th>
+
+        <!-- Start Date Column -->
+        <th pSortableColumn="promotionDTO.promotionStartDate" style="min-width:10rem; width: 12%">
+          <div class="header-cell">
+            Fecha Inicio
+            <p-sortIcon field="promotionDTO.promotionStartDate"></p-sortIcon>
+            <p-columnFilter type="date" field="promotionDTO.promotionStartDate" display="menu" />
+          </div>
+        </th>
+
+        <!-- End Date Column -->
+        <th pSortableColumn="promotionDTO.promotionEndDate" style="min-width:10rem; width: 12%">
+          <div class="header-cell">
+            Fecha Fin
+            <p-sortIcon field="promotionDTO.promotionEndDate"></p-sortIcon>
+            <p-columnFilter type="date" field="promotionDTO.promotionEndDate" display="menu" />
+          </div>
+        </th>
+
+        <!-- Categories Column -->
+        <th style="min-width:15rem; width: 16%">
+          <div class="header-cell text-center">
+            Categorías
+          </div>
+        </th>
+
+        <!-- Actions Column -->
+        <th style="min-width:8rem; width: 10%">
+          <div class="header-cell text-center">
+            Acciones
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-promotion>
+      <tr>
+        <!-- ID -->
+        <td>
+          <span class="p-column-title">ID</span>
+          {{promotion.promotionDTO.promotionId}}
+        </td>
+
+        <!-- Name -->
+        <td>
+          <span class="p-column-title">Nombre</span>
+          <div class="promotion-name">{{promotion.promotionDTO.promotionName}}</div>
+        </td>
+
+        <!-- Description -->
+        <td>
+          <span class="p-column-title">Descripción</span>
+          <div class="promotion-description text-truncate" [pTooltip]="promotion.promotionDTO.promotionDescription" *ngIf="promotion.promotionDTO.promotionDescription">
+            {{promotion.promotionDTO.promotionDescription}}
+          </div>
+          <span class="text-muted" *ngIf="!promotion.promotionDTO.promotionDescription">Sin descripción</span>
+        </td>
+
+        <!-- Discount -->
+        <td>
+          <span class="p-column-title">Descuento</span>
+          <span class="discount-badge">{{formatDiscount(promotion.promotionDTO.promotionDiscountRate)}}</span>
+        </td>
+
+        <!-- Start Date -->
+        <td>
+          <span class="p-column-title">Fecha Inicio</span>
+          {{formatDate(promotion.promotionDTO.promotionStartDate)}}
+        </td>
+
+        <!-- End Date -->
+        <td>
+          <span class="p-column-title">Fecha Fin</span>
+          {{formatDate(promotion.promotionDTO.promotionEndDate)}}
+        </td>
+
+        <!-- Categories -->
+        <td>
+          <span class="p-column-title">Categorías</span>
+          <div class="categories-container">
+            <ng-container *ngIf="promotion.categoryDTOList && promotion.categoryDTOList.length > 0; else noCategories">
+              <ng-container *ngFor="let category of promotion.categoryDTOList.slice(0, 3); let i = index">
+                <p-chip
+                  [label]="category.categoryName"
+                  [styleClass]="'category-chip ' + getCategoryChipColor(i)"
+                ></p-chip>
+              </ng-container>
+              <p-chip
+                *ngIf="promotion.categoryDTOList.length > 3"
+                [label]="'+' + (promotion.categoryDTOList.length - 3)"
+                styleClass="more-categories"
+                [pTooltip]="getRemainingCategoryNames(promotion.categoryDTOList)"
+                tooltipPosition="top"
+              ></p-chip>
+            </ng-container>
+            <ng-template #noCategories>
+              <span class="text-muted">Sin categorías</span>
+            </ng-template>
+          </div>
+        </td>
+
+        <!-- Actions -->
+        <td>
+          <span class="p-column-title">Acciones</span>
+          <div class="action-buttons">
+            <button
+              pButton
+              pRipple
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-success p-button-text"
+              (click)="editPromotion(promotion.promotionDTO)"
+              pTooltip="Editar promoción"
+              tooltipPosition="top"
+            ></button>
+            <button
+              pButton
+              pRipple
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-danger p-button-text"
+              (click)="deletePromotion(promotion.promotionDTO)"
+              pTooltip="Eliminar promoción"
+              tooltipPosition="top"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8">
+          <div class="empty-message">
+            <i class="pi pi-exclamation-circle empty-icon"></i>
+            <p>No se encontraron promociones.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="loadingbody">
+      <tr>
+        <td colspan="8">
+          <div class="loading-message">Cargando datos de promociones...</div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

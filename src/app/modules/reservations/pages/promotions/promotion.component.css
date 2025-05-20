@@ -1,0 +1,53 @@
+.promotion-container {
+  padding: 1rem;
+}
+
+.promotion-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: black;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.promotion-details {
+  flex: 1;
+}
+
+.promotion-details h2 {
+  margin-top: 0;
+  color: #495057;
+}
+
+.category-chips {
+  margin-top: 1rem;
+}
+
+.promotion-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  .promotion-header {
+    flex-direction: row;
+  }
+
+  .promotion-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0;
+  }
+}
+
+.center-line {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid #e9ecef;
+}

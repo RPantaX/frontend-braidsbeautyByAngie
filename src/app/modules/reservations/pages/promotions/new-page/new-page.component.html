@@ -1,0 +1,89 @@
+<form [formGroup]="entityForm" (ngSubmit)="onSubmit()">
+  <!-- Promotion ID (Read only) -->
+  <div class="field" *ngIf="promotionId">
+    <label>ID de Promoción: {{promotionId()}}</label>
+  </div>
+
+  <!-- Promotion Name -->
+  <div class="field">
+    <label for="promotionName">Nombre de la Promoción</label>
+    <input
+      type="text"
+      pInputText
+      id="promotionName"
+      formControlName="promotionName"
+      required
+      autofocus
+    />
+    <small class="p-error" *ngIf="entityForm.get('promotionName')?.invalid && entityForm.get('promotionName')?.touched">
+      El nombre es requerido y debe tener un máximo de 100 caracteres.
+    </small>
+  </div>
+
+  <!-- Promotion Description -->
+  <div class="field">
+    <label for="promotionDescription">Descripción de la Promoción</label>
+    <input
+      type="text"
+      pInputText
+      id="promotionDescription"
+      formControlName="promotionDescription"
+    />
+  </div>
+
+  <!-- Discount Rate -->
+  <div class="field">
+    <label for="promotionDiscountRate">Tasa de Descuento (0-1)</label>
+    <input
+      type="number"
+      pInputText
+      id="promotionDiscountRate"
+      formControlName="promotionDiscountRate"
+      required
+      min="0"
+      max="1"
+      step="0.01"
+    />
+    <small class="p-error" *ngIf="entityForm.get('promotionDiscountRate')?.invalid && entityForm.get('promotionDiscountRate')?.touched">
+      La tasa de descuento es requerida y debe estar entre 0 y 1.
+    </small>
+  </div>
+
+  <!-- Start Date -->
+  <div class="field">
+    <label for="promotionStartDate">Fecha de Inicio</label>
+    <p-calendar
+      id="promotionStartDate"
+      formControlName="promotionStartDate"
+      [showIcon]="true"
+      dateFormat="dd/mm/yy"
+    ></p-calendar>
+  </div>
+
+  <!-- End Date -->
+  <div class="field">
+    <label for="promotionEndDate">Fecha de Fin</label>
+    <p-calendar
+      id="promotionEndDate"
+      formControlName="promotionEndDate"
+      [showIcon]="true"
+      dateFormat="dd/mm/yy"
+    ></p-calendar>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <p-button
+      label="Cancelar"
+      icon="pi pi-times"
+      [text]="true"
+      (click)="onCancel()"
+    ></p-button>
+    <p-button
+      label="{{ isEditMode ? 'Editar' : 'Guardar' }}"
+      icon="pi pi-check"
+      [text]="true"
+      type="submit"
+    ></p-button>
+  </div>
+</form>

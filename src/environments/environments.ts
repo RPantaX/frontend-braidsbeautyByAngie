@@ -1,5 +1,5 @@
 
 export const environment =
 {
-  baseUrl: 'http://localhost:8080/v1/product-service'
+  baseUrl: 'http://localhost:8080/v1'
 }

@@ -21,12 +21,16 @@ const routes: Routes = [
     },
     {
       path: 'products',
-      loadChildren: ()=> import('./products/products.module').then(m=>m.ProductsModule),
+      loadChildren: ()=> import('./modules/products/products.module').then(m=>m.ProductsModule),
+    },
+    {
+      path: 'reservations',
+      loadChildren: ()=> import('./modules/reservations/reservations.module').then(m=>m.ReservationsModule),
     },
     {
       path: 'itemProduct',
       loadChildren: () =>
-        import('./products/pages/products/item-products/item-product.module').then(
+        import('./modules/products/pages/products/item-products/item-product.module').then(
           (m) => m.ItemProductModule
         ),
     },

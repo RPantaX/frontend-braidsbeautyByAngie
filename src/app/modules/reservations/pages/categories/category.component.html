@@ -1,0 +1,45 @@
+<div class="category-container">
+  <!-- Header Section with Actions -->
+  <div class="category-header p-card">
+    <div class="p-d-flex p-jc-between p-ai-center">
+      <h1 class="category-title">Gestión de Categorías</h1>
+      <p-button
+        label="Nueva Categoría"
+        icon="pi pi-plus"
+        styleClass="p-button-success"
+        (click)="openNewCategoryDialog()">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- List Component -->
+  <app-category-list-page
+    [loading]="isLoading"
+    [promotions]="promotions"
+    (deleteCategory)="confirmDeleteCategory($event)"
+    (selectedCategory)="openEditCategoryDialog($event)"
+    (refresh)="refreshCategories()">
+  </app-category-list-page>
+
+  <!-- Dialog for Creating/Editing -->
+  <p-dialog
+    [(visible)]="categoryDialog"
+    [style]="{ width: '600px', height: '600px' }"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [header]="selectedCategory ? 'Editar Categoría' : 'Nueva Categoría'"
+    styleClass="p-fluid category-dialog">
+
+    <app-new-category-page
+      [entity]="selectedCategory"
+      [categoryId]="selectedCategory?.productCategoryId || 0"
+      [promotions]="promotions"
+      (closeDialog)="hideCategoryDialog()"
+      (refreshEntities)="refreshCategories()">
+    </app-new-category-page>
+  </p-dialog>
+
+  <!-- Confirmation Dialog for Delete Actions -->
+  <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+</div>

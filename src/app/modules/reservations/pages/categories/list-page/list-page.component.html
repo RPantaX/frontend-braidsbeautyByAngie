@@ -1,0 +1,162 @@
+<div class="card category-list-container">
+  <p-table
+    #dt
+    [value]="categories"
+    dataKey="productCategoryId"
+    [rows]="rows"
+    [rowsPerPageOptions]="[5, 10, 25, 50]"
+    [loading]="loading"
+    [paginator]="true"
+    [lazy]="true"
+    (onLazyLoad)="loadCategories($event)"
+    [totalRecords]="totalRecords"
+    [globalFilterFields]="['productCategoryName']"
+    [tableStyle]="{'min-width': '75rem'}"
+    styleClass="p-datatable-gridlines"
+  >
+    <ng-template pTemplate="caption">
+      <div class="table-header-container">
+        <p-button
+          label="Limpiar Filtros"
+          icon="pi pi-filter-slash"
+          styleClass="p-button-outlined p-button-secondary"
+          (click)="clear(dt)"
+        />
+
+        <p-iconField iconPosition="left" styleClass="global-search">
+          <p-inputIcon>
+            <i class="pi pi-search"></i>
+          </p-inputIcon>
+          <input
+            pInputText
+            type="text"
+            [(ngModel)]="searchValue"
+            (input)="onGlobalSearch(dt, $event)"
+            placeholder="Buscar categorías..."
+            class="search-input"
+          />
+        </p-iconField>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <!-- ID Column -->
+        <th pSortableColumn="productCategoryId" style="min-width:5rem; width: 10%">
+          <div class="header-cell">
+            ID
+            <p-sortIcon field="productCategoryId"></p-sortIcon>
+          </div>
+        </th>
+
+        <!-- Name Column -->
+        <th pSortableColumn="productCategoryName" style="min-width:15rem; width: 30%">
+          <div class="header-cell">
+            Nombre
+            <p-sortIcon field="productCategoryName"></p-sortIcon>
+            <p-columnFilter type="text" field="productCategoryName" display="menu" />
+          </div>
+        </th>
+
+        <!-- Promotions Column -->
+        <th style="min-width:15rem; width: 50%">
+          <div class="header-cell text-center">
+            Promociones
+          </div>
+        </th>
+
+        <!-- Actions Column -->
+        <th style="min-width:8rem; width: 10%">
+          <div class="header-cell text-center">
+            Acciones
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-category>
+      <tr>
+        <!-- ID -->
+        <td>
+          <span class="p-column-title">ID</span>
+          {{category.productCategoryId}}
+        </td>
+
+        <!-- Name -->
+        <td>
+          <span class="p-column-title">Nombre</span>
+          <div class="category-name">{{category.productCategoryName}}</div>
+        </td>
+
+        <!-- Promotions -->
+        <td>
+          <span class="p-column-title">Promociones</span>
+          <div class="promotions-container">
+            <ng-container *ngIf="category.promotionDTOList && category.promotionDTOList.length > 0; else noPromotions">
+              <ng-container *ngFor="let promotion of category.promotionDTOList.slice(0, 3); let i = index">
+                <p-chip
+                  [label]="promotion.promotionName"
+                  [styleClass]="'promotion-chip ' + getPromotionChipColor(i)"
+                ></p-chip>
+              </ng-container>
+              <p-chip
+                *ngIf="category.promotionDTOList.length > 3"
+                [label]="'+' + (category.promotionDTOList.length - 3)"
+                styleClass="more-promotions"
+                [pTooltip]="getRemainingPromotionNames(category.promotionDTOList)"
+                tooltipPosition="top"
+              ></p-chip>
+            </ng-container>
+            <ng-template #noPromotions>
+              <span class="text-muted">Sin promociones</span>
+            </ng-template>
+          </div>
+        </td>
+
+        <!-- Actions -->
+        <td>
+          <span class="p-column-title">Acciones</span>
+          <div class="action-buttons">
+            <button
+              pButton
+              pRipple
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-success p-button-text"
+              (click)="editCategory(category)"
+              pTooltip="Editar categoría"
+              tooltipPosition="top"
+            ></button>
+            <button
+              pButton
+              pRipple
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-danger p-button-text"
+              (click)="deleteSelectedCategory(category)"
+              pTooltip="Eliminar categoría"
+              tooltipPosition="top"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4">
+          <div class="empty-message">
+            <i class="pi pi-exclamation-circle empty-icon"></i>
+            <p>No se encontraron categorías.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="loadingbody">
+      <tr>
+        <td colspan="4">
+          <div class="loading-message">Cargando datos de categorías...</div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -20,12 +20,22 @@
           "promotions": "Gestion des promotions"
         }
       },
+      "reservations": {
+  "title": "Réservations",
+  "managment": {
+    "categories": "Gestion des catégories",
+    "promotions": "Gestion des promotions"
+  }
+},
+
       "HairSalon": {
         "title": "Salon de Coiffure",
         "description": "Ceci est la page du salon de coiffure",
         "managment": {
           "services": "Gestion des services",
-          "appointments": "Gestion des rendez-vous"
+          "appointments": "Gestion des rendez-vous",
+              "categories": "Gestion des catégories",
+    "promotions": "Gestion des promotions"
         }
       },
       "orders": {
