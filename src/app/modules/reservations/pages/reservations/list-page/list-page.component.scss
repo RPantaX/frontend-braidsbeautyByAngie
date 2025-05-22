@@ -1,0 +1,282 @@
+:host ::ng-deep .p-toolbar {
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+:host ::ng-deep .p-paginator {
+  padding: 1rem;
+}
+
+:host ::ng-deep .p-datatable.p-datatable-customers .p-datatable-header {
+  padding: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+:host ::ng-deep .p-datatable.p-datatable-customers .p-paginator {
+  padding: 1rem;
+}
+
+:host ::ng-deep .p-datatable.p-datatable-customers .p-datatable-thead > tr > th {
+  text-align: left;
+}
+
+:host ::ng-deep .p-datatable.p-datatable-customers .p-dropdown-label:not(.p-placeholder) {
+  text-transform: uppercase;
+}
+
+:host ::ng-deep .p-datatable-customers .p-datatable-tbody > tr > td .p-column-title {
+  display: none;
+}
+
+.p-button.p-button-help {
+  background-color: #7b64c3;
+  border-color: #7b64c3;
+}
+
+/* Estilos para pantallas pequeñas */
+@media screen and (max-width: 960px) {
+  :host ::ng-deep .p-datatable.p-datatable-customers .p-datatable-thead > tr > th,
+  :host ::ng-deep .p-datatable.p-datatable-customers .p-datatable-tfoot > tr > td {
+      display: none !important;
+  }
+
+  :host ::ng-deep .p-datatable.p-datatable-customers .p-datatable-tbody > tr {
+      border-bottom: 1px solid var(--surface-d);
+  }
+
+  :host ::ng-deep .p-datatable.p-datatable-customers .p-datatable-tbody > tr > td {
+      text-align: left;
+      display: block;
+      border: 0 none !important;
+      width: 100% !important;
+      float: left;
+      clear: left;
+      border: 0 none;
+  }
+
+  :host ::ng-deep .p-datatable.p-datatable-customers .p-datatable-tbody > tr > td .p-column-title {
+      padding: 0.4rem;
+      min-width: 30%;
+      display: inline-block;
+      margin: -0.4rem 1rem -0.4rem -0.4rem;
+      font-weight: bold;
+  }
+
+  :host ::ng-deep .p-datatable.p-datatable-customers .p-datatable-tbody > tr > td .p-progressbar {
+      margin-top: 0.5rem;
+  }
+}
+:host {
+  display: block;
+
+  ::ng-deep {
+    .p-dialog {
+      .service-image {
+        width: 150px;
+        margin: 0 auto 2rem auto;
+        display: block;
+      }
+    }
+
+    // Mejores estilos para la tabla
+    .p-table {
+      .p-table-header {
+        background: var(--surface-section);
+        border: 1px solid var(--surface-border);
+      }
+
+      .p-table-thead > tr > th {
+        background: var(--surface-section);
+        color: var(--text-color);
+        border: 1px solid var(--surface-border);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+      }
+
+      .p-table-tbody > tr {
+        transition: all 0.2s;
+
+        &:hover {
+          background: var(--highlight-bg);
+        }
+
+        > td {
+          border: 1px solid var(--surface-border);
+          padding: 1rem;
+          vertical-align: middle;
+        }
+      }
+    }
+
+    // Estilos para botones en la tabla
+    .p-button {
+      &.p-button-rounded {
+        width: 2.5rem;
+        height: 2.5rem;
+
+        .p-button-icon {
+          font-size: 1rem;
+        }
+      }
+    }
+
+    // Estilos para el diálogo
+    .p-dialog {
+      .p-dialog-header {
+        background: var(--surface-section);
+        border-bottom: 1px solid var(--surface-border);
+      }
+
+      .p-dialog-content {
+        padding: 2rem;
+      }
+
+      .p-dialog-footer {
+        background: var(--surface-section);
+        border-top: 1px solid var(--surface-border);
+        padding: 1rem 2rem;
+
+        .p-button {
+          margin-left: 0.5rem;
+        }
+      }
+    }
+
+    // Estilos para formularios
+    .p-field {
+      margin-bottom: 1.5rem;
+    }
+
+    .p-inputtext,
+    .p-inputtextarea,
+    .p-dropdown,
+    .p-inputnumber-input {
+      width: 100%;
+    }
+
+    // Estilos para validación
+    .p-invalid {
+      border-color: var(--red-500) !important;
+    }
+
+    .field-error {
+      color: var(--red-500);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    // Estilos para loading
+    .p-table-loading-overlay {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    // Estilos para tags
+    .p-tag {
+      &.p-tag-info {
+        background: var(--blue-100);
+        color: var(--blue-900);
+      }
+    }
+
+    // Estilos para toolbar
+    .p-toolbar {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      padding: 1rem;
+      border-radius: 6px;
+
+      .p-toolbar-group-start,
+      .p-toolbar-group-end {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
+
+    // Responsive adjustments
+    @media screen and (max-width: 768px) {
+      .p-table {
+        font-size: 0.875rem;
+
+        .p-table-thead > tr > th,
+        .p-table-tbody > tr > td {
+          padding: 0.75rem 0.5rem;
+        }
+      }
+
+      .p-dialog {
+        width: 95vw !important;
+        margin: 1rem;
+
+        .p-dialog-content {
+          padding: 1rem;
+        }
+      }
+
+      .grid {
+        &.grid-cols-12 {
+          .col-span-6 {
+            grid-column: span 12;
+          }
+        }
+      }
+    }
+
+    // Animation for row selection
+    .p-table-tbody > tr.p-highlight {
+      background: var(--primary-50) !important;
+      color: var(--primary-900);
+      animation: highlight 0.3s ease-in-out;
+    }
+
+    @keyframes highlight {
+      0% {
+        background: var(--primary-100);
+      }
+      100% {
+        background: var(--primary-50);
+      }
+    }
+
+    // Custom scrollbar for table
+    .p-table-scrollable-body {
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--surface-ground);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--surface-border);
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: var(--surface-hover);
+      }
+    }
+  }
+}
+
+// Dark theme adjustments
+:host-context(.dark) {
+  ::ng-deep {
+    .p-table-thead > tr > th {
+      background: var(--surface-800);
+    }
+
+    .p-toolbar {
+      background: var(--surface-800);
+    }
+
+    .p-dialog-header,
+    .p-dialog-footer {
+      background: var(--surface-800);
+    }
+  }
+}

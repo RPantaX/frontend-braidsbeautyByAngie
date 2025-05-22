@@ -1,0 +1,270 @@
+<div class="card">
+    <p-toast />
+    <p-toolbar styleClass="mb-6">
+        <ng-template #start>
+            <p-button
+                label="Nuevo Servicio"
+                icon="pi pi-plus"
+                class="mr-2"
+                (onClick)="openNew()" />
+            <p-button
+                severity="danger"
+                label="Eliminar"
+                icon="pi pi-trash"
+                outlined
+                (onClick)="deleteSelectedServices()"
+                [disabled]="!selectedServices() || !selectedServices().length" />
+        </ng-template>
+
+        <ng-template #end>
+            <p-button
+                label="Exportar"
+                icon="pi pi-upload"
+                severity="secondary"
+                (onClick)="exportCSV()" />
+        </ng-template>
+    </p-toolbar>
+
+    <p-table
+        #dt
+        [value]="services()"
+        [rows]="pageSize()"
+        [paginator]="true"
+        [lazy]="true"
+        [totalRecords]="totalRecords()"
+        [loading]="loading()"
+        (onLazyLoad)="loadServices($event)"
+        [globalFilterFields]="['serviceDTO.serviceName', 'serviceDTO.serviceDescription', 'responseCategoryWIthoutServices.serviceCategoryDTO.categoryName']"
+        [tableStyle]="{ 'min-width': '75rem' }"
+        [(selection)]="selectedServicesValue"
+        [rowHover]="true"
+        dataKey="serviceDTO.serviceId"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} servicios"
+        [showCurrentPageReport]="true"
+    >
+        <ng-template #caption>
+            <div class="flex items-center justify-between">
+                <h5 class="m-0">Gestionar Servicios</h5>
+                <div class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input
+                        pInputText
+                        type="text"
+                        [value]="globalFilter()"
+                        (input)="onGlobalFilter($event)"
+                        placeholder="Buscar servicios..." />
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #header>
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox />
+                </th>
+                <th pSortableColumn="serviceDTO.serviceName" style="min-width:16rem">
+                    Nombre del Servicio
+                    <p-sortIcon field="serviceDTO.serviceName" />
+                </th>
+                <th pSortableColumn="serviceDTO.serviceDescription" style="min-width:20rem">
+                    Descripción
+                    <p-sortIcon field="serviceDTO.serviceDescription" />
+                </th>
+                <th pSortableColumn="serviceDTO.servicePrice" style="min-width: 10rem">
+                    Precio
+                    <p-sortIcon field="serviceDTO.servicePrice" />
+                </th>
+                <th pSortableColumn="responseCategoryWIthoutServices.serviceCategoryDTO.categoryName" style="min-width:12rem">
+                    Categoría
+                    <p-sortIcon field="responseCategoryWIthoutServices.serviceCategoryDTO.categoryName" />
+                </th>
+                <th pSortableColumn="serviceDTO.durationTimeAprox" style="min-width: 10rem">
+                    Duración Aprox.
+                    <p-sortIcon field="serviceDTO.durationTimeAprox" />
+                </th>
+                <th style="min-width: 12rem">Acciones</th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-service>
+            <tr>
+                <td style="width: 3rem">
+                    <p-tableCheckbox [value]="service" />
+                </td>
+                <td style="min-width: 16rem">
+                    {{ service.serviceDTO.serviceName }}
+                </td>
+                <td style="min-width: 20rem">
+                    {{ service.serviceDTO.serviceDescription }}
+                </td>
+                <td>
+                    {{ service.serviceDTO.servicePrice | currency: 'USD' }}
+                </td>
+                <td>
+                    <p-tag
+                        [value]="service.responseCategoryWIthoutServices.serviceCategoryDTO.categoryName"
+                        severity="info" />
+                </td>
+                <td>
+                    {{ service.serviceDTO.durationTimeAprox }}
+                </td>
+                <td>
+                    <p-button
+                        icon="pi pi-pencil"
+                        class="mr-2"
+                        [rounded]="true"
+                        [outlined]="true"
+                        (click)="editService(service)" />
+                    <p-button
+                        icon="pi pi-trash"
+                        severity="danger"
+                        [rounded]="true"
+                        [outlined]="true"
+                        (click)="deleteService(service)" />
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template #summary>
+            <div class="flex items-center justify-between">
+                En total hay {{ totalRecords() }} servicios.
+            </div>
+        </ng-template>
+    </p-table>
+
+    <!-- Dialog para crear/editar servicio -->
+    <p-dialog
+        [(visible)]="serviceDialogVisible"
+        [style]="{ width: '600px' }"
+        header="{{ isEditMode() ? 'Editar Servicio' : 'Nuevo Servicio' }}"
+        [modal]="true">
+
+        <ng-template #content>
+            <form [formGroup]="serviceForm" class="flex flex-col gap-6">
+
+                <!-- Nombre del servicio -->
+                <div>
+                    <label for="serviceName" class="block font-bold mb-3">Nombre del Servicio *</label>
+                    <input
+                        type="text"
+                        pInputText
+                        id="serviceName"
+                        formControlName="serviceName"
+                        autofocus
+                        fluid
+                        placeholder="Ingrese el nombre del servicio" />
+                    <small
+                        class="text-red-500"
+                        *ngIf="serviceForm.get('serviceName')?.invalid && serviceForm.get('serviceName')?.touched">
+                        El nombre del servicio es requerido.
+                    </small>
+                </div>
+
+                <!-- Descripción -->
+                <div>
+                    <label for="serviceDescription" class="block font-bold mb-3">Descripción *</label>
+                    <textarea
+                        id="serviceDescription"
+                        pTextarea
+                        formControlName="serviceDescription"
+                        rows="4"
+                        cols="20"
+                        fluid
+                        placeholder="Ingrese la descripción del servicio"></textarea>
+                    <small
+                        class="text-red-500"
+                        *ngIf="serviceForm.get('serviceDescription')?.invalid && serviceForm.get('serviceDescription')?.touched">
+                        La descripción es requerida.
+                    </small>
+                </div>
+
+                <!-- Categoría -->
+                <div>
+                    <label for="serviceCategoryId" class="block font-bold mb-3">Categoría *</label>
+                    <p-dropdown
+                        formControlName="serviceCategoryId"
+                        inputId="serviceCategoryId"
+                        [options]="categories()"
+                        optionLabel="productCategoryName"
+                        optionValue="productCategoryId"
+                        placeholder="Seleccione una categoría"
+                        [style]="{'width': '100%'}"
+                        [disabled]="categoriesLoading()" />
+                    <small
+                        class="text-red-500"
+                        *ngIf="serviceForm.get('serviceCategoryId')?.invalid && serviceForm.get('serviceCategoryId')?.touched">
+                        Debe seleccionar una categoría.
+                    </small>
+                </div>
+
+                <!-- Precio y Duración en una fila -->
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-6">
+                        <label for="servicePrice" class="block font-bold mb-3">Precio *</label>
+                        <p-inputnumber
+                            id="servicePrice"
+                            formControlName="servicePrice"
+                            mode="currency"
+                            currency="USD"
+                            locale="en-US"
+                            [style]="{'width': '100%'}" />
+                        <small
+                            class="text-red-500"
+                            *ngIf="serviceForm.get('servicePrice')?.invalid && serviceForm.get('servicePrice')?.touched">
+                            El precio es requerido y debe ser mayor a 0.
+                        </small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="durationTimeAprox" class="block font-bold mb-3">Duración Aproximada *</label>
+                        <input
+                            type="text"
+                            pInputText
+                            id="durationTimeAprox"
+                            formControlName="durationTimeAprox"
+                            fluid
+                            placeholder="ej: 30 min, 1 hora" />
+                        <small
+                            class="text-red-500"
+                            *ngIf="serviceForm.get('durationTimeAprox')?.invalid && serviceForm.get('durationTimeAprox')?.touched">
+                            La duración aproximada es requerida.
+                        </small>
+                    </div>
+                </div>
+
+                <!-- URL de imagen -->
+                <div>
+                    <label for="serviceImage" class="block font-bold mb-3">URL de Imagen</label>
+                    <input
+                        type="url"
+                        pInputText
+                        id="serviceImage"
+                        formControlName="serviceImage"
+                        fluid
+                        placeholder="https://ejemplo.com/imagen.jpg" />
+                    <small
+                        class="text-red-500"
+                        *ngIf="serviceForm.get('serviceImage')?.invalid && serviceForm.get('serviceImage')?.touched">
+                        Debe ser una URL válida.
+                    </small>
+                </div>
+
+            </form>
+        </ng-template>
+
+        <ng-template #footer>
+            <p-button
+                label="Cancelar"
+                icon="pi pi-times"
+                text
+                (click)="hideDialog()" />
+            <p-button
+                label="Guardar"
+                icon="pi pi-check"
+                [loading]="saving()"
+                [disabled]="serviceForm.invalid"
+                (click)="saveService()" />
+        </ng-template>
+    </p-dialog>
+
+    <p-confirmDialog [style]="{ width: '450px' }" />
+</div>

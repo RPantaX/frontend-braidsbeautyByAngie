@@ -1,3 +1,5 @@
+import { PromotionDTO } from "../promotions/promotion.interface";
+
 export interface CategoryOption {
   productCategoryId:   number;
   productCategoryName: string;
@@ -16,15 +18,6 @@ export interface ResponseCategory {
   productCategoryId:       number;
   productCategoryName:     string;
   promotionDTOList:        PromotionDTO[];
-}
-
-export interface PromotionDTO {
-  promotionId:           number;
-  promotionName:         string;
-  promotionDescription:  string;
-  promotionDiscountRate: number;
-  promotionStartDate:    Date;
-  promotionEndDate:      Date;
 }
 
 
