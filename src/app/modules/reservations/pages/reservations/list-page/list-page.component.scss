@@ -80,7 +80,7 @@
     }
 
     // Mejores estilos para la tabla
-    .p-table {
+  /*  .p-table {
       .p-table-header {
         background: var(--surface-section);
         border: 1px solid var(--surface-border);
@@ -109,7 +109,7 @@
         }
       }
     }
-
+*/
     // Estilos para botones en la tabla
     .p-button {
       &.p-button-rounded {
@@ -123,7 +123,7 @@
     }
 
     // Estilos para el diálogo
-    .p-dialog {
+ /*   .p-dialog {
       .p-dialog-header {
         background: var(--surface-section);
         border-bottom: 1px solid var(--surface-border);
@@ -143,18 +143,8 @@
         }
       }
     }
-
+*/
     // Estilos para formularios
-    .p-field {
-      margin-bottom: 1.5rem;
-    }
-
-    .p-inputtext,
-    .p-inputtextarea,
-    .p-dropdown,
-    .p-inputnumber-input {
-      width: 100%;
-    }
 
     // Estilos para validación
     .p-invalid {
@@ -262,7 +252,16 @@
     }
   }
 }
+.top-header-table{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 
+  .p-button {
+    margin-left: 0.5rem;
+  }
+}
 // Dark theme adjustments
 :host-context(.dark) {
   ::ng-deep {

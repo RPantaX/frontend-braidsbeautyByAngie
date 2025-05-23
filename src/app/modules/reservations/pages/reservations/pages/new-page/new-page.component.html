@@ -1,0 +1,128 @@
+<form [formGroup]="serviceForm" (ngSubmit)="onSubmit()">
+  <!-- Service ID (Read only) -->
+  <div class="field" *ngIf="serviceId">
+    <label>ID de Servicio: {{serviceId}}</label>
+  </div>
+
+  <!-- Service Name -->
+  <div class="field">
+    <label for="serviceName">Nombre del Servicio *</label>
+    <input
+      type="text"
+      pInputText
+      id="serviceName"
+      formControlName="serviceName"
+      required
+      autofocus
+      placeholder="Ingrese el nombre del servicio"
+    />
+    <small class="p-error" *ngIf="serviceForm.get('serviceName')?.invalid && serviceForm.get('serviceName')?.touched">
+      El nombre del servicio es requerido y debe tener al menos 2 caracteres.
+    </small>
+  </div>
+
+  <!-- Service Description -->
+  <div class="field">
+    <label for="serviceDescription">Descripción del Servicio *</label>
+    <textarea
+      id="serviceDescription"
+      pTextarea
+      formControlName="serviceDescription"
+      rows="4"
+      cols="20"
+      placeholder="Ingrese la descripción del servicio"
+      [style]="{'width':'100%'}"
+    ></textarea>
+    <small class="p-error" *ngIf="serviceForm.get('serviceDescription')?.invalid && serviceForm.get('serviceDescription')?.touched">
+      La descripción es requerida y debe tener al menos 10 caracteres.
+    </small>
+  </div>
+
+  <div class="field">
+    <label for="serviceCategoryId">Categoría *</label>
+    <p-dropdown
+      formControlName="serviceCategoryId"
+      inputId="categoryId"
+      [options]="categories()"
+      optionLabel="categoryName"
+      optionValue="categoryId"
+      placeholder="Seleccione una categoría"
+      [style]="{'width': '100%'}"
+      [disabled]="categoriesLoading()"
+    />
+    <small class="p-error" *ngIf="serviceForm.get('categoryId')?.invalid && serviceForm.get('serviceCategoryId')?.touched">
+      Debe seleccionar una categoría.
+    </small>
+  </div>
+  <!-- Price and Duration Row -->
+  <div class="field-row">
+    <div class="field field-half">
+      <label for="servicePrice">Precio *</label>
+      <p-inputNumber
+        formControlName="servicePrice"
+        mode="currency"
+        currency="PEN"
+        locale="es-PE"
+        [style]="{'width': '100%'}"
+        placeholder="0.00"
+        [min]="0"
+        [max]="999999"
+      />
+      <small class="p-error" *ngIf="serviceForm.get('servicePrice')?.invalid && serviceForm.get('servicePrice')?.touched">
+        El precio es requerido y debe ser mayor a 0.
+      </small>
+    </div>
+
+    <div class="field field-half">
+      <label for="durationTimeAprox">Duración Aproximada *</label>
+      <p-calendar
+        formControlName="durationTimeAprox"
+        [showIcon]="true"
+        [timeOnly]="true"
+        hourFormat="24"
+        placeholder="Selecciona hora"
+      >
+        <ng-template #inputicon let-clickCallBack="clickCallBack">
+          <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+        </ng-template>
+      </p-calendar>
+      <small class="p-error" *ngIf="serviceForm.get('durationTimeAprox')?.invalid && serviceForm.get('durationTimeAprox')?.touched">
+        La duración aproximada es requerida.
+      </small>
+    </div>
+
+  </div>
+
+  <!-- Service Image URL -->
+  <div class="field">
+    <label for="serviceImage">URL de Imagen</label>
+    <input
+      type="url"
+      pInputText
+      id="serviceImage"
+      formControlName="serviceImage"
+      placeholder="https://ejemplo.com/imagen.jpg"
+    />
+    <small class="p-error" *ngIf="serviceForm.get('serviceImage')?.invalid && serviceForm.get('serviceImage')?.touched">
+      Debe ser una URL válida.
+    </small>
+    <small class="p-text-muted">URL opcional de la imagen del servicio.</small>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <p-button
+      label="Cancelar"
+      icon="pi pi-times"
+      [text]="true"
+      (click)="onCancel()"
+    ></p-button>
+    <p-button
+      label="{{ isEditMode ? 'Editar' : 'Guardar' }}"
+      icon="pi pi-check"
+      [text]="true"
+      type="submit"
+      [loading]="isSubmitting"
+    ></p-button>
+  </div>
+</form>

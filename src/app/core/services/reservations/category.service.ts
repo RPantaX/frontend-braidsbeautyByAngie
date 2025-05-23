@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { CategoryOption, CategoryRegister, CategoryResponsePageable, ResponseCategory } from '../../../shared/models/categories/category.interface';
+import { CategoryRegister, CategoryResponsePageable, ResponseCategory } from '../../../shared/models/categories/category.interface';
 import { environment } from '../../../../environments/environments.prod';
+import { CategoryOption } from '../../../shared/models/categories/reservation-category.interface';
 
 @Injectable({providedIn: 'root'})
 export class CategoryService {
@@ -26,7 +27,7 @@ export class CategoryService {
    }
   getPageableCategories(pageNo: number = 0, pageSize: number = 10, sortBy: string = '', sortDir: string = 'asc'): Observable<CategoryResponsePageable> {
     return this.http.get<CategoryResponsePageable>(
-      `${this.baseUrl}/list?pageNo=${pageNo}&pageSize=${pageSize}&sortBy=${sortBy}&sortDir=${sortDir}`
+      `${this.baseUrl}/list/pageable?pageNo=${pageNo}&pageSize=${pageSize}&sortBy=${sortBy}&sortDir=${sortDir}`
     );
   }
 

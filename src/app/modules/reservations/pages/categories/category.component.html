@@ -15,7 +15,6 @@
   <!-- List Component -->
   <app-category-list-page
     [loading]="isLoading"
-    [promotions]="promotions"
     (deleteCategory)="confirmDeleteCategory($event)"
     (selectedCategory)="openEditCategoryDialog($event)"
     (refresh)="refreshCategories()">
@@ -34,7 +33,6 @@
     <app-new-category-page
       [entity]="selectedCategory"
       [categoryId]="selectedCategory?.productCategoryId || 0"
-      [promotions]="promotions"
       (closeDialog)="hideCategoryDialog()"
       (refreshEntities)="refreshCategories()">
     </app-new-category-page>

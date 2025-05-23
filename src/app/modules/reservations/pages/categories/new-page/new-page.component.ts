@@ -6,6 +6,7 @@ import { PromotionDTO } from '../../../../../shared/models/promotions/promotion.
 import { finalize, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { CategoryService } from '../../../../../core/services/reservations/category.service';
+import { PromotionService } from '../../../../products/services/promotion.service';
 
 @Component({
   selector: 'app-new-category-page',
@@ -17,7 +18,7 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
   @Output() refreshEntities = new EventEmitter<void>();
   @Input() entity: ResponseCategory | null = null;
   @Input() categoryId: number = 0;
-  @Input() promotions: PromotionDTO[] = [];
+  promotions: PromotionDTO[] = [];
 
   isEditMode: boolean = false;
   isSubmitting: boolean = false;
@@ -31,6 +32,8 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
   fb = inject(FormBuilder);
   messageService = inject(MessageService);
   categoryService = inject(CategoryService);
+  promotionService = inject(PromotionService);
+
   constructor(
   ) {
     // Initialize form with FormBuilder
@@ -51,9 +54,23 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
    * Lifecycle hook - component initialization
    */
   ngOnInit(): void {
-    // Additional initialization if needed
+    this.loadPromotions();
   }
-
+  loadPromotions(): void {
+    this.promotionService.getAllPromotions().subscribe({
+      next: (data) => {
+        this.promotions = data;
+      },
+      error: (error) => {
+        console.error('Error loading promotions:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar las promociones'
+        });
+      }
+    });
+  }
   /**
    * Lifecycle hook - detect input changes
    */

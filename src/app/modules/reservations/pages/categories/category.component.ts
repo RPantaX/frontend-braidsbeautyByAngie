@@ -1,10 +1,8 @@
 // category.component.ts - Main Component
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ResponseCategory, CategoryRegister } from '../../../../shared/models/categories/category.interface';
-import { PromotionDTO } from '../../../../shared/models/promotions/promotion.interface';
+import { ResponseCategory } from '../../../../shared/models/categories/category.interface';
 import { CategoryService } from '../../../../core/services/reservations/category.service';
-import { PromotionService } from '../../../../core/services/reservations/promotion.service';
 
 @Component({
   selector: 'app-category-page',
@@ -13,14 +11,12 @@ import { PromotionService } from '../../../../core/services/reservations/promoti
 })
 export class CategoryComponent implements OnInit {
   categories: ResponseCategory[] = [];
-  promotions: PromotionDTO[] = [];
   categoryDialog: boolean = false;
   deleteDialog: boolean = false;
   selectedCategory: ResponseCategory | null = null;
   isLoading: boolean = false;
 
   categoryService = inject(CategoryService);
-  promotionService = inject(PromotionService);
   messageService = inject(MessageService);
   confirmationService = inject(ConfirmationService);
   _changeDetectorRef = inject(ChangeDetectorRef);
@@ -29,31 +25,8 @@ export class CategoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Load promotions for the dropdown in the category form
-    this.loadPromotions();
   }
 
-  /**
-   * Load all promotions for use in category creation/editing
-   */
-  loadPromotions(): void {
-    this.isLoading = true;
-    this.promotionService.getAllPromotions().subscribe({
-      next: (data) => {
-        this.promotions = data;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading promotions:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudieron cargar las promociones'
-        });
-        this.isLoading = false;
-      }
-    });
-  }
 
   /**
    * Opens dialog for creating a new category

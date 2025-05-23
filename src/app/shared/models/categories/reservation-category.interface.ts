@@ -1,8 +1,8 @@
 import { PromotionDTO } from "../promotions/promotion.interface";
 
 export interface CategoryOption {
-  serviceCategoryId:   number;
-  serviceCategoryName: string;
+  categoryId:   number;
+  categoryName: string;
 }
 
 export interface CategoryResponse {

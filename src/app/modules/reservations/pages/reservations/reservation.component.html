@@ -1,1 +1,41 @@
-<app-services-list-page></app-services-list-page>
+<div class="services-container">
+  <div class="services-header p-card">
+    <div class="p-d-flex p-jc-between p-ai-center">
+      <h1 class="services-title">Gestión de Servicios</h1>
+      <p-button
+        label="Nuevo Servicio"
+        icon="pi pi-plus"
+        styleClass="p-button-success"
+        (click)="openNewServiceDialog()">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- List Component -->
+  <app-services-list-page
+    [loading]="isLoading"
+    (deleteService)="confirmDeleteService($event)"
+    (selectedService)="openEditServiceDialog($event)"
+    (refresh)="refreshServices()">
+  ></app-services-list-page>
+  <!-- Dialog for Creating/Editing -->
+  <p-dialog
+    [(visible)]="serviceDialog"
+    [style]="{ width: '700px', height: '800px' }"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [header]="selectedService ? 'Editar Servicio' : 'Nuevo Servicio'"
+    styleClass="p-fluid service-dialog">
+
+    <app-new-service-page
+      [entity]="selectedService"
+      [serviceId]="selectedService?.serviceDTO?.serviceId || 0"
+      (closeDialog)="hideServiceDialog()"
+      (refreshEntities)="refreshServices()">
+    </app-new-service-page>
+  </p-dialog>
+
+  <!-- Confirmation Dialog for Delete Actions -->
+  <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+</div>

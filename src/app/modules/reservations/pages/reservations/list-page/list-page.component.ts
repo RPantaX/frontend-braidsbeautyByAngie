@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, ViewChild, ChangeDetectionStrategy, DestroyRef, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, ViewChild, ChangeDetectionStrategy, DestroyRef, inject, input, output } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -58,19 +58,25 @@ import { CategoryOption } from '../../../../../shared/models/categories/category
 export class ServiceListComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
+  // Inputs
+  loading = input<boolean>(false);
+
+  // Outputs
+  deleteService = output<ResponseService>();
+  selectedService = output<ResponseService>();
+  refresh = output<void>();
+  newService = output<void>();
+  deleteSelectedServices = output<ResponseService[]>();
+
   private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
   private serviceService = inject(ServiceService);
-  private categoryService = inject(CategoryService);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
 
   // Signals
   services = signal<ResponseService[]>([]);
-  categories = signal<CategoryOption[]>([]);
-  loading = signal<boolean>(false);
-  categoriesLoading = signal<boolean>(false);
-  saving = signal<boolean>(false);
+  loadingData = signal<boolean>(false);
   totalRecords = signal<number>(0);
   pageSize = signal<number>(10);
   currentPage = signal<number>(0);
@@ -81,39 +87,23 @@ export class ServiceListComponent implements OnInit {
   // Dialog and form state
   serviceDialogVisible = signal<boolean>(false);
   currentService = signal<ResponseService | null>(null);
-  isEditMode = computed(() => !!this.currentService());
-
-  // Form
-  serviceForm!: FormGroup;
 
   // Selection
   selectedServicesValue: ResponseService[] = [];
-  selectedServices = signal<ResponseService[]>([]);
+  selectedServicesSignal = signal<ResponseService[]>([]);
 
   // Search subject for debouncing
   private searchSubject = new Subject<string>();
 
   constructor() {
-    this.initializeForm();
     this.setupSearch();
   }
 
   ngOnInit(): void {
-    this.loadCategories();
     this.loadInitialServices();
     this.subscribeToServiceRefresh();
   }
 
-  private initializeForm(): void {
-    this.serviceForm = this.fb.group({
-      serviceName: ['', [Validators.required, Validators.minLength(2)]],
-      serviceDescription: ['', [Validators.required, Validators.minLength(10)]],
-      serviceImage: ['', [Validators.pattern('https?://.+')]],
-      durationTimeAprox: ['', [Validators.required]],
-      servicePrice: [null, [Validators.required, Validators.min(0.01)]],
-      serviceCategoryId: [null, [Validators.required]]
-    });
-  }
 
   private setupSearch(): void {
     this.searchSubject.pipe(
@@ -134,29 +124,6 @@ export class ServiceListComponent implements OnInit {
     });
   }
 
-  private loadCategories(): void {
-    this.categoriesLoading.set(true);
-    this.categoryService.findAllCategories()
-      .pipe(
-        finalize(() => this.categoriesLoading.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (categories) => {
-          this.categories.set(categories);
-        },
-        error: (error) => {
-          console.error('Error loading categories:', error);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'No se pudieron cargar las categorías',
-            life: 3000
-          });
-        }
-      });
-  }
-
   private loadInitialServices(): void {
     const event: TableLazyLoadEvent = {
       first: 0,
@@ -168,7 +135,7 @@ export class ServiceListComponent implements OnInit {
   }
 
   loadServices(event: TableLazyLoadEvent): void {
-    this.loading.set(true);
+    this.loadingData.set(true);
 
     const page = Math.floor((event.first || 0) / (event.rows || 10));
     const size = event.rows || 10;
@@ -183,7 +150,7 @@ export class ServiceListComponent implements OnInit {
 
     this.serviceService.getPageableServices(page, size, sortField, sortDir)
       .pipe(
-        finalize(() => this.loading.set(false)),
+        finalize(() => this.loadingData.set(false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
@@ -219,147 +186,22 @@ export class ServiceListComponent implements OnInit {
   }
 
   openNew(): void {
-    this.currentService.set(null);
-    this.serviceForm.reset();
-    this.serviceDialogVisible.set(true);
+    this.newService.emit();
   }
 
   editService(service: ResponseService): void {
-    this.currentService.set(service);
-    this.serviceForm.patchValue({
-      serviceName: service.serviceDTO.serviceName,
-      serviceDescription: service.serviceDTO.serviceDescription,
-      serviceImage: service.serviceDTO.serviceImage,
-      durationTimeAprox: service.serviceDTO.durationTimeAprox,
-      servicePrice: service.serviceDTO.servicePrice,
-      serviceCategoryId: service.responseCategoryWIthoutServices.serviceCategoryDTO.categoryId
-    });
-    this.serviceDialogVisible.set(true);
+    this.selectedService.emit(service);
   }
 
-  hideDialog(): void {
-    this.serviceDialogVisible.set(false);
-    this.serviceForm.reset();
-    this.currentService.set(null);
+
+  onDeleteService(service: ResponseService): void {
+    this.deleteService.emit(service);
   }
 
-  saveService(): void {
-    if (this.serviceForm.invalid) {
-      this.serviceForm.markAllAsTouched();
-      return;
+  onDeleteSelectedServices(): void {
+    if (this.selectedServicesSignal().length > 0) {
+      this.deleteSelectedServices.emit(this.selectedServicesSignal());
     }
-
-    this.saving.set(true);
-    const formValue = this.serviceForm.value;
-
-    const serviceRequest: RequestService = {
-      serviceName: formValue.serviceName,
-      serviceDescription: formValue.serviceDescription,
-      serviceImage: formValue.serviceImage || '',
-      durationTimeAprox: formValue.durationTimeAprox,
-      servicePrice: formValue.servicePrice,
-      serviceCategoryId: formValue.serviceCategoryId
-    };
-
-    const saveOperation = this.isEditMode()
-      ? this.serviceService.updateService(this.currentService()!.serviceDTO.serviceId, serviceRequest)
-      : this.serviceService.createService(serviceRequest);
-
-    saveOperation.pipe(
-      finalize(() => this.saving.set(false)),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Exitoso',
-          detail: `Servicio ${this.isEditMode() ? 'actualizado' : 'creado'} correctamente`,
-          life: 3000
-        });
-        this.hideDialog();
-        this.loadServicesWithCurrentParams();
-      },
-      error: (error) => {
-        console.error('Error saving service:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: `No se pudo ${this.isEditMode() ? 'actualizar' : 'crear'} el servicio`,
-          life: 3000
-        });
-      }
-    });
-  }
-
-  deleteService(service: ResponseService): void {
-    this.confirmationService.confirm({
-      message: `¿Está seguro que desea eliminar el servicio "${service.serviceDTO.serviceName}"?`,
-      header: 'Confirmar Eliminación',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí, eliminar',
-      rejectLabel: 'Cancelar',
-      accept: () => {
-        this.serviceService.deleteService(service.serviceDTO.serviceId)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: () => {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Exitoso',
-                detail: 'Servicio eliminado correctamente',
-                life: 3000
-              });
-              this.loadServicesWithCurrentParams();
-            },
-            error: (error) => {
-              console.error('Error deleting service:', error);
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'No se pudo eliminar el servicio',
-                life: 3000
-              });
-            }
-          });
-      }
-    });
-  }
-
-  deleteSelectedServices(): void {
-    if (!this.selectedServices().length) return;
-
-    this.confirmationService.confirm({
-      message: `¿Está seguro que desea eliminar ${this.selectedServices().length} servicio(s) seleccionado(s)?`,
-      header: 'Confirmar Eliminación Múltiple',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí, eliminar',
-      rejectLabel: 'Cancelar',
-      accept: () => {
-        const deleteRequests = this.selectedServices().map(service =>
-          this.serviceService.deleteService(service.serviceDTO.serviceId)
-        );
-
-        // Execute all delete requests
-        deleteRequests.forEach(request => {
-          request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-            error: (error) => {
-              console.error('Error deleting service:', error);
-            }
-          });
-        });
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Exitoso',
-          detail: `${this.selectedServices().length} servicio(s) eliminado(s) correctamente`,
-          life: 3000
-        });
-
-        this.selectedServices.set([]);
-        this.selectedServicesValue = [];
-        this.loadServicesWithCurrentParams();
-      }
-    });
   }
 
   exportCSV(): void {
@@ -368,6 +210,6 @@ export class ServiceListComponent implements OnInit {
 
   // Update selected services when table selection changes
   onSelectionChange(): void {
-    this.selectedServices.set([...this.selectedServicesValue]);
+    this.selectedServicesSignal.set([...this.selectedServicesValue]);
   }
 }

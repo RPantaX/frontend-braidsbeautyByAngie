@@ -1,0 +1,91 @@
+.services-container {
+  padding: 1rem;
+
+  .services-header {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .services-title {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .p-d-flex {
+      display: flex;
+    }
+
+    .p-jc-between {
+      justify-content: space-between;
+    }
+
+    .p-ai-center {
+      align-items: center;
+    }
+  }
+}
+
+:host ::ng-deep {
+  .service-dialog {
+    .p-dialog-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+
+      .p-dialog-title {
+        color: #2c3e50;
+        font-weight: 600;
+      }
+    }
+
+    .p-dialog-content {
+      padding: 1.5rem;
+      background-color: #ffffff;
+    }
+
+    .p-dialog-footer {
+      background-color: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+      padding: 1rem 1.5rem;
+    }
+  }
+
+  .p-button-success {
+    background-color: #28a745;
+    border-color: #28a745;
+
+    &:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
+  }
+
+  .p-confirmdialog {
+    .p-dialog-header {
+      background-color: #fff3cd;
+      border-bottom: 1px solid #ffeaa7;
+
+      .p-dialog-title {
+        color: #856404;
+      }
+    }
+
+    .p-dialog-content {
+      padding: 1.5rem;
+
+      .p-confirm-dialog-message {
+        margin-left: 1rem;
+        color: #495057;
+      }
+    }
+
+    .p-dialog-footer {
+      padding: 1rem 1.5rem;
+      background-color: #fff3cd;
+      border-top: 1px solid #ffeaa7;
+    }
+  }
+}
