@@ -1,7 +1,7 @@
-import { Component, OnInit, signal, computed, ViewChild, ChangeDetectionStrategy, DestroyRef, inject, input, output } from '@angular/core';
+import { Component, OnInit, signal, ViewChild, ChangeDetectionStrategy, DestroyRef, inject, input, output, AfterViewInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { TableLazyLoadEvent } from 'primeng/table';
 // PrimeNG Imports
@@ -12,7 +12,6 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextareaModule } from 'primeng/inputtextarea';
 import { DropdownModule } from 'primeng/dropdown';
 import { TagModule } from 'primeng/tag';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -22,12 +21,12 @@ import { RippleModule } from 'primeng/ripple';
 import { FormsModule } from '@angular/forms';
 // Services and Models
 
-import { debounceTime, distinctUntilChanged, startWith, switchMap, finalize, catchError } from 'rxjs/operators';
-import { Subject, of } from 'rxjs';
-import { RequestService, ResponseService, ResponseServicePageable } from '../../../../../shared/models/reservations/services.interface';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { ResponseService, ResponseServicePageable } from '../../../../../shared/models/reservations/services.interface';
 import { ServiceService } from '../../../../../core/services/reservations/services.service';
 import { CategoryService } from '../../../../../core/services/reservations/category.service';
-import { CategoryOption } from '../../../../../shared/models/categories/category.interface';
+import { CategoryOption } from '../../../../../shared/models/categories/reservation-category.interface';
 
 @Component({
   selector: 'app-services-list-page',
@@ -37,6 +36,7 @@ import { CategoryOption } from '../../../../../shared/models/categories/category
 
     ReactiveFormsModule,
     TableModule,
+    FormsModule,
     DialogModule,
     ButtonModule,
     ToastModule,
@@ -55,7 +55,7 @@ import { CategoryOption } from '../../../../../shared/models/categories/category
   styleUrls: ['./list-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ServiceListComponent implements OnInit {
+export class ServiceListComponent implements OnInit, AfterViewInit {
   @ViewChild('dt') dt!: Table;
 
   // Inputs
@@ -67,12 +67,12 @@ export class ServiceListComponent implements OnInit {
   refresh = output<void>();
   newService = output<void>();
   deleteSelectedServices = output<ResponseService[]>();
+  requestCsv = output<Table>();
 
   private destroyRef = inject(DestroyRef);
-  private fb = inject(FormBuilder);
   private serviceService = inject(ServiceService);
+  private categoryService = inject(CategoryService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
 
   // Signals
   services = signal<ResponseService[]>([]);
@@ -83,6 +83,10 @@ export class ServiceListComponent implements OnInit {
   sortField = signal<string>('');
   sortOrder = signal<number>(1);
   globalFilter = signal<string>('');
+
+  // Filtros
+  categories = signal<CategoryOption[]>([]);
+  selectedCategory = signal<CategoryOption | null>(null);
 
   // Dialog and form state
   serviceDialogVisible = signal<boolean>(false);
@@ -102,9 +106,16 @@ export class ServiceListComponent implements OnInit {
   ngOnInit(): void {
     this.loadInitialServices();
     this.subscribeToServiceRefresh();
+    this.loadCategories();
   }
-
-
+  ngAfterViewInit(): void {
+    // Corregido: Emitir la referencia de la tabla después de que la vista se inicialice
+    setTimeout(() => {
+      if (this.dt) {
+        this.requestCsv.emit(this.dt);
+      }
+    }, 100);
+  }
   private setupSearch(): void {
     this.searchSubject.pipe(
       debounceTime(300),
@@ -113,6 +124,25 @@ export class ServiceListComponent implements OnInit {
     ).subscribe(searchTerm => {
       this.globalFilter.set(searchTerm);
       this.loadServicesWithCurrentParams();
+    });
+  }
+
+    private loadCategories(): void {
+    this.categoryService.findAllCategories().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (categories: CategoryOption[]) => {
+        this.categories.set(categories);
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar las categorías',
+          life: 3000
+        });
+      }
     });
   }
 
@@ -148,7 +178,25 @@ export class ServiceListComponent implements OnInit {
     this.sortField.set(sortField);
     this.sortOrder.set(event.sortOrder || 1);
 
-    this.serviceService.getPageableServices(page, size, sortField, sortDir)
+    // Determinar si usar filtro por categoría o cargar todos
+    const selectedCategory = this.selectedCategory();
+    let serviceObservable;
+
+     if (selectedCategory && selectedCategory.categoryId) {
+      // Cargar servicios filtrados por categoría
+      serviceObservable = this.serviceService.getPageableServicesByCategoryId(
+        selectedCategory.categoryId,
+        page,
+        size,
+        sortField,
+        sortDir
+      );
+    } else {
+      // Cargar todos los servicios
+      serviceObservable = this.serviceService.getPageableServices(page, size, sortField, sortDir);
+    }
+
+    serviceObservable
       .pipe(
         finalize(() => this.loadingData.set(false)),
         takeUntilDestroyed(this.destroyRef)
@@ -184,7 +232,17 @@ export class ServiceListComponent implements OnInit {
     const target = event.target as HTMLInputElement;
     this.searchSubject.next(target.value);
   }
+  onCategoryFilter(selectedCategory: CategoryOption | null): void {
+    this.selectedCategory.set(selectedCategory);
+    this.currentPage.set(0); // Reset to first page when filtering
+    this.loadServicesWithCurrentParams();
+  }
 
+  clearCategoryFilter(): void {
+    this.selectedCategory.set(null);
+    this.currentPage.set(0);
+    this.loadServicesWithCurrentParams();
+  }
   openNew(): void {
     this.newService.emit();
   }
@@ -205,11 +263,17 @@ export class ServiceListComponent implements OnInit {
   }
 
   exportCSV(): void {
-    this.dt.exportCSV();
+    if (this.dt) {
+      this.requestCsv.emit(this.dt);
+    }
   }
 
-  // Update selected services when table selection changes
+    // Corregido: Update selected services when table selection changes
   onSelectionChange(): void {
+    console.log('Selection changed:', this.selectedServicesValue);
     this.selectedServicesSignal.set([...this.selectedServicesValue]);
+    // Emitir inmediatamente los servicios seleccionados al componente padre
+    this.deleteSelectedServices.emit(this.selectedServicesSignal());
   }
+
 }

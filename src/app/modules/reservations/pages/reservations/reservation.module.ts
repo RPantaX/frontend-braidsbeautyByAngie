@@ -6,6 +6,8 @@ import { DialogModule } from "primeng/dialog";
 import { ReservationComponent } from "./reservation.component";
 import { ServiceListComponent } from "./list-page/list-page.component";
 import { NewServicePageModule } from "./pages/new-page/new-page.module";
+import { ToastModule } from "primeng/toast";
+import { ToolbarModule } from "primeng/toolbar";
 
 const routes: Routes = [
   {
@@ -22,7 +24,8 @@ const routes: Routes = [
     CommonModule,
     ConfirmDialogModule,
     DialogModule,
-
+    ToastModule,
+    ToolbarModule,
     NewServicePageModule,
     ServiceListComponent,
     RouterModule.forChild(routes),

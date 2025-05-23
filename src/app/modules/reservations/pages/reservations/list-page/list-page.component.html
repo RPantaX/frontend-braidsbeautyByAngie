@@ -1,31 +1,4 @@
-<div class="card">
-    <p-toast />
-    <p-toolbar styleClass="mb-6">
-        <ng-template pTemplate="start">
-            <p-button
-                label="Nuevo Servicio"
-                icon="pi pi-plus"
-                class="mr-2"
-                (onClick)="openNew()" />
-            <p-button
-                severity="danger"
-                label="Eliminar"
-                icon="pi pi-trash"
-                outlined
-                (onClick)="onDeleteSelectedServices()"
-                [disabled]="!selectedServicesSignal() || !selectedServicesSignal().length" />
-        </ng-template>
-
-        <ng-template pTemplate="end">
-            <p-button
-                label="Exportar"
-                icon="pi pi-upload"
-                severity="secondary"
-                (onClick)="exportCSV()" />
-        </ng-template>
-    </p-toolbar>
-
-    <p-table
+<p-table
         #dt
         [value]="services()"
         [rows]="pageSize()"
@@ -37,6 +10,7 @@
         [globalFilterFields]="['serviceDTO.serviceName', 'serviceDTO.serviceDescription', 'responseCategoryWIthoutServices.serviceCategoryDTO.categoryName']"
         [tableStyle]="{ 'min-width': '75rem' }"
         [(selection)]="selectedServicesValue"
+        (selectionChange)="onSelectionChange()"
         [rowHover]="true"
         dataKey="serviceDTO.serviceId"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} servicios"
@@ -45,14 +19,39 @@
         <ng-template pTemplate="caption">
             <div class="flex items-center justify-between top-header-table">
                 <h5 class="m-0">Gestionar Servicios</h5>
-                <div class="p-input-icon-left">
-                    <i class="pi pi-search"></i>
-                    <input
-                        pInputText
-                        type="text"
-                        [value]="globalFilter()"
-                        (input)="onGlobalFilter($event)"
-                        placeholder="Buscar servicios..." />
+                <div class="flex gap-3 items-center">
+                    <!-- Filtro por categoría -->
+                    <div class="flex flex-column gap-2">
+                        <label for="categoryFilter" class="text-sm font-medium">Filtrar por categoría:</label>
+                        <div class="flex gap-2 items-center">
+                            <p-dropdown
+                                id="categoryFilter"
+                                [options]="categories()"
+                                [(ngModel)]="selectedCategory"
+                                (onChange)="onCategoryFilter($event.value)"
+                                optionLabel="categoryName"
+                                placeholder="Seleccionar categoría"
+                                [showClear]="true"
+                                (onClear)="clearCategoryFilter()"
+                                [style]="{ 'min-width': '200px' }">
+                            </p-dropdown>
+                        </div>
+                    </div>
+
+                    <!-- Búsqueda global -->
+                    <div class="flex flex-column gap-2">
+                        <label for="globalSearch" class="text-sm font-medium">Búsqueda global:</label>
+                        <div class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                                id="globalSearch"
+                                pInputText
+                                type="text"
+                                [value]="globalFilter()"
+                                (input)="onGlobalFilter($event)"
+                                placeholder="Buscar servicios..." />
+                        </div>
+                    </div>
                 </div>
             </div>
         </ng-template>
@@ -134,4 +133,3 @@
         </ng-template>
     </p-table>
     <p-confirmDialog [style]="{ width: '450px' }" />
-</div>

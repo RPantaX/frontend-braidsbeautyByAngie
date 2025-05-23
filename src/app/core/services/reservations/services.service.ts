@@ -31,6 +31,12 @@ export class ServiceService {
   getServiceById(serviceId: number): Observable<ResponseService> {
     return this.http.get<ResponseService>(`${this.baseUrl}/${serviceId}`);
   }
+  //get paginable by categoryId
+  getPageableServicesByCategoryId(categoryId: number, pageNo: number = 0, pageSize: number = 10, sortBy: string = '', sortDir: string = 'asc'): Observable<ResponseServicePageable> {
+    return this.http.get<ResponseServicePageable>(
+      `${this.baseUrl}/list/category/${categoryId}?pageNo=${pageNo}&pageSize=${pageSize}&sortBy=${sortBy}&sortDir=${sortDir}`
+    );
+  }
 
   createService(service: RequestService ): Observable<ServiceDTO> {
     return this.http.post<ServiceDTO>(this.baseUrl, service);

@@ -1,22 +1,44 @@
+<div class="card">
+  <p-toast />
 <div class="services-container">
   <div class="services-header p-card">
-    <div class="p-d-flex p-jc-between p-ai-center">
+    <div class="p-d-flex p-ai-center">
       <h1 class="services-title">Gestión de Servicios</h1>
-      <p-button
-        label="Nuevo Servicio"
-        icon="pi pi-plus"
-        styleClass="p-button-success"
-        (click)="openNewServiceDialog()">
-      </p-button>
     </div>
   </div>
+      <p-toolbar styleClass="mb-6">
+        <ng-template pTemplate="start">
+            <p-button
+                label="Nuevo Servicio"
+                icon="pi pi-plus"
+                class="mr-2"
+                (onClick)="openNewServiceDialog()" />
+            <p-button
+                severity="danger"
+                label="Eliminar"
+                icon="pi pi-trash"
+                outlined
+                [disabled]="!hasSelectedServices"
+                (onClick)="confirmDeleteSelectedServices()" />
+                <!--[disabled]="!selectedServicesSignal() || !selectedServicesSignal().length" /> -->
+        </ng-template>
 
+        <ng-template pTemplate="end">
+            <p-button
+                label="Exportar"
+                icon="pi pi-upload"
+                severity="secondary"
+                (onClick)="exportCSV()" />
+        </ng-template>
+    </p-toolbar>
   <!-- List Component -->
   <app-services-list-page
     [loading]="isLoading"
     (deleteService)="confirmDeleteService($event)"
+    (deleteSelectedServices)="setDeleteSelectedServices($event)"
     (selectedService)="openEditServiceDialog($event)"
-    (refresh)="refreshServices()">
+    (refresh)="refreshServices()"
+    (requestCsv)="setDt($event)">
   ></app-services-list-page>
   <!-- Dialog for Creating/Editing -->
   <p-dialog
@@ -38,4 +60,5 @@
 
   <!-- Confirmation Dialog for Delete Actions -->
   <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+
 </div>
