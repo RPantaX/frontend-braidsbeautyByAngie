@@ -37,10 +37,19 @@
                       <span class="font-semibold text-2xl text-primary">{{"home.title" | translate}}</span>
                   </span>
                   <span>
-                      <p-button type="button" (onClick)="closeCallback($event)" icon="pi pi-times" rounded="true" outlined="true" styleClass="h-2rem w-2rem"></p-button>
+                      <p-button
+                          type="button"
+                          (onClick)="closeCallback($event)"
+                          icon="pi pi-times"
+                          [rounded]="true"
+                          [outlined]="true"
+                          styleClass="h-2rem w-2rem">
+                      </p-button>
                   </span>
               </div>
-              <div class="overflow-y-auto">
+
+              <!-- Navegación -->
+              <div class="overflow-y-auto flex-1">
                   <ul class="list-none p-3 m-0">
                       <li>
                           <div
@@ -57,14 +66,16 @@
                           </div>
                           <ul class="list-none p-0 m-0 overflow-hidden">
                               <li>
-                                  <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                      routerLink="/home">
+                                  <a pRipple
+                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+                                     routerLink="/home">
                                       <i class="pi pi-home mr-2"></i>
                                       <span class="font-medium">{{ "home.modules.home" | translate }}</span>
                                   </a>
                               </li>
                               <li>
-                                  <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                  <a pRipple
+                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                       <i class="pi pi-truck mr-2"></i>
                                       <span class="font-medium">{{ "home.modules.delivery" | translate }}</span>
                                   </a>
@@ -84,35 +95,35 @@
                                       <i class="pi pi-chevron-down ml-auto"></i>
                                   </a>
                                   <ul class="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
-
                                       <li>
-                                          <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                          <a pRipple
+                                             class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                               <i class="pi pi-sort-numeric-up mr-2"></i>
                                               <span class="font-medium">{{ "home.modules.products.managment.stock" | translate }}</span>
                                           </a>
                                       </li>
                                       <li>
-                                        <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                            routerLink="/products/manage/list">
+                                        <a pRipple
+                                           class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+                                           routerLink="/products/manage/list">
                                             <i class="pi pi-shopping-bag mr-2"></i>
                                             <span class="font-medium">{{ "home.modules.products.managment.products" | translate }}</span>
-
                                         </a>
                                     </li>
                                     <li>
-                                      <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                          routerLink="/products/promotions">
-                                          <i class="pi pi-shopping-bag mr-2"></i>
+                                      <a pRipple
+                                         class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+                                         routerLink="/products/promotions">
+                                          <i class="pi pi-tag mr-2"></i>
                                           <span class="font-medium">{{ "home.modules.products.managment.promotions" | translate }}</span>
-
                                       </a>
                                   </li>
                                   <li>
-                                    <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                        routerLink="/products/categories">
-                                        <i class="pi pi-shopping-bag mr-2"></i>
+                                    <a pRipple
+                                       class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+                                       routerLink="/products/categories">
+                                        <i class="pi pi-tags mr-2"></i>
                                         <span class="font-medium">{{ "home.modules.products.managment.categories" | translate }}</span>
-
                                     </a>
                                 </li>
                                   </ul>
@@ -133,44 +144,49 @@
                                     <i class="pi pi-chevron-down ml-auto"></i>
                                 </a>
                                 <ul class="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
-
                                     <li>
-                                        <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                        routerLink="/reservations">
-                                            <i class="pi pi-pencil mr-2"></i>
+                                        <a pRipple
+                                           class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+                                           routerLink="/reservations">
+                                            <i class="pi pi-scissors mr-2"></i>
                                             <span class="font-medium">{{ "home.modules.HairSalon.managment.services" | translate }}</span>
                                         </a>
                                     </li>
                                     <li>
-                                      <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                      <a pRipple
+                                         class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                           <i class="pi pi-calendar mr-2"></i>
                                           <span class="font-medium">{{ "home.modules.HairSalon.managment.appointments" | translate }}</span>
                                       </a>
                                     </li>
                                     <li>
-                                      <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                      routerLink="/reservations/categories">
-                                          <i class="pi pi-calendar mr-2"></i>
+                                      <a pRipple
+                                         class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+                                         routerLink="/reservations/categories">
+                                          <i class="pi pi-tags mr-2"></i>
                                           <span class="font-medium">{{ "home.modules.HairSalon.managment.categories" | translate }}</span>
                                       </a>
                                     </li>
-                                                                        <li>
-                                      <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                      routerLink="/reservations/promotions">
-                                          <i class="pi pi-calendar mr-2"></i>
+                                    <li>
+                                      <a pRipple
+                                         class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+                                         routerLink="/reservations/promotions">
+                                          <i class="pi pi-percentage mr-2"></i>
                                           <span class="font-medium">{{ "home.modules.HairSalon.managment.promotions" | translate }}</span>
                                       </a>
                                     </li>
                                 </ul>
                             </li>
                             <li>
-                              <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                              <a pRipple
+                                 class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                   <i class="pi pi-receipt mr-2"></i>
                                   <span class="font-medium">{{ "home.modules.orders.title" | translate }}</span>
                               </a>
                             </li>
                             <li>
-                                  <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                  <a pRipple
+                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                       <i class="pi pi-cog mr-2"></i>
                                       <span class="font-medium">{{ "home.modules.settings" | translate }}</span>
                                   </a>
@@ -194,13 +210,15 @@
                           </div>
                           <ul class="list-none p-0 m-0 overflow-hidden">
                               <li>
-                                  <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                  <a pRipple
+                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                       <i class="pi pi-cart-minus mr-2"></i>
                                       <span class="font-medium">{{ "home.modules.sales.managment.products" | translate }}</span>
                                   </a>
                               </li>
                               <li>
-                                  <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                  <a pRipple
+                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                       <i class="pi pi-calendar mr-2"></i>
                                       <span class="font-medium">{{ "home.modules.sales.managment.services" | translate }}</span>
                                   </a>
@@ -224,14 +242,16 @@
                         </div>
                         <ul class="list-none p-0 m-0 overflow-hidden">
                             <li>
-                                <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                    routerLink="/users">
+                                <a pRipple
+                                   class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+                                   routerLink="/users">
                                     <i class="pi pi-user mr-2"></i>
                                     <span class="font-medium">{{ "home.modules.users.managment" | translate }}</span>
                                 </a>
                             </li>
                             <li>
-                                <a pRipple class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                <a pRipple
+                                   class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                     <i class="pi pi-cog mr-2"></i>
                                     <span class="font-medium">{{ "home.modules.settings" | translate }}</span>
                                 </a>
@@ -240,32 +260,90 @@
                     </li>
                 </ul>
               </div>
-              <div class="mt-auto">
-                  <hr class="mb-3 mx-3 border-top-1 border-none surface-border" />
-                  <a pRipple class="m-3 flex align-items-center cursor-pointer p-3 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                      <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
-                      <span class="font-bold">{{ "home.modules.users.userLogged" | translate : {user: "Usuario de prueba"} }}</span>
-                  </a>
+
+              <!-- Sección de usuario mejorada -->
+              <div class="mt-auto border-top-1 border-surface-border">
+                  <div class="user-section">
+                      <div class="user-info">
+                          <p-avatar
+                              [image]="getUserAvatar()"
+                              shape="circle"
+                              size="large">
+                          </p-avatar>
+                          <div class="flex-1 min-w-0">
+                              <div class="user-name text-900 font-semibold">{{ getUserDisplayName() }}</div>
+                              <div class="text-sm text-600">
+                                {{ currentUser?.roles && currentUser?.roles!.length > 0 ? currentUser!.roles[0].name : 'Usuario' }}
+                              </div>
+                          </div>
+                          <p-button
+                              (onClick)="logout()"
+                              icon="pi pi-sign-out"
+                              [rounded]="true"
+                              [outlined]="true"
+                              severity="danger"
+                              size="small"
+                              pTooltip="Cerrar sesión"
+                              tooltipPosition="top">
+                          </p-button>
+                      </div>
+                  </div>
               </div>
           </div>
       </ng-template>
     </p-sidebar>
-    <p-button (onClick)="sidebarVisible = true" icon="pi pi-bars" class="left-100"></p-button>
-
+    <p-button
+        (onClick)="toggleSidebar()"
+        icon="pi pi-bars"
+        [rounded]="true">
+    </p-button>
   </div>
 
-  <div class="flex align-items-center justify-content-center w-8rem h-6rem">
-    <div class=" p-1 m-1">
+  <!-- Header mejorado -->
+  <div class="header-controls">
+    <div class="p-1 m-1">
       <app-language-selector></app-language-selector>
     </div>
-      <p-avatar class=" p-2 m-2" image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
-  </div>
 
+    <!-- Información del usuario en el header -->
+    <div class="user-info">
+      <span class="user-name hidden md:block text-900 font-medium">{{ getUserDisplayName() }}</span>
+      <p-avatar
+          [image]="getUserAvatar()"
+          shape="circle"
+          class="cursor-pointer"
+          (click)="userMenu.toggle($event)">
+      </p-avatar>
+
+      <!-- Menú desplegable del usuario - CORREGIDO -->
+      <p-menu
+          #userMenu
+          [model]="userMenuItems"
+          [popup]="true"
+          styleClass="user-menu">
+      </p-menu>
+
+      <p-button
+          (onClick)="userMenu.toggle($event)"
+          icon="pi pi-chevron-down"
+          [text]="true"
+          size="small">
+      </p-button>
+    </div>
+  </div>
 </div>
 
 <div class="m-5">
   <router-outlet></router-outlet>
 </div>
+<!-- COMPONENTES NECESARIOS PARA LOGOUT - AGREGAR AL FINAL -->
+<p-confirmDialog
+    [style]="{width: '450px'}"
+    [baseZIndex]="10000"
+    rejectButtonStyleClass="p-button-outlined">
+</p-confirmDialog>
 
-
-
+<p-toast
+    position="top-right"
+    [baseZIndex]="5000">
+</p-toast>

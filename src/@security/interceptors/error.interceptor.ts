@@ -5,6 +5,8 @@ import { APIErrorResponse } from "../../@utils/interfaces/ApiResponse";
 import { inject, Injectable } from '@angular/core';
 import { MessageService } from "../../app/shared/message/message.service";
 import { TranslateService } from "@ngx-translate/core";
+import { KeyStorage } from "../../@utils/enums/KeyStorage";
+import { TokenResponse } from "../../app/shared/models/auth/auth.interface";
 
 @Injectable({providedIn: 'root'})
 export class SecurityInterceptor implements HttpInterceptor{
@@ -15,7 +17,7 @@ export class SecurityInterceptor implements HttpInterceptor{
   constructor() { }
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-    return next.handle(req).pipe(
+    return next.handle(this._getCloneReques(req)).pipe(
       catchError((error: HttpErrorResponse) => {
         const apiResponse = error.error as APIErrorResponse;
         const internalServerErrorMessage =  this._translate.instant('errors.serverError');
@@ -36,5 +38,21 @@ export class SecurityInterceptor implements HttpInterceptor{
 
     throw new Error("Method not implemented.");
   }
+	private _getCloneReques(request: HttpRequest<unknown>): HttpRequest<unknown> {
+		let clonedRequest: HttpRequest<unknown> = request.clone({});
 
+		let idToken: TokenResponse | null = null;
+
+		idToken =JSON.parse(localStorage.getItem(KeyStorage.TOKEN) as string) || null;
+
+		if (idToken) {
+			clonedRequest = request.clone({
+				setHeaders: {
+					authorization: `Bearer ${idToken.token}`,
+				},
+			});
+		}
+
+		return clonedRequest;
+	}
 }

@@ -12,6 +12,13 @@ import { SecurityInterceptor } from '../@security/interceptors/error.interceptor
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { MessageModule } from './shared/message/message.module';
+import { StoreModule } from '@ngrx/store';
+import { securityReducer } from '../@security/redux/auth.reducer';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { RouterState, StoreRouterConnectingModule } from '@ngrx/router-store';
+import { EffectsModule } from '@ngrx/effects';
+import { AuthEffect } from '../@security/redux/effects/auth.effect';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -26,6 +33,12 @@ import { MessageModule } from './shared/message/message.module';
             deps: [HttpClient],
           },
         }),
+    EffectsModule.forRoot([AuthEffect]),
+    StoreModule.forRoot(securityReducer),
+    StoreRouterConnectingModule.forRoot({ stateKey: 'router', routerState: RouterState.Minimal }),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25, // Retain last 25 states
+    }),
     AppRoutingModule,
     SharedModule,
     MessageModule
