@@ -1,7 +1,7 @@
 <form [formGroup]="entityForm" (ngSubmit)="onSubmit()">
   <!-- Category ID (Read only) -->
-  <div class="field" *ngIf="categoryId">
-    <label>ID de Categoría: {{categoryId}}</label>
+  <div class="field" *ngIf="categoryId()">
+    <label>ID de Categoría: {{categoryId()}}</label>
   </div>
 
   <!-- Category Name -->
@@ -14,9 +14,17 @@
       formControlName="productCategoryName"
       required
       autofocus
+      [class.p-invalid]="entityForm.get('productCategoryName')?.invalid && entityForm.get('productCategoryName')?.touched"
     />
-    <small class="p-error" *ngIf="entityForm.get('productCategoryName')?.invalid && entityForm.get('productCategoryName')?.touched">
-      El nombre es requerido y debe tener un máximo de 100 caracteres.
+    <small
+      class="p-error"
+      *ngIf="entityForm.get('productCategoryName')?.hasError('required') || entityForm.get('productCategoryName')?.hasError('maxlength')">
+      El nombre es requerido y debe tener un minimo de 2 caracteres.
+    </small>
+    <small
+      class="p-error"
+      *ngIf="entityForm.get('productCategoryName')?.hasError('categoryExists')">
+      El nombre de la categoría ya existe.
     </small>
   </div>
 
@@ -24,7 +32,7 @@
   <div class="field">
     <label for="promotionListId">Promociones</label>
     <p-multiSelect
-      [options]="promotions"
+      [options]="promotions()"
       formControlName="promotionListId"
       optionLabel="promotionName"
       optionValue="promotionId"
@@ -48,11 +56,11 @@
   </div>
 
   <!-- Selected Promotions Display -->
-  <div class="field selected-promotions" *ngIf="selectedPromotions && selectedPromotions.length > 0">
+  <div class="field selected-promotions" *ngIf="selectedPromotions() && selectedPromotions.length > 0">
     <label>Promociones seleccionadas:</label>
     <div class="promotion-chips">
-      <ng-container *ngFor="let promotionId of selectedPromotions; let i = index">
-        <ng-container *ngFor="let promotion of promotions">
+      <ng-container *ngFor="let promotionId of selectedPromotions(); let i = index">
+        <ng-container *ngFor="let promotion of promotions()">
           <p-chip
             *ngIf="promotion.promotionId === promotionId"
             [label]="promotion.promotionName"
@@ -74,11 +82,11 @@
       (click)="onCancel()"
     ></p-button>
     <p-button
-      label="{{ isEditMode ? 'Editar' : 'Guardar' }}"
+      label="{{ isEditMode() ? 'Editar' : 'Guardar' }}"
       icon="pi pi-check"
       [text]="true"
       type="submit"
-      [loading]="isSubmitting"
+      [loading]="isSubmitting()"
     ></p-button>
   </div>
 </form>

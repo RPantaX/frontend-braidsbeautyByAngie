@@ -1,52 +1,100 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, OnDestroy, SimpleChanges, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, OnDestroy, SimpleChanges, inject, input, signal, effect } from '@angular/core';
+import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { CategoryService } from '../../../services/category.service';
+import { CategoryService } from '../../../../../core/services/products/category.service';
 import { ResponseCategory, CategoryRegister } from '../../../../../shared/models/categories/category.interface';
 import { PromotionDTO } from '../../../../../shared/models/promotions/promotion.interface';
-import { finalize, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
+import { Observable, of, Subject, timer } from 'rxjs';
 
 @Component({
   selector: 'app-new-category-page',
   templateUrl: './new-page.component.html',
   styleUrls: ['./new-page.component.scss']
 })
-export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
+export class NewCategoryPageComponent implements OnInit, OnDestroy {
+  // Entradas y salidas del componente
   @Output() closeDialog = new EventEmitter<void>();
   @Output() refreshEntities = new EventEmitter<void>();
-  @Input() entity: ResponseCategory | null = null;
-  @Input() categoryId: number = 0;
-  @Input() promotions: PromotionDTO[] = [];
 
-  isEditMode: boolean = false;
-  isSubmitting: boolean = false;
-  selectedPromotions: number[] = [];
+  // Usamos input() para las propiedades de entrada (más moderno que @Input)
+  entity = input<ResponseCategory | null>(null);
+  categoryId = input<number>(0);
+  promotions = input<PromotionDTO[]>([]);
 
-  // Form group declaration using FormBuilder for cleaner code
-  entityForm: FormGroup;
+  isEditMode = signal(false);
+  isSubmitting = signal(false);
+  selectedPromotions = signal<number[]>([]);
 
   // Subject for cleaning up subscriptions
   private destroy$ = new Subject<void>();
-  fb = inject(FormBuilder);
-  messageService = inject(MessageService);
-  categoryService = inject(CategoryService);
-  constructor(
-  ) {
-    // Initialize form with FormBuilder
+  // Inyección de dependencias
+
+  private fb = inject(FormBuilder);
+  private messageService = inject(MessageService);
+  private categoryService = inject(CategoryService);
+
+  // Form group declaration using FormBuilder for cleaner code
+  entityForm: FormGroup;
+   constructor() {
     this.entityForm = this.initializeForm();
+
+    // Usamos effect() para reaccionar a cambios en el input `entity`
+    effect(() => {
+      const currentEntity = this.entity();
+      if (currentEntity) {
+        console.log('Current entity:', currentEntity);
+        this.isEditMode.set(true);
+        this.patchFormValues(currentEntity);
+      } else {
+        this.resetForm();
+      }
+    }, { allowSignalWrites: true });
   }
 
   /**
-   * Initialize form with default values and validators
+   * Inicializa el formulario con validadores síncronos y asíncronos.
    */
   private initializeForm(): FormGroup {
     return this.fb.group({
-      productCategoryName: ['', [Validators.required, Validators.maxLength(100)]],
+      productCategoryName: ['',
+        {
+          validators: [Validators.required, Validators.maxLength(100), Validators.minLength(2)],
+          asyncValidators: [this.categoryNameValidator()], // ✅ Validador asíncrono
+          updateOn: 'blur' // Opcional: valida solo cuando se pierde el foco
+        }
+      ],
       promotionListId: [[]]
     });
   }
+  /**
+   * Validador asíncrono para verificar si el nombre de la categoría ya existe.
+   */
+  private categoryNameValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      const name = control.value;
+      if (!name) {
+        return of(null); // Si no hay valor, no validar
+      }
 
+      // Si estamos en modo edición y el nombre no ha cambiado, es válido.
+      if (this.isEditMode() && name.toLowerCase() === this.entity()?.productCategoryName.toLowerCase()) {
+        return of(null);
+      }
+
+      // Espera 500ms después de que el usuario deja de escribir para lanzar la petición
+      return timer(500).pipe(
+        switchMap(() =>
+          this.categoryService.getCategoryByName(name).pipe(
+            // Si el servicio encuentra una categoría, el nombre ya existe -> inválido
+            map(response => (response ? { categoryExists: true } : null)),
+            // Si el servicio retorna error (ej. 404, o tu error custom), significa que el nombre está disponible -> válido
+            catchError(() => of(null))
+          )
+        )
+      );
+    };
+  }
   /**
    * Lifecycle hook - component initialization
    */
@@ -54,17 +102,6 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
     // Additional initialization if needed
   }
 
-  /**
-   * Lifecycle hook - detect input changes
-   */
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['entity'] && changes['entity'].currentValue) {
-      this.isEditMode = true;
-      this.patchFormValues(changes['entity'].currentValue);
-    } else if (changes['entity'] && !changes['entity'].currentValue) {
-      this.resetForm();
-    }
-  }
 
   /**
    * Lifecycle hook - component destruction
@@ -78,15 +115,11 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
    * Patch form values from entity
    */
   private patchFormValues(entity: ResponseCategory): void {
-    // Extract promotion IDs from the entity
-    this.selectedPromotions = entity.promotionDTOList ?
-      entity.promotionDTOList.map(promotion => promotion.promotionId) :
-      [];
-
-    // Patch form values
+    const promotionIds = entity.promotionDTOList ? entity.promotionDTOList.map(p => p.promotionId) : [];
+    this.selectedPromotions.set(promotionIds);
     this.entityForm.patchValue({
       productCategoryName: entity.productCategoryName,
-      promotionListId: this.selectedPromotions
+      promotionListId: promotionIds
     });
   }
 
@@ -94,18 +127,23 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
    * Reset form to default values
    */
   private resetForm(): void {
-    this.entityForm.reset();
-    this.selectedPromotions = [];
-    this.isEditMode = false;
+    this.entityForm.reset({
+        productCategoryName: '',
+        promotionListId: []
+    });
+    this.selectedPromotions.set([]);
+    this.isEditMode.set(false);
   }
 
   /**
    * Handle promotion selection change
    */
   onPromotionChange(event: any): void {
-    this.selectedPromotions = event.value;
-    this.entityForm.get('promotionListId')?.setValue(this.selectedPromotions);
+    const promotionIds = event.value;
+    this.selectedPromotions.set(promotionIds);
+    this.entityForm.get('promotionListId')?.setValue(promotionIds);
   }
+
 
   /**
    * Form submission handler
@@ -121,15 +159,15 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
+    this.isSubmitting.set(true);
+
     const category: CategoryRegister = {
       categoryName: this.entityForm.get('productCategoryName')?.value,
       promotionListId: this.entityForm.get('promotionListId')?.value || []
     };
 
-    this.isSubmitting = true;
-
-    if (this.isEditMode && this.categoryId) {
-      this.updateCategory(this.categoryId, category);
+    if (this.isEditMode() && this.categoryId()) {
+      this.updateCategory(this.categoryId(), category);
     } else {
       this.createCategory(category);
     }
@@ -140,49 +178,34 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
    */
   private createCategory(category: CategoryRegister): void {
     this.categoryService.createCategory(category)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.isSubmitting = false)
-      )
+      .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Categoría creada correctamente'
-          });
-          this.refreshEntities.emit();
-          this.closeDialog.emit();
-          this.resetForm();
-          this.refreshCategories();
-        },
-        error: (error) => this.handleError(error)
+        next: () => this.handleSuccess('Categoría creada correctamente'),
+        error: (err) => this.handleError(err)
       });
   }
+
 
   /**
    * Update an existing category
    */
   private updateCategory(id: number, category: CategoryRegister): void {
     this.categoryService.updateCategory(id, category)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.isSubmitting = false)
-      )
+      .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Categoría actualizada correctamente'
-          });
-          this.refreshEntities.emit();
-          this.closeDialog.emit();
-          this.resetForm();
-          this.refreshCategories();
-        },
-        error: (error) => this.handleError(error)
+        next: () => this.handleSuccess('Categoría actualizada correctamente'),
+        error: (err) => this.handleError(err)
       });
+  }
+
+  /**
+   * Maneja la respuesta exitosa de la API.
+   */
+  private handleSuccess(detail: string): void {
+    this.messageService.add({ severity: 'success', summary: 'Éxito', detail });
+    this.refreshEntities.emit();
+    this.closeDialog.emit();
+    this.categoryService.refreshCategories();
   }
 
   /**
@@ -201,25 +224,23 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
    * Handle API errors
    */
   private handleError(error: any): void {
-    console.error('API Error:', error);
     let errorMessage = 'Ocurrió un error inesperado. Intente nuevamente.';
 
-    if (error.status === 406 && error.error?.message) {
+    // ✅ Si el backend retorna el error de que ya existe, lo asignamos al input.
+    if (error.error?.code === 'ERC00009') {
+      errorMessage = 'Ya existe una categoría con este nombre.';
+      this.entityForm.get('productCategoryName')?.setErrors({ categoryExists: true });
+    } else if (error.error?.message) {
       errorMessage = error.error.message;
     }
 
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: errorMessage
-    });
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMessage });
   }
 
   /**
    * Cancel form and close dialog
    */
   onCancel(): void {
-    this.resetForm();
     this.closeDialog.emit();
   }
 
@@ -229,8 +250,9 @@ export class NewCategoryPageComponent implements OnInit, OnChanges, OnDestroy {
   refreshCategories(): void {
     this.categoryService.refreshCategories();
   }
-  removePromotion(promotionId: number): void {
-    this.selectedPromotions = this.selectedPromotions.filter(id => id !== promotionId);
-    this.entityForm.get('promotionListId')?.setValue(this.selectedPromotions);
+   removePromotion(promotionId: number): void {
+    const updatedPromos = this.selectedPromotions().filter(id => id !== promotionId);
+    this.selectedPromotions.set(updatedPromos);
+    this.entityForm.get('promotionListId')?.setValue(updatedPromos);
   }
 }

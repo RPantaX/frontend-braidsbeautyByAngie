@@ -6,7 +6,7 @@ import { PromotionDTO } from '../../../../../shared/models/promotions/promotion.
 import { finalize, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { CategoryService } from '../../../../../core/services/reservations/category.service';
-import { PromotionService } from '../../../../products/services/promotion.service';
+import { PromotionService } from '../../../../../core/services/products/promotion.service';
 
 @Component({
   selector: 'app-new-category-page',

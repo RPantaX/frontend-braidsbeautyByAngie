@@ -16,7 +16,7 @@ import { RouterModule } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 import { DatePipe } from '@angular/common';
 
-import { PromotionService } from '../../../services/promotion.service';
+import { PromotionService } from '../../../../../core/services/products/promotion.service';
 import { PromotionDTO, PromotionResponsePageable, PromotionWithCategories } from '../../../../../shared/models/promotions/promotion.interface';
 import { Subscription } from 'rxjs';
 

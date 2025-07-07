@@ -1,5 +1,5 @@
 import { ContentChild, Directive,EventEmitter, Input, Output } from '@angular/core';
-import { ResponseProductItemDetail } from '../../../interfaces/product.interface';
+import { ResponseProductItemDetail } from '../../../../../shared/models/products/product.interface';
 import { TemplateFollbackDirective } from '../../../../../shared/directives/template-follback.directive';
 
 @Directive({

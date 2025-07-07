@@ -1,7 +1,7 @@
 // promotion.component.ts - Main Component (Enhanced)
 import { Component, inject, OnInit } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { PromotionService } from '../../services/promotion.service';
+import { PromotionService } from '../../../../core/services/products/promotion.service';
 import { PromotionDTO, PromotionWithCategories } from '../../../../shared/models/promotions/promotion.interface';
 
 @Component({

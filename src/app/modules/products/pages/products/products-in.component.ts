@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ProductsService } from '../../services/products.service';
-import { ResponsePageableProducts, SaveProduct } from '../../interfaces/product.interface';
+import { ProductsService } from '../../../../core/services/products/products.service';
+import { ResponsePageableProducts, SaveProduct } from '../../../../shared/models/products/product.interface';
 
 @Component({
   selector: 'app-products-in-page',

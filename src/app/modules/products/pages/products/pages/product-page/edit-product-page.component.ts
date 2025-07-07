@@ -2,8 +2,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ProductsService } from '../../../../services/products.service';
-import { ResponseProduct, ResponseProductItemDetail, SaveProduct } from '../../../../interfaces/product.interface';
+import { ProductsService } from '../../../../../../core/services/products/products.service';
+import { ResponseProduct, ResponseProductItemDetail, SaveProduct } from '../../../../../../shared/models/products/product.interface';
 
 @Component({
   selector: 'product-edit-page',

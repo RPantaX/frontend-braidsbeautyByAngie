@@ -1,9 +1,9 @@
 import { ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
-import { ItemProductService } from '../../../../services/products/items-products.service';
+import { ItemProductService } from '../../../../../../core/services/products/items-products.service';
 import { ItemProductList } from '../item-product-list';
-import { ResponseProductItemDetail, Variation } from '../../../../interfaces/product.interface';
+import { ResponseProductItemDetail, Variation } from '../../../../../../shared/models/products/product.interface';
 
 import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';

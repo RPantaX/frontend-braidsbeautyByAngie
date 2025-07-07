@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { ItemProductResponse, ItemProductSave } from '../../interfaces/item-product.interface';
-import { environment } from '../../../../../environments/environments.prod';
+import { map, Observable } from 'rxjs';
+import { ItemProductResponse, ItemProductSave } from '../../../shared/models/products/item-product.interface';
+import { environment } from '../../../../environments/environments.prod';
+import { ApiResponse } from '../../../../@utils/interfaces/ApiResponse';
 
 @Injectable({providedIn: 'root'})
 export class ItemProductService {
@@ -10,7 +11,9 @@ export class ItemProductService {
   constructor(private httpClient: HttpClient) { }
 
   getListItemProductById(id: Number) : Observable<ItemProductResponse> {
-    return this.httpClient.get<ItemProductResponse>(`${this.baseUrl}/itemProduct/${id}`);
+    return this.httpClient.get<ApiResponse<ItemProductResponse>>(`${this.baseUrl}/itemProduct/${id}`).pipe(
+          map(response => response.data)
+        );
   }
   saveItemProduct(itemProduct: ItemProductSave): Observable<any> {
     return this.httpClient.post(`${this.baseUrl}/itemProduct`, itemProduct);

@@ -1,10 +1,10 @@
 import { Component, EventEmitter, inject, Input, Output,  } from '@angular/core';
-import { SaveProduct } from '../../../interfaces/product.interface';
+import { SaveProduct } from '../../../../../shared/models/products/product.interface';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ProductsService } from '../../../services/products.service';
+import { ProductsService } from '../../../../../core/services/products/products.service';
 import { MessageService } from 'primeng/api';
 import { CategoryOption } from '../../../../../shared/models/categories/category.interface';
-import { CategoryService } from '../../../services/category.service';
+import { CategoryService } from '../../../../../core/services/products/category.service';
 
 @Component({
   selector: 'app-new-product-page',

@@ -7,7 +7,10 @@ import { MessageService } from "../../app/shared/message/message.service";
 import { TranslateService } from "@ngx-translate/core";
 import { KeyStorage } from "../../@utils/enums/KeyStorage";
 import { TokenResponse } from "../../app/shared/models/auth/auth.interface";
+import { EnumErrorCode } from "../../@utils/enums/EnumErrorCode";
 
+
+const ERROR_CODE = Object.values(EnumErrorCode as unknown as string[]);
 @Injectable({providedIn: 'root'})
 export class SecurityInterceptor implements HttpInterceptor{
   private readonly _messageService: MessageService = inject(MessageService);

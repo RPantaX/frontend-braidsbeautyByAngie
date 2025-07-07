@@ -1,9 +1,9 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { ResponseProduct, ResponseProductItemDetail } from '../../../interfaces/product.interface';
-import { ItemProductService } from '../../../services/products/items-products.service';
-import { ProductsService } from '../../../services/products.service';
+import { ResponseProduct, ResponseProductItemDetail } from '../../../../../shared/models/products/product.interface';
+import { ItemProductService } from '../../../../../core/services/products/items-products.service';
+import { ProductsService } from '../../../../../core/services/products/products.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ItemProductSave } from '../../../interfaces/item-product.interface';
+import { ItemProductSave } from '../../../../../shared/models/products/item-product.interface';
 
 @Component({
   selector: 'app-item-product-page',

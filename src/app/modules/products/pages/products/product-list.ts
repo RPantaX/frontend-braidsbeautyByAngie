@@ -1,5 +1,5 @@
 import { ContentChild, Directive, EventEmitter, Input, Output } from "@angular/core";
-import { ResponsePageableProducts, SaveProduct } from "../../interfaces/product.interface";
+import { ResponsePageableProducts, SaveProduct } from "../../../../shared/models/products/product.interface";
 import { TemplateFollbackDirective } from "../../../../shared/directives/template-follback.directive";
 
 

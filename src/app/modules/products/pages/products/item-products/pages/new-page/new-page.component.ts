@@ -4,10 +4,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { tap } from 'rxjs';
 
-import { ItemProductService } from '../../../../../services/products/items-products.service';
-import { VariationService } from '../../../../../services/products/variation.service';
-import { ItemProductSave } from '../../../../../interfaces/item-product.interface';
-import { Variation, VariationOptionEntity } from '../../../../../interfaces/vatiations/variation.interface';
+import { ItemProductService } from '../../../../../../../core/services/products/items-products.service';
+import { VariationService } from '../../../../../../../core/services/products/variation.service';
+import { ItemProductSave } from '../../../../../../../shared/models/products/item-product.interface';
+import { Variation, VariationOptionEntity } from '../../../../../../../shared/models/vatiations/variation.interface';
 
 @Component({
   selector: 'item-product-new-page',

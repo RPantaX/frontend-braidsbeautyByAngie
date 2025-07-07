@@ -15,7 +15,7 @@ import { ChipModule } from 'primeng/chip';
 import { RouterModule } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { CategoryService } from '../../../services/category.service';
+import { CategoryService } from '../../../../../core/services/products/category.service';
 import { ResponseCategory, CategoryResponsePageable } from '../../../../../shared/models/categories/category.interface';
 import { PromotionDTO } from '../../../../../shared/models/promotions/promotion.interface';
 import { Subscription } from 'rxjs';

@@ -7,7 +7,6 @@ import { SharedModule } from './shared/shared.module';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient ,withInterceptorsFromDi } from '@angular/common/http';
-import { JwtInterceptor } from './auth/interceptor/JwtInterceptor';
 import { SecurityInterceptor } from '../@security/interceptors/error.interceptor';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnChanges, OnDestroy, SimpleChanges, input, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { PromotionService } from '../../../services/promotion.service';
+import { PromotionService } from '../../../../../core/services/products/promotion.service';
 import { CategoryOption } from '../../../../../shared/models/categories/category.interface';
 import { PromotionDTO } from '../../../../../shared/models/promotions/promotion.interface';
 import { finalize, takeUntil } from 'rxjs/operators';

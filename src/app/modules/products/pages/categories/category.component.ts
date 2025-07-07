@@ -1,8 +1,8 @@
 // category.component.ts - Main Component
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { CategoryService } from '../../services/category.service';
-import { PromotionService } from '../../services/promotion.service';
+import { CategoryService } from '../../../../core/services/products/category.service';
+import { PromotionService } from '../../../../core/services/products/promotion.service';
 import { ResponseCategory, CategoryRegister } from '../../../../shared/models/categories/category.interface';
 import { PromotionDTO } from '../../../../shared/models/promotions/promotion.interface';
 
