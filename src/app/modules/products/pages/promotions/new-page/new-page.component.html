@@ -1,6 +1,6 @@
 <form [formGroup]="entityForm" (ngSubmit)="onSubmit()">
   <!-- Promotion ID (Read only) -->
-  <div class="field" *ngIf="promotionId">
+  <div class="field" *ngIf="promotionId()">
     <label>ID de Promoción: {{promotionId()}}</label>
   </div>
 
@@ -14,9 +14,18 @@
       formControlName="promotionName"
       required
       autofocus
+      [class.p-invalid]="entityForm.get('promotionName')?.invalid && entityForm.get('promotionName')?.touched"
     />
-    <small class="p-error" *ngIf="entityForm.get('promotionName')?.invalid && entityForm.get('promotionName')?.touched">
-      El nombre es requerido y debe tener un máximo de 100 caracteres.
+    <small
+      class="p-error"
+      *ngIf="entityForm.get('promotionName')?.hasError('required') || entityForm.get('promotionName')?.hasError('maxlength')">
+      El nombre es requerido y debe tener un minimo de 2 caracteres.
+    </small>
+
+    <small
+      class="p-error"
+      *ngIf="entityForm.get('promotionName')?.hasError('promotionExists')">
+      El nombre de la promoción ya existe.
     </small>
   </div>
 
@@ -80,7 +89,7 @@
       (click)="onCancel()"
     ></p-button>
     <p-button
-      label="{{ isEditMode ? 'Editar' : 'Guardar' }}"
+      label="{{ isEditMode() ? 'Editar' : 'Guardar' }}"
       icon="pi pi-check"
       [text]="true"
       type="submit"

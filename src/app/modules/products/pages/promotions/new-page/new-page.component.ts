@@ -1,25 +1,30 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, OnDestroy, SimpleChanges, input, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, OnDestroy, SimpleChanges, input, inject, signal, effect } from '@angular/core';
+import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { PromotionService } from '../../../../../core/services/products/promotion.service';
 import { CategoryOption } from '../../../../../shared/models/categories/category.interface';
 import { PromotionDTO } from '../../../../../shared/models/promotions/promotion.interface';
-import { finalize, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
+import { Observable, of, Subject, timer } from 'rxjs';
 
 @Component({
   selector: 'app-new-promotion-page',
   templateUrl: './new-page.component.html',
   styleUrls: ['./new-page.component.scss']
 })
-export class NewPromotionPageComponent implements OnInit, OnChanges, OnDestroy {
+export class NewPromotionPageComponent implements OnInit, OnDestroy {
   @Output() closeDialog = new EventEmitter<void>();
   @Output() refreshEntities = new EventEmitter<void>();
-  entity = input.required<PromotionDTO | null>();
-  promotionId = input.required<number>();
 
-  isEditMode: boolean = false;
-  isSubmitting: boolean = false;
+  entity = input<PromotionDTO | null>(null);
+  promotionId = input<number | null>(null);
+
+  isEditMode = signal(false);
+  isSubmitting = signal(false);
+
+  fb = inject(FormBuilder);
+  messageService = inject(MessageService);
+  promotionService = inject(PromotionService);
 
   // Form group declaration using FormBuilder for cleaner code
   entityForm: FormGroup;
@@ -27,12 +32,19 @@ export class NewPromotionPageComponent implements OnInit, OnChanges, OnDestroy {
   // Subject for cleaning up subscriptions
   private destroy$ = new Subject<void>();
 
-  fb = inject(FormBuilder);
-  messageService = inject(MessageService);
-  promotionService = inject(PromotionService);
   constructor() {
-    // Initialize form with FormBuilder
     this.entityForm = this.initializeForm();
+
+    // Reacciona a los cambios en la entidad de entrada para editar o resetear
+    effect(() => {
+      const currentEntity = this.entity();
+      if (currentEntity) {
+        this.isEditMode.set(true);
+        this.patchFormValues(currentEntity);
+      } else {
+        this.resetForm();
+      }
+    }, { allowSignalWrites: true }); // Permite modificar signals dentro del efecto
   }
 
   /**
@@ -40,32 +52,47 @@ export class NewPromotionPageComponent implements OnInit, OnChanges, OnDestroy {
    */
   private initializeForm(): FormGroup {
     return this.fb.group({
-      promotionName: ['', [Validators.required, Validators.maxLength(100)]],
+      promotionName: ['', {
+        validators: [Validators.required, Validators.maxLength(100)],
+        asyncValidators: [this.promotionNameValidator()], // ✅ Validador asíncrono
+        updateOn: 'blur' // Valida al perder el foco para optimizar
+      }],
       promotionDescription: [''],
       promotionDiscountRate: [0, [Validators.required, Validators.min(0), Validators.max(1)]],
       promotionStartDate: [new Date()],
-      promotionEndDate: [new Date()],
-      productCategoryIds: [[]]
+      promotionEndDate: [new Date()]
     });
   }
+  private promotionNameValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      const name = control.value;
+      if (!name) {
+        return of(null);
+      }
 
+      // Si estamos editando y el nombre no ha cambiado, es válido.
+      if (this.isEditMode() && name.toLowerCase() === this.entity()?.promotionName.toLowerCase()) {
+        return of(null);
+      }
+
+      // Espera 500ms antes de llamar a la API
+      return timer(500).pipe(
+        switchMap(() =>
+          this.promotionService.getPromotionByName(name).pipe(
+            // Si la API devuelve una promoción, el nombre ya existe -> inválido
+            map(response => (response ? { promotionExists: true } : null)),
+            // Si la API falla o no encuentra nada, el nombre está disponible -> válido
+            catchError(() => of(null))
+          )
+        )
+      );
+    };
+  }
   /**
    * Lifecycle hook - component initialization
    */
   ngOnInit(): void {
 
-  }
-
-  /**
-   * Lifecycle hook - detect input changes
-   */
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['entity'] && changes['entity'].currentValue) {
-      this.isEditMode = true;
-      this.patchFormValues(changes['entity'].currentValue);
-    } else if (changes['entity'] && !changes['entity'].currentValue) {
-      this.resetForm();
-    }
   }
 
   /**
@@ -81,17 +108,11 @@ export class NewPromotionPageComponent implements OnInit, OnChanges, OnDestroy {
    * Patch form values from entity
    */
   private patchFormValues(entity: PromotionDTO): void {
-    // Format dates if they're strings
-    const formattedEntity = {
+    this.entityForm.patchValue({
       ...entity,
-      promotionStartDate: entity.promotionStartDate instanceof Date ?
-        entity.promotionStartDate : new Date(entity.promotionStartDate),
-      promotionEndDate: entity.promotionEndDate instanceof Date ?
-        entity.promotionEndDate : new Date(entity.promotionEndDate)
-    };
-
-    this.entityForm.patchValue(formattedEntity);
-
+      promotionStartDate: entity.promotionStartDate ? new Date(entity.promotionStartDate) : new Date(),
+      promotionEndDate: entity.promotionEndDate ? new Date(entity.promotionEndDate) : new Date(),
+    });
   }
 
   /**
@@ -99,11 +120,13 @@ export class NewPromotionPageComponent implements OnInit, OnChanges, OnDestroy {
    */
   private resetForm(): void {
     this.entityForm.reset({
+      promotionName: '',
+      promotionDescription: '',
       promotionDiscountRate: 0,
       promotionStartDate: new Date(),
-      promotionEndDate: new Date(),
+      promotionEndDate: new Date()
     });
-    this.isEditMode = false;
+    this.isEditMode.set(false);
   }
 
   /**
@@ -123,70 +146,36 @@ export class NewPromotionPageComponent implements OnInit, OnChanges, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Por favor, complete los campos obligatorios correctamente'
+        detail: 'Por favor, complete los campos obligatorios.'
       });
       return;
     }
 
-    const promotion = this.entityForm.value as PromotionDTO;
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
+    const promotionData = this.entityForm.value;
 
-    if (this.isEditMode && this.promotionId) {
-      this.updatePromotion(this.promotionId(), promotion);
-    } else {
-      this.createPromotion(promotion);
-    }
+    const action$ = this.isEditMode() && this.promotionId()
+      ? this.promotionService.updatePromotion(this.promotionId()!, promotionData)
+      : this.promotionService.createPromotion(promotionData);
+
+    action$.pipe(
+      finalize(() => this.isSubmitting.set(false))
+    ).subscribe({
+      next: () => this.handleSuccess(this.isEditMode() ? 'actualizada' : 'creada'),
+      error: (err) => this.handleError(err)
+    });
+  }
+  private handleSuccess(action: 'creada' | 'actualizada'): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: `Promoción ${action} correctamente`
+    });
+    this.refreshEntities.emit();
+    this.closeDialog.emit();
+    this.promotionService.refreshPromotions();
   }
 
-  /**
-   * Create a new promotion
-   */
-  private createPromotion(promotion: PromotionDTO): void {
-    this.promotionService.createPromotion(promotion)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.isSubmitting = false)
-      )
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Promoción creada correctamente'
-          });
-          this.refreshEntities.emit();
-          this.closeDialog.emit();
-          this.resetForm();
-          this.refreshPromotions();
-        },
-        error: (error) => this.handleError(error)
-      });
-  }
-
-  /**
-   * Update an existing promotion
-   */
-  private updatePromotion(id: number, promotion: PromotionDTO): void {
-    this.promotionService.updatePromotion(id, promotion)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.isSubmitting = false)
-      )
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Promoción actualizada correctamente'
-          });
-          this.refreshEntities.emit();
-          this.closeDialog.emit();
-          this.resetForm();
-          this.refreshPromotions();
-        },
-        error: (error) => this.handleError(error)
-      });
-  }
 
   /**
    * Mark all form controls as touched to trigger validation
@@ -204,10 +193,13 @@ export class NewPromotionPageComponent implements OnInit, OnChanges, OnDestroy {
    * Handle API errors
    */
   private handleError(error: any): void {
-    console.error('API Error:', error);
-    let errorMessage = 'Ocurrió un error inesperado. Intente nuevamente.';
+    let errorMessage = 'Ocurrió un error inesperado.';
 
-    if (error.status === 406 && error.error?.message) {
+    // ✅ Lógica específica para el error de promoción duplicada
+    if (error.error?.code === 'ERPN00023') {
+      errorMessage = 'Ya existe una promoción con este nombre.';
+      this.entityForm.get('promotionName')?.setErrors({ promotionExists: true });
+    } else if (error.error?.message) {
       errorMessage = error.error.message;
     }
 
