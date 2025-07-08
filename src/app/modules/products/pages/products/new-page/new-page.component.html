@@ -15,25 +15,28 @@
       formControlName="productName"
       required
       autofocus
+      [class.ng-invalid]="isFieldInvalid('productName')"
     />
     <small class="p-error" *ngIf="entityForm.get('productName')?.invalid && entityForm.get('productName')?.touched">
       El nombre es requerido y debe tener un máximo de 100 caracteres.
+    </small>
+    <small class="p-error" *ngIf="isFieldInvalid('productName')">
+      {{ getFieldError('productName') }}
     </small>
   </div>
 
   <!-- SKU del Producto -->
   <div class="field">
-    <label for="productName">Descripcion del Producto</label>
-    <input
-      type="text"
-      pInputText
+    <label for="productDescription">Descripción del Producto</label>
+    <textarea
+      pInputTextarea
       id="productDescription"
       formControlName="productDescription"
-      required
-      autofocus
-    />
-    <small class="p-error" *ngIf="entityForm.get('productDescription')?.invalid && entityForm.get('productDescription')?.touched">
-      El nombre es requerido y debe tener un máximo de 100 caracteres.
+      rows="3"
+      [class.ng-invalid]="isFieldInvalid('productDescription')"
+    ></textarea>
+    <small class="p-error" *ngIf="isFieldInvalid('productDescription')">
+      {{ getFieldError('productDescription') }}
     </small>
   </div>
 
@@ -41,13 +44,15 @@
   <div class="field">
     <label for="productImage">Imagen del Producto</label>
     <input
-      type="text"
+      type="url"
       pInputText
       id="productImage"
       formControlName="productImage"
+      placeholder="https://ejemplo.com/imagen.jpg"
+      [class.ng-invalid]="isFieldInvalid('productImage')"
     />
-    <small class="p-error" *ngIf="entityForm.get('productImage')?.invalid && entityForm.get('productImage')?.touched">
-      La URL de la imagen no es válida.
+    <small class="p-error" *ngIf="isFieldInvalid('productImage')">
+      {{ getFieldError('productImage') }}
     </small>
   </div>
     <!-- Ctegoria -->
@@ -55,12 +60,16 @@
       <label for="categoryId">Categoria</label>
       <p-dropdown
         inputId="categoryId"
-        [options]="categories"
+        [options]="categories()"
         optionLabel="categoryName"
         optionValue="categoryId"
         formControlName="categoryId"
         placeholder="Selecciona una categoria"
+        [class.ng-invalid]="isFieldInvalid('categoryId')"
       ></p-dropdown>
+      <small class="p-error" *ngIf="isFieldInvalid('categoryId')">
+      {{ getFieldError('categoryId') }}
+      </small>
     </div>
   <!-- Botones de acción -->
   <div class="form-actions">
@@ -69,12 +78,15 @@
       icon="pi pi-times"
       [text]="true"
       (click)="onCancel()"
+      [disabled]="isSubmitting()"
     ></p-button>
     <p-button
-      label="{{ isEditMode ? 'Editar' : 'Guardar' }}"
+      [label]="isEditMode() ? 'Actualizar' : 'Guardar'"
       icon="pi pi-check"
       [text]="true"
       type="submit"
+      [disabled]="isSubmitting()"
+      [loading]="isSubmitting()"
     ></p-button>
   </div>
 </form>
