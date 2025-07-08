@@ -11,15 +11,32 @@
 
     <div class="form-field">
       <label for="productItemSKU">SKU del Producto *</label>
-      <input pInputText id="productItemSKU" formControlName="productItemSKU" />
-      <small class="p-error" *ngIf="isInvalid('productItemSKU')">
-        SKU requerido (máx. 100 caracteres).
+      <input
+        pInputText
+        id="productItemSKU"
+        formControlName="productItemSKU"
+        [class.ng-invalid]="isInvalid('productItemSKU')"
+        />
+      <!-- Mostrar errores de validación estándar -->
+      <small class="p-error" *ngIf="isInvalid('productItemSKU') && !skuError()">
+        {{ getFieldError('productItemSKU') }}
+      </small>
+
+      <!-- Mostrar error específico del backend -->
+      <small class="p-error" *ngIf="skuError()">
+        {{ skuError() }}
       </small>
     </div>
 
     <div class="form-field">
       <label for="productItemQuantityInStock">Cantidad en Stock *</label>
-      <input pInputText id="productItemQuantityInStock" formControlName="productItemQuantityInStock" />
+      <input
+      pInputText
+      id="productItemQuantityInStock"
+      formControlName="productItemQuantityInStock"
+      type="number"
+      [class.ng-invalid]="isInvalid('productItemQuantityInStock')"
+      />
       <small class="p-error" *ngIf="isInvalid('productItemQuantityInStock')">
         Cantidad inválida (8-15 caracteres, decimal).
       </small>
@@ -27,14 +44,30 @@
 
     <div class="form-field">
       <label for="productItemImage">URL de Imagen</label>
-      <input pInputText id="productItemImage" formControlName="productItemImage" />
+      <input
+      pInputText
+      id="productItemImage"
+      formControlName="productItemImage"
+      [class.ng-invalid]="isInvalid('productItemImage')"
+      placeholder="https://ejemplo.com/imagen.jpg"
+      />
+      <small class="p-error" *ngIf="isInvalid('productItemImage')">
+        {{ getFieldError('productItemImage') }}
+      </small>
     </div>
 
     <div class="form-field">
       <label for="productItemPrice">Precio *</label>
-      <input pInputText id="productItemPrice" formControlName="productItemPrice" />
+      <input
+        pInputText
+        id="productItemPrice"
+        formControlName="productItemPrice"
+        type="number"
+        step="0.01"
+        [class.ng-invalid]="isInvalid('productItemPrice')"
+      />
       <small class="p-error" *ngIf="isInvalid('productItemPrice')">
-        Precio inválido (1-15 caracteres).
+        {{ getFieldError('productItemPrice') }}
       </small>
     </div>
 
@@ -73,7 +106,10 @@
           (click)="addToVariation()"
           [disabled]="
             entityForm.get('variationName')?.invalid ||
-            entityForm.get('variationOptionValue')?.invalid
+            entityForm.get('variationOptionValue')?.invalid ||
+            !entityForm.get('variationName')?.value ||
+            !entityForm.get('variationOptionValue')?.value ||
+            isSubmitting()
           ">
         </button>
       </div>
@@ -82,6 +118,12 @@
       <div class="form-section">
         <h3>Variaciones Agregadas</h3>
         <div formArrayName="requestVariations">
+          <!-- Mensaje cuando no hay variaciones -->
+          <div *ngIf="variationsArray.length === 0" class="no-variations-message">
+            <p>No hay variaciones agregadas</p>
+          </div>
+
+          <!-- Lista de variaciones -->
           <ng-container *ngFor="let group of variationsArray.controls; let i = index">
             <div [formGroupName]="i" class="variation-row">
               <input pInputText formControlName="variationName" readonly class="half-width" />
@@ -91,10 +133,16 @@
                 type="button"
                 icon="pi pi-trash"
                 class="p-button-danger p-button-rounded"
+                [disabled]="isSubmitting()"
                 (click)="deleteVariation(i)">
               </button>
             </div>
           </ng-container>
+
+          <!-- Error de variaciones mínimas -->
+          <small class="p-error" *ngIf="variationsArray.invalid && variationsArray.touched">
+            {{ getFieldError('requestVariations') }}
+          </small>
         </div>
       </div>
     </div>
@@ -107,15 +155,17 @@
         label="Cancelar"
         icon="pi pi-times"
         class="p-button-text"
+        [disabled]="isSubmitting()"
         [routerLink]="['/products/manage', 'edit', idProduct]">
       </button>
 
       <button
         pButton
         type="submit"
-        [label]="isEditMode ? 'Editar' : 'Guardar'"
+        [label]="isEditMode ? 'Actualizar' : 'Guardar'"
         icon="pi pi-check"
-        [disabled]="entityForm.invalid"
+        [disabled]="entityForm.invalid || isSubmitting()"
+        [loading]="isSubmitting()"
         class="p-button-success">
       </button>
     </div>

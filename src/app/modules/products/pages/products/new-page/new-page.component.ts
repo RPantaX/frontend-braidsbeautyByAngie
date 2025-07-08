@@ -175,10 +175,10 @@ export class NewPageComponent {
       console.error('Error en operación:', error);
 
       // Verificar si es el error específico de nombre duplicado
-      if (error.status === 406 && error.error?.code === 'ERP00002') {
+      if (error.status === 500 && error.error?.code === 'ERP00002') {
         // Establecer el error específico para el campo nombre
         this._productNameError.set(error.error.message || 'Ya existe un producto con este nombre');
-
+        this._isSubmitting.set(false);
         // Marcar el campo como tocado para mostrar el error
         const nameControl = this.entityForm.get('productName');
         if (nameControl) {

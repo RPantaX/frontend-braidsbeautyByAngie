@@ -27,7 +27,6 @@ export class EditProductPageComponent implements OnInit{
   ){}
 
   ngOnInit(): void {
-    console.log('EditProductPageComponent initialized');
     this.activatedRoute.params
     .pipe(
       switchMap(({id}) => this.productService.getProductById(id)),
