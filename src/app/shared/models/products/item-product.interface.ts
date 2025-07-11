@@ -35,9 +35,20 @@ export interface ItemProductSave {
   productItemImage?:           string;
   productItemPrice:           number;
   requestVariations:          RequestVariation[];
+  deleteFile?: boolean;
 }
 
 export interface RequestVariation {
   variationName:        string;
   variationOptionValue: string;
+}
+
+export interface ItemProductFormData {
+  productId: number;
+  productItemSKU: string;
+  productItemQuantityInStock: number;
+  productItemPrice: number;
+  requestVariations: RequestVariation[];
+  imagen?: File; // Archivo de imagen seleccionado
+  deleteFile?: boolean; // Para indicar si se debe eliminar la imagen
 }

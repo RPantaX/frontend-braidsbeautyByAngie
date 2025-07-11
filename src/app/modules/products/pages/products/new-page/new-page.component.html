@@ -1,13 +1,12 @@
 <form [formGroup]="entityForm" (ngSubmit)="onSubmit()">
   <!-- Product ID (Solo lectura) -->
-
   <div class="field" *ngIf="productId">
-    <label >ID del Producto: {{productId}}</label>
+    <label>ID del Producto: {{productId}}</label>
   </div>
 
-  <!-- SKU del Producto -->
+  <!-- Nombre del Producto -->
   <div class="field">
-    <label for="productName">Nombre del Producto</label>
+    <label for="productName">Nombre del Producto *</label>
     <input
       type="text"
       pInputText
@@ -16,16 +15,14 @@
       required
       autofocus
       [class.ng-invalid]="isFieldInvalid('productName')"
+      placeholder="Ingrese el nombre del producto"
     />
-    <small class="p-error" *ngIf="entityForm.get('productName')?.invalid && entityForm.get('productName')?.touched">
-      El nombre es requerido y debe tener un máximo de 100 caracteres.
-    </small>
     <small class="p-error" *ngIf="isFieldInvalid('productName')">
       {{ getFieldError('productName') }}
     </small>
   </div>
 
-  <!-- SKU del Producto -->
+  <!-- Descripción del Producto -->
   <div class="field">
     <label for="productDescription">Descripción del Producto</label>
     <textarea
@@ -34,6 +31,7 @@
       formControlName="productDescription"
       rows="3"
       [class.ng-invalid]="isFieldInvalid('productDescription')"
+      placeholder="Ingrese la descripción del producto (opcional)"
     ></textarea>
     <small class="p-error" *ngIf="isFieldInvalid('productDescription')">
       {{ getFieldError('productDescription') }}
@@ -43,47 +41,113 @@
   <!-- Imagen del Producto -->
   <div class="field">
     <label for="productImage">Imagen del Producto</label>
-    <input
-      type="url"
-      pInputText
-      id="productImage"
-      formControlName="productImage"
-      placeholder="https://ejemplo.com/imagen.jpg"
-      [class.ng-invalid]="isFieldInvalid('productImage')"
-    />
-    <small class="p-error" *ngIf="isFieldInvalid('productImage')">
-      {{ getFieldError('productImage') }}
+
+    <div class="flex flex-column gap-3">
+      <input
+        type="file"
+        #fileInput
+        accept="image/jpeg,image/png,image/gif,image/webp"
+        (change)="onFileSelected($event)"
+        class="hidden"
+        id="fileInput"
+      />
+
+      <div class="flex gap-2 align-items-center">
+        <p-button
+          type="button"
+          label="Seleccionar Imagen"
+          icon="pi pi-upload"
+          (click)="fileInput.click()"
+          [disabled]="isSubmitting()"
+          severity="secondary"
+          [outlined]="true"
+        ></p-button>
+
+        <p-button
+          type="button"
+          label="Remover Imagen"
+          icon="pi pi-times"
+          (click)="removeImage()"
+          [disabled]="!imagePreview() || isSubmitting()"
+          severity="danger"
+          [outlined]="true"
+        ></p-button>
+
+        <!-- Indicador de cambios -->
+        <span *ngIf="hasImageChanged()" class="text-sm text-orange-500">
+          <i class="pi pi-exclamation-triangle"></i>
+          {{ shouldDeleteImage() ? 'La imagen será eliminada' : 'Nueva imagen seleccionada' }}
+        </span>
+      </div>
+
+      <!-- Preview de la imagen -->
+      <div *ngIf="imagePreview()" class="image-preview-container">
+        <div class="relative inline-block">
+          <img
+            [src]="imagePreview()"
+            alt="Vista previa de la imagen"
+            class="border-round-md shadow-2"
+            style="max-width: 300px; max-height: 200px; object-fit: contain; border: 2px solid #e9ecef;"
+          />
+
+          <!-- Overlay cuando la imagen será eliminada -->
+          <div
+            *ngIf="shouldDeleteImage()"
+            class="absolute top-0 left-0 w-full h-full bg-black-alpha-50 border-round-md flex align-items-center justify-content-center"
+          >
+            <span class="text-white text-lg font-medium">
+              <i class="pi pi-times-circle"></i>
+              Será eliminada
+            </span>
+          </div>
+        </div>
+
+        <small class="text-sm text-500 mt-2 block">
+          Formatos soportados: JPG, PNG, GIF, WebP (máximo 5MB)
+        </small>
+      </div>
+
+      <!-- Mensaje cuando no hay imagen -->
+      <div *ngIf="!imagePreview()" class="text-center p-4 border-2 border-dashed border-300 border-round-md">
+        <i class="pi pi-image text-4xl text-300"></i>
+        <p class="text-500 mt-2">No hay imagen seleccionada</p>
+        <small class="text-sm text-400">Haga clic en "Seleccionar Imagen" para agregar una</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categoría -->
+  <div class="field">
+    <label for="categoryId">Categoría *</label>
+    <p-dropdown
+      inputId="categoryId"
+      [options]="categories()"
+      optionLabel="categoryName"
+      optionValue="categoryId"
+      formControlName="categoryId"
+      placeholder="Seleccione una categoría"
+      [class.ng-invalid]="isFieldInvalid('categoryId')"
+      [showClear]="true"
+    ></p-dropdown>
+    <small class="p-error" *ngIf="isFieldInvalid('categoryId')">
+      {{ getFieldError('categoryId') }}
     </small>
   </div>
-    <!-- Ctegoria -->
-    <div class="field">
-      <label for="categoryId">Categoria</label>
-      <p-dropdown
-        inputId="categoryId"
-        [options]="categories()"
-        optionLabel="categoryName"
-        optionValue="categoryId"
-        formControlName="categoryId"
-        placeholder="Selecciona una categoria"
-        [class.ng-invalid]="isFieldInvalid('categoryId')"
-      ></p-dropdown>
-      <small class="p-error" *ngIf="isFieldInvalid('categoryId')">
-      {{ getFieldError('categoryId') }}
-      </small>
-    </div>
+
   <!-- Botones de acción -->
-  <div class="form-actions">
+  <div class="form-actions flex justify-content-end gap-2 mt-4">
     <p-button
       label="Cancelar"
       icon="pi pi-times"
-      [text]="true"
+      severity="secondary"
+      [outlined]="true"
       (click)="onCancel()"
       [disabled]="isSubmitting()"
     ></p-button>
+
     <p-button
-      [label]="isEditMode() ? 'Actualizar' : 'Guardar'"
+      [label]="isEditMode() ? 'Actualizar Producto' : 'Crear Producto'"
       icon="pi pi-check"
-      [text]="true"
       type="submit"
       [disabled]="isSubmitting()"
       [loading]="isSubmitting()"

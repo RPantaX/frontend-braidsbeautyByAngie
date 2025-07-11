@@ -5,12 +5,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class ProductImagePipe implements PipeTransform {
 
-  transform(img: String): string {
+  transform(img: string): string {
     if(!img){
       return 'assets/no-image.png';
     }
     //if(product.productImage) return product.productImage;
-    return `assets/products/product-1.png`
+    return img;
   }
 
 }

@@ -45,9 +45,21 @@ export interface Variation {
   options:       string;
 }
 
+
 export interface SaveProduct {
-  productName:        string;
+  productName: string;
   productDescription?: string;
-  productImage?:       string;
-  productCategoryId:  number;
+  imagen?: string; // URL de la imagen existente (para mostrar en modo edición)
+  productCategoryId: number;
+  deleteFile?: boolean; // Para indicar si se debe eliminar la imagen
+  categoryId?: number; // Para compatibilidad con el formulario
+  categoryName?: string; // Para mostrar el nombre de la categoría
+}
+
+export interface ProductFormData {
+  productName: string;
+  productDescription?: string;
+  productCategoryId: number;
+  imagen?: File; // Archivo de imagen seleccionado
+  deleteFile?: boolean; // Para indicar si se debe eliminar la imagen
 }

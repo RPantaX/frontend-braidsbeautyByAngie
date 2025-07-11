@@ -1,6 +1,9 @@
 <p-card header="{{product.productName}}">
   <ng-template pTemplate="header">
-      <img [alt]="product.productName" [src]="product.productImage! | productImage"/>
+      <img
+      style="width: 500px;"
+      [alt]="product.productName"
+      [src]="product.productImage! | productImage"/>
   </ng-template>
   <p>
     <strong>Categoria: </strong> {{product.responseCategory.productCategoryName}}

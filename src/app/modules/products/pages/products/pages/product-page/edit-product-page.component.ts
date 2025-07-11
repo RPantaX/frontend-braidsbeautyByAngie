@@ -88,7 +88,6 @@ export class EditProductPageComponent implements OnInit{
     return {
       productName: item.productName,
       productDescription: item.productDescription,
-      productImage: item.productImage,
       productCategoryId: item.responseCategory.productCategoryId,
     };
   }

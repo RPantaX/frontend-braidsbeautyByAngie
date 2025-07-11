@@ -1,5 +1,5 @@
 <div class="form-wrapper">
-  <h2 class="form-title">Formulario de Producto</h2>
+  <h2 class="form-title">Formulario de Item de Producto</h2>
 
   <form [formGroup]="entityForm" (ngSubmit)="submit()" class="form-grid">
 
@@ -16,6 +16,7 @@
         id="productItemSKU"
         formControlName="productItemSKU"
         [class.ng-invalid]="isInvalid('productItemSKU')"
+        placeholder="Ingrese el SKU del item"
         />
       <!-- Mostrar errores de validación estándar -->
       <small class="p-error" *ngIf="isInvalid('productItemSKU') && !skuError()">
@@ -31,28 +32,16 @@
     <div class="form-field">
       <label for="productItemQuantityInStock">Cantidad en Stock *</label>
       <input
-      pInputText
-      id="productItemQuantityInStock"
-      formControlName="productItemQuantityInStock"
-      type="number"
-      [class.ng-invalid]="isInvalid('productItemQuantityInStock')"
+        pInputText
+        id="productItemQuantityInStock"
+        formControlName="productItemQuantityInStock"
+        type="number"
+        min="0"
+        [class.ng-invalid]="isInvalid('productItemQuantityInStock')"
+        placeholder="0"
       />
       <small class="p-error" *ngIf="isInvalid('productItemQuantityInStock')">
-        Cantidad inválida (8-15 caracteres, decimal).
-      </small>
-    </div>
-
-    <div class="form-field">
-      <label for="productItemImage">URL de Imagen</label>
-      <input
-      pInputText
-      id="productItemImage"
-      formControlName="productItemImage"
-      [class.ng-invalid]="isInvalid('productItemImage')"
-      placeholder="https://ejemplo.com/imagen.jpg"
-      />
-      <small class="p-error" *ngIf="isInvalid('productItemImage')">
-        {{ getFieldError('productItemImage') }}
+        {{ getFieldError('productItemQuantityInStock') }}
       </small>
     </div>
 
@@ -64,11 +53,92 @@
         formControlName="productItemPrice"
         type="number"
         step="0.01"
+        min="0.01"
         [class.ng-invalid]="isInvalid('productItemPrice')"
+        placeholder="0.00"
       />
       <small class="p-error" *ngIf="isInvalid('productItemPrice')">
         {{ getFieldError('productItemPrice') }}
       </small>
+    </div>
+
+    <!-- IMAGEN DEL ITEM DE PRODUCTO -->
+    <div class="form-field image-field">
+      <label for="productItemImage">Imagen del Item de Producto</label>
+
+      <div class="flex flex-column gap-3">
+        <input
+          type="file"
+          #fileInput
+          accept="image/jpeg,image/png,image/gif,image/webp"
+          (change)="onFileSelected($event)"
+          class="hidden"
+          id="fileInput"
+        />
+
+        <div class="flex gap-2 align-items-center">
+          <p-button
+            type="button"
+            label="Seleccionar Imagen"
+            icon="pi pi-upload"
+            (click)="fileInput.click()"
+            [disabled]="isSubmitting()"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+          ></p-button>
+
+          <p-button
+            type="button"
+            label="Remover"
+            icon="pi pi-times"
+            (click)="removeImage()"
+            [disabled]="!imagePreview() || isSubmitting()"
+            severity="danger"
+            [outlined]="true"
+            size="small"
+          ></p-button>
+
+          <!-- Indicador de cambios -->
+          <span *ngIf="hasImageChanged()" class="text-sm text-orange-500">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ shouldDeleteImage() ? 'La imagen será eliminada' : 'Nueva imagen seleccionada' }}
+          </span>
+        </div>
+
+        <!-- Preview de la imagen -->
+        <div *ngIf="imagePreview()" class="image-preview-container">
+          <div class="relative inline-block">
+            <img
+              [src]="imagePreview()"
+              alt="Vista previa de la imagen del item"
+              class="item-image-preview"
+            />
+
+            <!-- Overlay cuando la imagen será eliminada -->
+            <div
+              *ngIf="shouldDeleteImage()"
+              class="image-overlay"
+            >
+              <span class="overlay-text">
+                <i class="pi pi-times-circle"></i>
+                Será eliminada
+              </span>
+            </div>
+          </div>
+
+          <small class="image-info">
+            Formatos soportados: JPG, PNG, GIF, WebP (máximo 5MB)
+          </small>
+        </div>
+
+        <!-- Mensaje cuando no hay imagen -->
+        <div *ngIf="!imagePreview()" class="no-image-placeholder">
+          <i class="pi pi-image text-4xl text-300"></i>
+          <p class="text-500 mt-2">No hay imagen seleccionada</p>
+          <small class="text-sm text-400">Haga clic en "Seleccionar Imagen" para agregar una</small>
+        </div>
+      </div>
     </div>
 
     <!-- VARIACIONES -->
@@ -79,7 +149,7 @@
 
         <div class="form-field">
           <label>Variación:</label>
-          <select formControlName="variationName">
+          <select formControlName="variationName" class="variation-select">
             <option value="">-- Seleccione la variación --</option>
             @for (varia of variations(); track varia) {
               <option [value]="varia.variationName">{{ varia.variationName }}</option>
@@ -89,7 +159,7 @@
 
         <div class="form-field">
           <label>Opción:</label>
-          <select formControlName="variationOptionValue">
+          <select formControlName="variationOptionValue" class="variation-select">
             <option value="">-- Seleccione la opción --</option>
             @for (option of optionVariations(); track option) {
               <option [value]="option.variationOptionValue">{{ option.variationOptionValue }}</option>
@@ -121,6 +191,7 @@
           <!-- Mensaje cuando no hay variaciones -->
           <div *ngIf="variationsArray.length === 0" class="no-variations-message">
             <p>No hay variaciones agregadas</p>
+            <small>Debe agregar al menos una variación</small>
           </div>
 
           <!-- Lista de variaciones -->
@@ -132,9 +203,10 @@
                 pButton
                 type="button"
                 icon="pi pi-trash"
-                class="p-button-danger p-button-rounded"
+                class="p-button-danger p-button-rounded p-button-sm"
                 [disabled]="isSubmitting()"
-                (click)="deleteVariation(i)">
+                (click)="deleteVariation(i)"
+                title="Eliminar variación">
               </button>
             </div>
           </ng-container>
@@ -162,7 +234,7 @@
       <button
         pButton
         type="submit"
-        [label]="isEditMode ? 'Actualizar' : 'Guardar'"
+        [label]="isEditMode ? 'Actualizar Item' : 'Crear Item'"
         icon="pi pi-check"
         [disabled]="entityForm.invalid || isSubmitting()"
         [loading]="isSubmitting()"

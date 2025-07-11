@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -6,15 +6,17 @@ import { tap } from 'rxjs';
 
 import { ItemProductService } from '../../../../../../../core/services/products/items-products.service';
 import { VariationService } from '../../../../../../../core/services/products/variation.service';
-import { ItemProductSave } from '../../../../../../../shared/models/products/item-product.interface';
+import { ItemProductSave, ItemProductFormData } from '../../../../../../../shared/models/products/item-product.interface';
 import { Variation, VariationOptionEntity } from '../../../../../../../shared/models/vatiations/variation.interface';
 
 @Component({
   selector: 'item-product-new-page',
   templateUrl: './new-page.component.html',
-  styleUrl: './new-page.component.css',
+  styleUrl: './new-page.component.scss',
 })
 export class NewPageComponent {
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   private fb = inject(FormBuilder);
   private idItemProduct!: number;
   idProduct!: number;
@@ -22,18 +24,29 @@ export class NewPageComponent {
   isEditMode = false;
   variations = signal<Variation[]>([]);
   optionVariations = signal<VariationOptionEntity[]>([]);
+
+  // Signals para manejo de imágenes
   private readonly _isSubmitting = signal<boolean>(false);
   private readonly _skuError = signal<string | null>(null);
+  private readonly _selectedFile = signal<File | null>(null);
+  private readonly _imagePreview = signal<string | null>(null);
+  private readonly _hasImageChanged = signal<boolean>(false);
+  private readonly _shouldDeleteImage = signal<boolean>(false);
+  private readonly _originalImageUrl = signal<string | null>(null);
 
   // Computed signals
   readonly isSubmitting = () => this._isSubmitting();
   readonly skuError = () => this._skuError();
+  readonly selectedFile = () => this._selectedFile();
+  readonly imagePreview = () => this._imagePreview();
+  readonly hasImageChanged = () => this._hasImageChanged();
+  readonly shouldDeleteImage = () => this._shouldDeleteImage();
 
   entityForm: FormGroup = this.fb.group({
     productId: [0],
     productItemSKU: ['', [Validators.required, Validators.maxLength(100)]],
     productItemQuantityInStock: [0, [Validators.required, Validators.min(0)]],
-    productItemImage: ['', [Validators.pattern('(https?://.*\\.(?:png|jpg|jpeg|gif))')]],
+    productItemImage: [''],
     productItemPrice: [0, [Validators.required, Validators.min(0.01)]],
     requestVariations: this.fb.array([], Validators.minLength(1)),
     variationName: [''],
@@ -63,6 +76,7 @@ export class NewPageComponent {
 
   ngOnDestroy(): void {
     this.entityForm.reset();
+    this.resetImageState();
   }
 
   get variationsArray(): FormArray {
@@ -79,7 +93,13 @@ export class NewPageComponent {
         this.entityForm.patchValue(item);
         this.entityForm.get('productId')?.setValue(this.idProduct);
         this.populateVariationsArray(item.variations || []);
-        console.log('errors: ', this.entityForm.errors);
+
+        // Manejar imagen existente
+        if (item.productItemImage) {
+          this._originalImageUrl.set(item.productItemImage);
+          this._imagePreview.set(item.productItemImage);
+        }
+        this.resetImageState();
       });
     } else {
       this.entityForm.get('productId')?.setValue(this.idProduct);
@@ -111,6 +131,102 @@ export class NewPageComponent {
     ).subscribe();
   }
 
+  // ============ MÉTODOS DE MANEJO DE IMÁGENES ============
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const validation = this.validateImageFile(file);
+
+      if (!validation.isValid) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Archivo inválido',
+          detail: validation.error
+        });
+        this.resetImageSelection();
+        return;
+      }
+
+      this._selectedFile.set(file);
+      this._hasImageChanged.set(true);
+      this._shouldDeleteImage.set(false);
+
+      // Generar previsualización
+      const reader = new FileReader();
+      reader.onload = () => {
+        this._imagePreview.set(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeImage(): void {
+    if (this.isEditMode && this._originalImageUrl()) {
+      // En modo edición, marcar para eliminar
+      this._shouldDeleteImage.set(true);
+      this._hasImageChanged.set(true);
+    }
+
+    this._selectedFile.set(null);
+    this._imagePreview.set(null);
+
+    // Resetear el input file
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  private resetImageSelection(): void {
+    this._selectedFile.set(null);
+
+    // Restaurar la imagen original si estamos en modo edición
+    if (this.isEditMode && this._originalImageUrl()) {
+      this._imagePreview.set(this._originalImageUrl());
+      this._hasImageChanged.set(false);
+      this._shouldDeleteImage.set(false);
+    } else {
+      this._imagePreview.set(null);
+    }
+
+    // Resetear el input file
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  private resetImageState(): void {
+    this._selectedFile.set(null);
+    this._hasImageChanged.set(false);
+    this._shouldDeleteImage.set(false);
+
+    if (!this.isEditMode) {
+      this._imagePreview.set(null);
+      this._originalImageUrl.set(null);
+    }
+
+    // Resetear el input file
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  private validateImageFile(file: File): { isValid: boolean; error?: string } {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+
+    if (!allowedTypes.includes(file.type)) {
+      return { isValid: false, error: 'Formato de archivo no soportado. Use JPG, PNG, GIF o WebP.' };
+    }
+    if (file.size > maxSizeInBytes) {
+      return { isValid: false, error: 'La imagen no debe exceder los 5MB.' };
+    }
+    return { isValid: true };
+  }
+
+  // ============ MÉTODOS DE VARIACIONES ============
+
   addToVariation(): void {
     const name = this.entityForm.get('variationName')?.value;
     const option = this.entityForm.get('variationOptionValue')?.value;
@@ -130,6 +246,8 @@ export class NewPageComponent {
     this.variationsArray.removeAt(index);
   }
 
+  // ============ SUBMIT Y VALIDACIONES ============
+
   submit(): void {
     // Limpiar errores previos
     this._skuError.set(null);
@@ -139,31 +257,38 @@ export class NewPageComponent {
       this.showMessage('error', 'Error', 'Por favor, complete los campos obligatorios y verifique que la información sea válida.');
       return;
     }
+
     this._isSubmitting.set(true);
-    const entity = {
+
+    const formData: ItemProductFormData = {
       productId: this.entityForm.get('productId')?.value,
       productItemSKU: this.entityForm.get('productItemSKU')?.value,
       productItemQuantityInStock: this.entityForm.get('productItemQuantityInStock')?.value,
-      productItemImage: this.entityForm.get('productItemImage')?.value,
       productItemPrice: this.entityForm.get('productItemPrice')?.value,
       requestVariations: this.variationsArray.value
-    } as ItemProductSave;
-    console.log('entity: ', entity);
-    console.log('isEditMode:' ,this.isEditMode)
+    };
+    // Manejar imagen según el estado
+    if (this.shouldDeleteImage()) {
+      formData.deleteFile = true;
+    } else if (this.selectedFile()) {
+      formData.imagen = this.selectedFile()!;
+    }
+
     const operation = this.isEditMode
-      ? this.entidadService.updateItemProduct(this.idItemProduct, entity)
-      : this.entidadService.saveItemProduct(entity);
+      ? this.entidadService.updateItemProduct(this.idItemProduct, formData)
+      : this.entidadService.saveItemProduct(formData);
 
     operation.subscribe({
       next: () => {
-        const message = this.isEditMode ? 'Entidad actualizada' : 'Entidad creada';
+        const message = this.isEditMode ? 'Item de producto actualizado' : 'Item de producto creado';
         this.handleSuccess(message);
       },
       error: (error) => this.handleError(error),
       complete: () => this._isSubmitting.set(false)
     });
   }
-    private markFormGroupTouched(): void {
+
+  private markFormGroupTouched(): void {
     Object.keys(this.entityForm.controls).forEach(key => {
       const control = this.entityForm.get(key);
       control?.markAsTouched();
@@ -181,27 +306,24 @@ export class NewPageComponent {
   private handleSuccess(message: string): void {
     this.showMessage('success', 'Éxito', message);
     this.entityForm.reset();
-    this._isSubmitting.set(false); // ✅ Establecer aquí también por seguridad
+    this.resetImageState();
+    this._isSubmitting.set(false);
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       this.router.navigate(['/products/manage/edit/', this.idProduct]);
     });
   }
 
-    private handleError(error: any): void {
+  private handleError(error: any): void {
     console.error('Error en operación:', error);
 
     // Verificar si es el error específico de SKU duplicado
     if (error.status === 500 && error.error?.code === 'ERI00002') {
-      // Establecer el error específico para el campo SKU
       this._skuError.set(error.error.message || 'Ya existe un item con este SKU');
-
-      // Marcar el campo como tocado para mostrar el error
       const skuControl = this.entityForm.get('productItemSKU');
       if (skuControl) {
         skuControl.markAsTouched();
       }
     } else {
-      // Otros errores se manejan con el mensaje general
       const message = error.status === 406
         ? error.error?.message || 'Error en la solicitud'
         : 'Ocurrió un error inesperado. Intente nuevamente.';
@@ -215,7 +337,8 @@ export class NewPageComponent {
     this.messageService.add({ severity, summary, detail });
   }
 
-  // Método mejorado para verificar si un campo es inválido
+  // ============ VALIDACIONES Y ERRORES ============
+
   isInvalid(controlName: string): boolean {
     const control = this.entityForm.get(controlName);
 
@@ -227,21 +350,21 @@ export class NewPageComponent {
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
-  // Método para obtener el error específico de un campo
-getFieldError(fieldName: string): string | null {
-  const control = this.entityForm.get(fieldName);
+  getFieldError(fieldName: string): string | null {
+    const control = this.entityForm.get(fieldName);
 
-  // Caso especial para el SKU del producto
-  if (fieldName === 'productItemSKU' && this.skuError()) {
-    return this.skuError(); // ✅ Solo retornar el error, no modificar signals
+    // Caso especial para el SKU del producto
+    if (fieldName === 'productItemSKU' && this.skuError()) {
+      return this.skuError();
+    }
+
+    if (control && control.errors && (control.dirty || control.touched)) {
+      return this.getErrorMessage(fieldName, control.errors);
+    }
+
+    return null;
   }
 
-  if (control && control.errors && (control.dirty || control.touched)) {
-    return this.getErrorMessage(fieldName, control.errors);
-  }
-
-  return null;
-}
   private getErrorMessage(fieldName: string, errors: any): string {
     if (errors['required']) {
       return `${this.getFieldDisplayName(fieldName)} es requerido`;
