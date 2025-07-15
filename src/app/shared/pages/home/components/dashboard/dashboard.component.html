@@ -1,0 +1,295 @@
+<div class="dashboard-container">
+  <p-toast></p-toast>
+
+  <!-- Header with refresh button -->
+  <div class="dashboard-header">
+    <div class="flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="text-900 font-bold text-4xl mb-0">Dashboard E-Commerce</h2>
+        <p class="text-600 mt-2 mb-0">Panel de control y análisis de ventas</p>
+      </div>
+      <p-button
+        icon="pi pi-refresh"
+        label="Actualizar"
+        (onClick)="refreshDashboard()"
+        styleClass="p-button-outlined">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid mb-4">
+    <div class="col-12 lg:col-3 md:col-6">
+      <div class="card bg-blue-500 text-white">
+        <div class="card-body">
+          <div class="flex justify-content-between align-items-start">
+            <div>
+              <div class="text-white-alpha-60 mb-2">Ventas del mes</div>
+              <div class="text-3xl font-bold" *ngIf="!loading.summary">
+                {{ formatCurrency(dashboardSummary?.totalSalesThisMonth || 0) }}
+              </div>
+              <p-skeleton *ngIf="loading.summary" width="8rem" height="2rem"></p-skeleton>
+            </div>
+            <div class="bg-white-alpha-20 border-circle p-3">
+              <i class="pi pi-dollar text-2xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 lg:col-3 md:col-6">
+      <div class="card bg-gray-500 text-white">
+        <div class="card-body">
+          <div class="flex justify-content-between align-items-start">
+            <div>
+              <div class="text-white-alpha-60 mb-2">Compras hechas en tienda</div>
+              <div class="text-3xl font-bold" *ngIf="!loading.summary">
+                {{ dashboardSummary?.inStoreOrdersCount || 0 }}
+              </div>
+              <p-skeleton *ngIf="loading.summary" width="4rem" height="2rem"></p-skeleton>
+            </div>
+            <div class="bg-white-alpha-20 border-circle p-3">
+              <i class="pi pi-shopping-bag text-2xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 lg:col-3 md:col-6">
+      <div class="card bg-gray-700 text-white">
+        <div class="card-body">
+          <div class="flex justify-content-between align-items-start">
+            <div>
+              <div class="text-white-alpha-60 mb-2">Compras hechas en vía web</div>
+              <div class="text-3xl font-bold" *ngIf="!loading.summary">
+                {{ (dashboardSummary?.onlineOrdersPercentage || 0) | number:'1.1-1' }}%
+              </div>
+              <p-skeleton *ngIf="loading.summary" width="4rem" height="2rem"></p-skeleton>
+            </div>
+            <div class="bg-white-alpha-20 border-circle p-3">
+              <i class="pi pi-chart-bar text-2xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 lg:col-3 md:col-6">
+      <div class="card bg-orange-500 text-white">
+        <div class="card-body">
+          <div class="flex justify-content-between align-items-start">
+            <div>
+              <div class="text-white-alpha-60 mb-2">Producto estrella</div>
+              <div class="text-3xl font-bold" *ngIf="!loading.summary">
+                {{ dashboardSummary?.starProductsCount || 0 }}
+              </div>
+              <p-skeleton *ngIf="loading.summary" width="4rem" height="2rem"></p-skeleton>
+            </div>
+            <div class="bg-white-alpha-20 border-circle p-3">
+              <i class="pi pi-star text-2xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analytics Chart -->
+  <div class="grid mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="flex align-items-center gap-2">
+              <h5 class="card-title mb-0">Análisis de Ventas</h5>
+              <p-skeleton *ngIf="loading.analytics" width="10rem" height="1.5rem"></p-skeleton>
+            </div>
+
+            <div class="flex align-items-center gap-3 flex-wrap">
+              <!-- Period Selection -->
+              <p-dropdown
+                [options]="periodOptions"
+                [(ngModel)]="analyticsPeriod"
+                (onChange)="onAnalyticsPeriodChange()"
+                placeholder="Seleccionar período"
+                [disabled]="loading.analytics">
+              </p-dropdown>
+
+              <!-- Type Selection -->
+              <p-dropdown
+                [options]="analyticsTypeOptions"
+                [(ngModel)]="analyticsType"
+                (onChange)="onAnalyticsTypeChange()"
+                placeholder="Seleccionar tipo"
+                [disabled]="loading.analytics">
+              </p-dropdown>
+
+              <!-- Date Range -->
+              <p-calendar
+                [(ngModel)]="customDateRange"
+                (onSelect)="onCustomDateRangeChange()"
+                selectionMode="range"
+                [readonlyInput]="true"
+                placeholder="Rango personalizado"
+                [disabled]="loading.analytics">
+              </p-calendar>
+
+              <!-- Export Buttons -->
+              <p-button
+                icon="pi pi-download"
+                label="Descargar"
+                styleClass="p-button-outlined p-button-sm"
+                (onClick)="downloadChart()"
+                [disabled]="loading.analytics">
+              </p-button>
+
+              <p-button
+                icon="pi pi-file-export"
+                label="XML"
+                styleClass="p-button-outlined p-button-sm"
+                (onClick)="exportToXML()"
+                [disabled]="loading.analytics">
+              </p-button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body" style="height: 400px;">
+          <div *ngIf="loading.analytics" class="flex justify-content-center align-items-center h-full">
+            <p-progressSpinner strokeWidth="3"></p-progressSpinner>
+          </div>
+          <canvas
+            *ngIf="!loading.analytics"
+            id="analyticsChart"
+            #chartCanvas
+            class="w-full h-full">
+          </canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Transactions and Top Products -->
+  <div class="grid">
+    <!-- Today's Transactions -->
+    <div class="col-12 lg:col-7">
+      <div class="card">
+        <div class="card-header">
+          <div class="flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Transacciones del día</h5>
+            <p-skeleton *ngIf="loading.transactions" width="8rem" height="1.5rem"></p-skeleton>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <div *ngIf="loading.transactions" class="p-4">
+            <p-skeleton height="4rem" class="mb-3" *ngFor="let item of [1,2,3,4,5]"></p-skeleton>
+          </div>
+
+          <div *ngIf="!loading.transactions && todayTransactions.length === 0" class="p-4 text-center">
+            <i class="pi pi-info-circle text-4xl text-400 mb-3"></i>
+            <p class="text-600">No hay transacciones para el día de hoy</p>
+          </div>
+
+          <div *ngIf="!loading.transactions && todayTransactions.length > 0" class="max-h-20rem overflow-auto">
+            <div
+              *ngFor="let transaction of todayTransactions; let i = index"
+              class="flex align-items-center justify-content-between p-3 border-bottom-1 border-200 hover:surface-100 transition-colors transition-duration-150">
+
+              <div class="flex align-items-center gap-3">
+                <div class="bg-primary-50 text-primary-500 border-circle p-2">
+                  <i [class]="getOrderTypeIcon(transaction.orderType)"></i>
+                </div>
+                <div>
+                  <div class="font-medium text-900">{{ transaction.orderId }}</div>
+                  <div class="text-600 text-sm">{{ transaction.customerName }}</div>
+                  <div class="text-500 text-xs">{{ transaction.orderDate | date:'short' }}</div>
+                </div>
+              </div>
+
+              <div class="text-right">
+                <div class="font-medium text-900 mb-1">{{ formatCurrency(transaction.amount) }}</div>
+                <p-tag
+                  [value]="getStatusLabel(transaction.status)"
+                  [severity]="getStatusSeverity(transaction.status)"
+                  styleClass="text-xs">
+                </p-tag>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Products -->
+    <div class="col-12 lg:col-5">
+      <div class="card">
+        <div class="card-header">
+          <div class="flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="card-title mb-0">Productos más vendidos</h5>
+            <div class="flex align-items-center gap-2">
+              <p-skeleton *ngIf="loading.topProducts" width="6rem" height="2rem"></p-skeleton>
+              <p-dropdown
+                *ngIf="!loading.topProducts"
+                [options]="periodOptions"
+                [(ngModel)]="topProductsPeriod"
+                (onChange)="onTopProductsPeriodChange()"
+                [disabled]="loading.topProducts"
+                styleClass="p-dropdown-sm">
+              </p-dropdown>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <div *ngIf="loading.topProducts" class="p-3">
+            <div class="flex align-items-center gap-3 mb-3" *ngFor="let item of [1,2,3,4,5]">
+              <p-skeleton shape="circle" size="3rem"></p-skeleton>
+              <div class="flex-1">
+                <p-skeleton width="8rem" height="1rem" class="mb-2"></p-skeleton>
+                <p-skeleton width="6rem" height="0.8rem"></p-skeleton>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!loading.topProducts && topProducts.length === 0" class="p-4 text-center">
+            <i class="pi pi-box text-4xl text-400 mb-3"></i>
+            <p class="text-600">No hay productos vendidos en este período</p>
+          </div>
+
+          <div *ngIf="!loading.topProducts && topProducts.length > 0" class="max-h-20rem overflow-auto">
+            <div
+              *ngFor="let product of topProducts; let i = index"
+              class="flex align-items-center gap-3 p-3 border-bottom-1 border-200 hover:surface-100 transition-colors transition-duration-150">
+
+              <div class="relative">
+                <img
+                  [src]="product.productImage | productImage"
+                  [alt]="product.productName"
+                  class="w-3rem h-3rem border-circle object-fit-cover" />
+                <span
+                  class="bg-primary text-white border-circle w-1rem h-1rem flex align-items-center justify-content-center text-xs font-bold absolute"
+                  style="top: -0.25rem; right: -0.25rem;">
+                  {{ i + 1 }}
+                </span>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <div class="font-medium text-900 text-overflow-ellipsis overflow-hidden white-space-nowrap">
+                  {{ product.productName }}
+                </div>
+                <div class="text-600 text-sm">{{ product.category }}</div>
+                <div class="flex align-items-center justify-content-between mt-1">
+                  <span class="text-primary font-medium">{{ formatCurrency(product.price) }}</span>
+                  <span class="text-500 text-xs">{{ product.totalSold }} vendidos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

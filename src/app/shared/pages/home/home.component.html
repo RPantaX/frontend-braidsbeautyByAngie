@@ -1,349 +1,409 @@
-<div class="flex justify-content-between flex-wrap">
-  <div class="flex align-items-center justify-content-center w-8rem h-6rem">
-    <p-sidebar #sidebarRef [(visible)]="sidebarVisible">
-      <ng-template pTemplate="headless">
-          <div class="flex flex-column h-full">
-              <div class="flex align-items-center justify-content-between px-4 pt-3 flex-shrink-0">
-                  <span class="inline-flex align-items-center gap-2">
-                      <svg width="33" height="35" viewBox="0 0 33 35" fill="none" xmlns="http://www.w3.org/2000/svg" class="block mx-auto">
-                          <path d="M15.1934 0V0V0L0.0391235 5.38288L2.35052 25.3417L15.1934 32.427V32.427V32.427L28.0364 25.3417L30.3478 5.38288L15.1934 0Z" fill="var(--primary-color)" />
-                          <mask id="mask0_1_36" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="31" height="33">
-                              <path d="M15.1934 0V0V0L0.0391235 5.38288L2.35052 25.3417L15.1934 32.427V32.427V32.427L28.0364 25.3417L30.3478 5.38288L15.1934 0Z" fill="var(--primary-color-text)" />
-                          </mask>
-                          <g mask="url(#mask0_1_36)">
-                              <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1935 0V3.5994V3.58318V20.0075V20.0075V32.427V32.427L28.0364 25.3417L30.3478 5.38288L15.1935 0Z" fill="var(--primary-color)" />
-                          </g>
-                          <path d="M19.6399 15.3776L18.1861 15.0547L19.3169 16.6695V21.6755L23.1938 18.4458V12.9554L21.4169 13.6013L19.6399 15.3776Z" fill="var(--primary-color-text)" />
-                          <path d="M10.5936 15.3776L12.0474 15.0547L10.9166 16.6695V21.6755L7.03966 18.4458V12.9554L8.81661 13.6013L10.5936 15.3776Z" fill="var(--primary-color-text)" />
-                          <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M11.3853 16.9726L12.6739 15.0309L13.4793 15.5163H16.7008L17.5061 15.0309L18.7947 16.9726V24.254L17.8283 25.7103L16.7008 26.843H13.4793L12.3518 25.7103L11.3853 24.254V16.9726Z"
-                              fill="var(--primary-color-text)"
-                          />
-                          <path d="M19.3168 24.7437L21.4168 22.6444V20.5451L19.3168 22.3214V24.7437Z" fill="var(--primary-color-text)" />
-                          <path d="M10.9166 24.7437L8.81662 22.6444V20.5451L10.9166 22.3214V24.7437Z" fill="var(--primary-color-text)" />
-                          <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M13.0167 5.68861L11.7244 8.7568L13.8244 14.8932H14.7936V5.68861H13.0167ZM15.4397 5.68861V14.8932H16.5706L18.5091 8.7568L17.2167 5.68861H15.4397Z"
-                              fill="var(--primary-color-text)"
-                          />
-                          <path d="M13.8244 14.8932L6.87813 12.3094L5.90888 8.27235L11.8859 8.7568L13.9859 14.8932H13.8244Z" fill="var(--primary-color-text)" />
-                          <path d="M16.5706 14.8932L23.5169 12.3094L24.4861 8.27235L18.3476 8.7568L16.4091 14.8932H16.5706Z" fill="var(--primary-color-text)" />
-                          <path d="M18.8321 8.27235L22.2245 7.94938L19.9629 5.68861H17.7013L18.8321 8.27235Z" fill="var(--primary-color-text)" />
-                          <path d="M11.4013 8.27235L8.00893 7.94938L10.2705 5.68861H12.5321L11.4013 8.27235Z" fill="var(--primary-color-text)" />
-                      </svg>
-                      <span class="font-semibold text-2xl text-primary">{{"home.title" | translate}}</span>
-                  </span>
-                  <span>
-                      <p-button
-                          type="button"
-                          (onClick)="closeCallback($event)"
-                          icon="pi pi-times"
-                          [rounded]="true"
-                          [outlined]="true"
-                          styleClass="h-2rem w-2rem">
-                      </p-button>
-                  </span>
-              </div>
+<!-- Enhanced Home Component Template -->
+<div class="layout-wrapper">
+  <!-- Top Navbar -->
+  <div class="layout-topbar">
+    <div class="flex justify-content-between align-items-center w-full">
+      <!-- Left Section -->
+      <div class="flex align-items-center gap-3">
+        <!-- Sidebar Toggle -->
+        <p-button
+          (onClick)="toggleSidebar()"
+          icon="pi pi-bars"
+          [rounded]="true"
+          styleClass="p-button-outlined sidebar-toggle">
+        </p-button>
 
-              <!-- Navegación -->
-              <div class="overflow-y-auto flex-1">
-                  <ul class="list-none p-3 m-0">
-                      <li>
-                          <div
-                              pRipple
-                              pStyleClass="@next"
-                              enterClass="hidden"
-                              enterActiveClass="slidedown"
-                              leaveToClass="hidden"
-                              leaveActiveClass="slideup"
-                              class="p-3 flex align-items-center justify-content-between text-600 cursor-pointer p-ripple"
-                          >
-                              <span class="font-medium">{{ "home.modules.managment" | translate }}</span>
-                              <i class="pi pi-chevron-down"></i>
-                          </div>
-                          <ul class="list-none p-0 m-0 overflow-hidden">
-                              <li>
-                                  <a pRipple
-                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                     routerLink="/home">
-                                      <i class="pi pi-home mr-2"></i>
-                                      <span class="font-medium">{{ "home.modules.home" | translate }}</span>
-                                  </a>
-                              </li>
-                              <li>
-                                  <a pRipple
-                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                                      <i class="pi pi-truck mr-2"></i>
-                                      <span class="font-medium">{{ "home.modules.delivery" | translate }}</span>
-                                  </a>
-                              </li>
-                              <li>
-                                  <a
-                                      pRipple
-                                      pStyleClass="@next"
-                                      enterClass="hidden"
-                                      enterActiveClass="slidedown"
-                                      leaveToClass="hidden"
-                                      leaveActiveClass="slideup"
-                                      class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                  >
-                                      <i class="pi pi-shop mr-2"></i>
-                                      <span class="font-medium">{{ "home.modules.products.title" | translate }}</span>
-                                      <i class="pi pi-chevron-down ml-auto"></i>
-                                  </a>
-                                  <ul class="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
-                                      <li>
-                                          <a pRipple
-                                             class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                                              <i class="pi pi-sort-numeric-up mr-2"></i>
-                                              <span class="font-medium">{{ "home.modules.products.managment.stock" | translate }}</span>
-                                          </a>
-                                      </li>
-                                      <li>
-                                        <a pRipple
-                                           class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                           routerLink="/products/manage/list">
-                                            <i class="pi pi-shopping-bag mr-2"></i>
-                                            <span class="font-medium">{{ "home.modules.products.managment.products" | translate }}</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                      <a pRipple
-                                         class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                         routerLink="/products/promotions">
-                                          <i class="pi pi-tag mr-2"></i>
-                                          <span class="font-medium">{{ "home.modules.products.managment.promotions" | translate }}</span>
-                                      </a>
-                                  </li>
-                                  <li>
-                                    <a pRipple
-                                       class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                       routerLink="/products/categories">
-                                        <i class="pi pi-tags mr-2"></i>
-                                        <span class="font-medium">{{ "home.modules.products.managment.categories" | translate }}</span>
-                                    </a>
-                                </li>
-                                  </ul>
-                              </li>
+        <!-- Logo and Title -->
+        <div class="flex align-items-center gap-2">
+          <svg width="33" height="35" viewBox="0 0 33 35" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo">
+            <path d="M15.1934 0V0V0L0.0391235 5.38288L2.35052 25.3417L15.1934 32.427V32.427V32.427L28.0364 25.3417L30.3478 5.38288L15.1934 0Z" fill="var(--primary-color)" />
+            <mask id="mask0_1_36" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="31" height="33">
+              <path d="M15.1934 0V0V0L0.0391235 5.38288L2.35052 25.3417L15.1934 32.427V32.427V32.427L28.0364 25.3417L30.3478 5.38288L15.1934 0Z" fill="var(--primary-color-text)" />
+            </mask>
+            <g mask="url(#mask0_1_36)">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1935 0V3.5994V3.58318V20.0075V20.0075V32.427V32.427L28.0364 25.3417L30.3478 5.38288L15.1935 0Z" fill="var(--primary-color)" />
+            </g>
+            <path d="M19.6399 15.3776L18.1861 15.0547L19.3169 16.6695V21.6755L23.1938 18.4458V12.9554L21.4169 13.6013L19.6399 15.3776Z" fill="var(--primary-color-text)" />
+            <path d="M10.5936 15.3776L12.0474 15.0547L10.9166 16.6695V21.6755L7.03966 18.4458V12.9554L8.81661 13.6013L10.5936 15.3776Z" fill="var(--primary-color-text)" />
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M11.3853 16.9726L12.6739 15.0309L13.4793 15.5163H16.7008L17.5061 15.0309L18.7947 16.9726V24.254L17.8283 25.7103L16.7008 26.843H13.4793L12.3518 25.7103L11.3853 24.254V16.9726Z" fill="var(--primary-color-text)" />
+            <path d="M19.3168 24.7437L21.4168 22.6444V20.5451L19.3168 22.3214V24.7437Z" fill="var(--primary-color-text)" />
+            <path d="M10.9166 24.7437L8.81662 22.6444V20.5451L10.9166 22.3214V24.7437Z" fill="var(--primary-color-text)" />
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M13.0167 5.68861L11.7244 8.7568L13.8244 14.8932H14.7936V5.68861H13.0167ZM15.4397 5.68861V14.8932H16.5706L18.5091 8.7568L17.2167 5.68861H15.4397Z" fill="var(--primary-color-text)" />
+            <path d="M13.8244 14.8932L6.87813 12.3094L5.90888 8.27235L11.8859 8.7568L13.9859 14.8932H13.8244Z" fill="var(--primary-color-text)" />
+            <path d="M16.5706 14.8932L23.5169 12.3094L24.4861 8.27235L18.3476 8.7568L16.4091 14.8932H16.5706Z" fill="var(--primary-color-text)" />
+            <path d="M18.8321 8.27235L22.2245 7.94938L19.9629 5.68861H17.7013L18.8321 8.27235Z" fill="var(--primary-color-text)" />
+            <path d="M11.4013 8.27235L8.00893 7.94938L10.2705 5.68861H12.5321L11.4013 8.27235Z" fill="var(--primary-color-text)" />
+          </svg>
+          <span class="logo-text font-semibold text-xl text-primary hidden md:block">
+            {{"home.title" | translate}}
+          </span>
+        </div>
+      </div>
 
-                              <li>
-                                <a
-                                    pRipple
-                                    pStyleClass="@next"
-                                    enterClass="hidden"
-                                    enterActiveClass="slidedown"
-                                    leaveToClass="hidden"
-                                    leaveActiveClass="slideup"
-                                    class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                >
-                                    <i class="pi pi-palette mr-2"></i>
-                                    <span class="font-medium">{{ "home.modules.HairSalon.title" | translate }}</span>
-                                    <i class="pi pi-chevron-down ml-auto"></i>
-                                </a>
-                                <ul class="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
-                                    <li>
-                                        <a pRipple
-                                           class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                           routerLink="/reservations">
-                                            <i class="pi pi-scissors mr-2"></i>
-                                            <span class="font-medium">{{ "home.modules.HairSalon.managment.services" | translate }}</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                      <a pRipple
-                                         class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                                          <i class="pi pi-calendar mr-2"></i>
-                                          <span class="font-medium">{{ "home.modules.HairSalon.managment.appointments" | translate }}</span>
-                                      </a>
-                                    </li>
-                                    <li>
-                                      <a pRipple
-                                         class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                         routerLink="/reservations/categories">
-                                          <i class="pi pi-tags mr-2"></i>
-                                          <span class="font-medium">{{ "home.modules.HairSalon.managment.categories" | translate }}</span>
-                                      </a>
-                                    </li>
-                                    <li>
-                                      <a pRipple
-                                         class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                         routerLink="/reservations/promotions">
-                                          <i class="pi pi-percentage mr-2"></i>
-                                          <span class="font-medium">{{ "home.modules.HairSalon.managment.promotions" | translate }}</span>
-                                      </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>
-                              <a pRipple
-                                 class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                                  <i class="pi pi-receipt mr-2"></i>
-                                  <span class="font-medium">{{ "home.modules.orders.title" | translate }}</span>
-                              </a>
-                            </li>
-                            <li>
-                                  <a pRipple
-                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                                      <i class="pi pi-cog mr-2"></i>
-                                      <span class="font-medium">{{ "home.modules.settings" | translate }}</span>
-                                  </a>
-                            </li>
-                          </ul>
-                      </li>
-                  </ul>
-                  <ul class="list-none p-3 m-0">
-                      <li>
-                          <div
-                              pRipple
-                              pStyleClass="@next"
-                              enterClass="hidden"
-                              enterActiveClass="slidedown"
-                              leaveToClass="hidden"
-                              leaveActiveClass="slideup"
-                              class="p-3 flex align-items-center justify-content-between text-600 cursor-pointer p-ripple"
-                          >
-                              <span class="font-medium">{{ "home.modules.sales.title" | translate }}</span>
-                              <i class="pi pi-chevron-down"></i>
-                          </div>
-                          <ul class="list-none p-0 m-0 overflow-hidden">
-                              <li>
-                                  <a pRipple
-                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                                      <i class="pi pi-cart-minus mr-2"></i>
-                                      <span class="font-medium">{{ "home.modules.sales.managment.products" | translate }}</span>
-                                  </a>
-                              </li>
-                              <li>
-                                  <a pRipple
-                                     class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                                      <i class="pi pi-calendar mr-2"></i>
-                                      <span class="font-medium">{{ "home.modules.sales.managment.services" | translate }}</span>
-                                  </a>
-                              </li>
-                          </ul>
-                      </li>
-                  </ul>
-                  <ul class="list-none p-3 m-0">
-                    <li>
-                        <div
-                            pRipple
-                            pStyleClass="@next"
-                            enterClass="hidden"
-                            enterActiveClass="slidedown"
-                            leaveToClass="hidden"
-                            leaveActiveClass="slideup"
-                            class="p-3 flex align-items-center justify-content-between text-600 cursor-pointer p-ripple"
-                        >
-                            <span class="font-medium">{{ "home.modules.administrator" | translate }}</span>
-                            <i class="pi pi-chevron-down"></i>
-                        </div>
-                        <ul class="list-none p-0 m-0 overflow-hidden">
-                            <li>
-                                <a pRipple
-                                   class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
-                                   routerLink="/users">
-                                    <i class="pi pi-user mr-2"></i>
-                                    <span class="font-medium">{{ "home.modules.users.managment" | translate }}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a pRipple
-                                   class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                                    <i class="pi pi-cog mr-2"></i>
-                                    <span class="font-medium">{{ "home.modules.settings" | translate }}</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-              </div>
+      <!-- Right Section -->
+      <div class="flex align-items-center gap-3">
+        <!-- Notifications -->
+        <div class="relative">
+          <p-button
+            icon="pi pi-bell"
+            [rounded]="true"
+            [outlined]="true"
+            [badge]="notificationCount > 0 ? notificationCount.toString() : undefined"
+            badgeClass="p-badge-danger"
+            (onClick)="notificationMenu.toggle($event)">
+          </p-button>
 
-              <!-- Sección de usuario mejorada -->
-              <div class="mt-auto border-top-1 border-surface-border">
-                  <div class="user-section">
-                      <div class="user-info">
-                          <p-avatar
-                              [image]="getUserAvatar()"
-                              shape="circle"
-                              size="large">
-                          </p-avatar>
-                          <div class="flex-1 min-w-0">
-                              <div class="user-name text-900 font-semibold">{{ getUserDisplayName() }}</div>
-                              <div class="text-sm text-600">
-                                {{ currentUser?.roles && currentUser?.roles!.length > 0 ? currentUser!.roles[0].name : 'Usuario' }}
-                              </div>
-                          </div>
-                          <p-button
-                              (onClick)="logout()"
-                              icon="pi pi-sign-out"
-                              [rounded]="true"
-                              [outlined]="true"
-                              severity="danger"
-                              size="small"
-                              pTooltip="Cerrar sesión"
-                              tooltipPosition="top">
-                          </p-button>
-                      </div>
-                  </div>
-              </div>
+          <p-menu
+            #notificationMenu
+            [model]="notificationItems"
+            [popup]="true"
+            styleClass="notification-menu">
+          </p-menu>
+        </div>
+
+        <!-- Search -->
+        <div class="search-container hidden md:block">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              pInputText
+              placeholder="Buscar..."
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="performSearch()"
+              class="search-input" />
+          </span>
+        </div>
+
+        <!-- Language Selector -->
+        <app-language-selector></app-language-selector>
+
+        <!-- Theme Toggle -->
+        <p-button
+          [icon]="isDarkTheme ? 'pi pi-sun' : 'pi pi-moon'"
+          [rounded]="true"
+          [outlined]="true"
+          (onClick)="toggleTheme()"
+          pTooltip="Cambiar tema"
+          tooltipPosition="bottom">
+        </p-button>
+
+        <!-- User Menu -->
+        <div class="user-info">
+          <p-avatar
+            [image]="getUserAvatar()"
+            shape="circle"
+            class="cursor-pointer user-avatar"
+            (click)="userMenu.toggle($event)">
+          </p-avatar>
+
+          <div class="user-details hidden md:block ml-2">
+            <div class="user-name text-sm font-medium">{{ getUserDisplayName() }}</div>
+            <div class="user-role text-xs text-600">
+              {{ currentUser?.roles && currentUser?.roles!.length > 0 ? currentUser!.roles[0].name : 'Usuario' }}
+            </div>
           </div>
-      </ng-template>
-    </p-sidebar>
-    <p-button
-        (onClick)="toggleSidebar()"
-        icon="pi pi-bars"
-        [rounded]="true">
-    </p-button>
-  </div>
 
-  <!-- Header mejorado -->
-  <div class="header-controls">
-    <div class="p-1 m-1">
-      <app-language-selector></app-language-selector>
-    </div>
+          <p-button
+            icon="pi pi-chevron-down"
+            [text]="true"
+            size="small"
+            (onClick)="userMenu.toggle($event)"
+            class="user-menu-toggle">
+          </p-button>
 
-    <!-- Información del usuario en el header -->
-    <div class="user-info">
-      <span class="user-name hidden md:block text-900 font-medium">{{ getUserDisplayName() }}</span>
-      <p-avatar
-          [image]="getUserAvatar()"
-          shape="circle"
-          class="cursor-pointer"
-          (click)="userMenu.toggle($event)">
-      </p-avatar>
-
-      <!-- Menú desplegable del usuario - CORREGIDO -->
-      <p-menu
-          #userMenu
-          [model]="userMenuItems"
-          [popup]="true"
-          styleClass="user-menu">
-      </p-menu>
-
-      <p-button
-          (onClick)="userMenu.toggle($event)"
-          icon="pi pi-chevron-down"
-          [text]="true"
-          size="small">
-      </p-button>
+          <p-menu
+            #userMenu
+            [model]="userMenuItems"
+            [popup]="true"
+            styleClass="user-dropdown-menu">
+          </p-menu>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Sidebar -->
+  <p-sidebar
+    #sidebarRef
+    [(visible)]="sidebarVisible"
+    position="left"
+    styleClass="layout-sidebar"
+    [modal]="false">
+
+    <ng-template pTemplate="header">
+      <div class="sidebar-header">
+        <div class="flex align-items-center gap-2">
+          <svg width="24" height="24" viewBox="0 0 33 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.1934 0V0V0L0.0391235 5.38288L2.35052 25.3417L15.1934 32.427V32.427V32.427L28.0364 25.3417L30.3478 5.38288L15.1934 0Z" fill="var(--primary-color)" />
+          </svg>
+          <span class="sidebar-title font-semibold text-lg text-primary">
+            {{"home.title" | translate}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="sidebar-content">
+      <!-- Quick Stats Widget -->
+      <div class="sidebar-widget mb-4">
+        <div class="widget-header">
+          <h6 class="widget-title">Resumen Rápido</h6>
+        </div>
+        <div class="widget-content">
+          <div class="stat-item">
+            <i class="pi pi-shopping-cart text-primary"></i>
+            <div class="stat-info">
+              <span class="stat-value">{{ quickStats.ordersToday || 0 }}</span>
+              <span class="stat-label">Órdenes hoy</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <i class="pi pi-dollar text-green-500"></i>
+            <div class="stat-info">
+              <span class="stat-value">{{ (quickStats.salesToday || 0) | currencySoles }}</span>
+              <span class="stat-label">Ventas hoy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <div class="navigation-menu">
+        <ul class="menu-list">
+          <!-- Dashboard -->
+          <li class="menu-item">
+            <a
+              pRipple
+              routerLink="/dashboard"
+              routerLinkActive="active"
+              class="menu-link">
+              <i class="pi pi-chart-line menu-icon"></i>
+              <span class="menu-label">{{ "menu.dashboard" | translate }}</span>
+            </a>
+          </li>
+
+          <!-- Management Section -->
+          <li class="menu-category">
+            <div
+              pRipple
+              class="menu-category-header"
+              (click)="toggleMenuSection('management')">
+              <span class="category-title">{{ "home.modules.managment" | translate }}</span>
+              <i class="pi" [class]="getMenuChevron('management')"></i>
+            </div>
+
+            <ul class="submenu" [class.expanded]="expandedSections.has('management')">
+              <li>
+                <a pRipple routerLink="/home" routerLinkActive="active" class="submenu-link">
+                  <i class="pi pi-home submenu-icon"></i>
+                  <span>{{ "home.modules.home" | translate }}</span>
+                </a>
+              </li>
+              <li>
+                <a pRipple class="submenu-link">
+                  <i class="pi pi-truck submenu-icon"></i>
+                  <span>{{ "home.modules.delivery" | translate }}</span>
+                </a>
+              </li>
+
+              <!-- Products Submenu -->
+              <li class="submenu-parent">
+                <div
+                  pRipple
+                  class="submenu-header"
+                  (click)="toggleMenuSection('products')">
+                  <div class="flex align-items-center">
+                    <i class="pi pi-shop submenu-icon"></i>
+                    <span>{{ "home.modules.products.title" | translate }}</span>
+                  </div>
+                  <i class="pi" [class]="getMenuChevron('products')"></i>
+                </div>
+
+                <ul class="submenu-items" [class.expanded]="expandedSections.has('products')">
+                  <li>
+                    <a pRipple class="submenu-item-link">
+                      <i class="pi pi-sort-numeric-up"></i>
+                      <span>{{ "home.modules.products.managment.stock" | translate }}</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a pRipple routerLink="/products/manage/list" routerLinkActive="active" class="submenu-item-link">
+                      <i class="pi pi-shopping-bag"></i>
+                      <span>{{ "home.modules.products.managment.products" | translate }}</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a pRipple routerLink="/products/promotions" routerLinkActive="active" class="submenu-item-link">
+                      <i class="pi pi-tag"></i>
+                      <span>{{ "home.modules.products.managment.promotions" | translate }}</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a pRipple routerLink="/products/categories" routerLinkActive="active" class="submenu-item-link">
+                      <i class="pi pi-tags"></i>
+                      <span>{{ "home.modules.products.managment.categories" | translate }}</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+
+              <!-- Hair Salon Submenu -->
+              <li class="submenu-parent">
+                <div
+                  pRipple
+                  class="submenu-header"
+                  (click)="toggleMenuSection('hairsalon')">
+                  <div class="flex align-items-center">
+                    <i class="pi pi-palette submenu-icon"></i>
+                    <span>{{ "home.modules.HairSalon.title" | translate }}</span>
+                  </div>
+                  <i class="pi" [class]="getMenuChevron('hairsalon')"></i>
+                </div>
+
+                <ul class="submenu-items" [class.expanded]="expandedSections.has('hairsalon')">
+                  <li>
+                    <a pRipple routerLink="/reservations" routerLinkActive="active" class="submenu-item-link">
+                      <i class="pi pi-scissors"></i>
+                      <span>{{ "home.modules.HairSalon.managment.services" | translate }}</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a pRipple class="submenu-item-link">
+                      <i class="pi pi-calendar"></i>
+                      <span>{{ "home.modules.HairSalon.managment.appointments" | translate }}</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a pRipple routerLink="/reservations/categories" routerLinkActive="active" class="submenu-item-link">
+                      <i class="pi pi-tags"></i>
+                      <span>{{ "home.modules.HairSalon.managment.categories" | translate }}</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a pRipple routerLink="/reservations/promotions" routerLinkActive="active" class="submenu-item-link">
+                      <i class="pi pi-percentage"></i>
+                      <span>{{ "home.modules.HairSalon.managment.promotions" | translate }}</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+
+              <li>
+                <a pRipple class="submenu-link">
+                  <i class="pi pi-receipt submenu-icon"></i>
+                  <span>{{ "home.modules.orders.title" | translate }}</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Sales Section -->
+          <li class="menu-category">
+            <div
+              pRipple
+              class="menu-category-header"
+              (click)="toggleMenuSection('sales')">
+              <span class="category-title">{{ "home.modules.sales.title" | translate }}</span>
+              <i class="pi" [class]="getMenuChevron('sales')"></i>
+            </div>
+
+            <ul class="submenu" [class.expanded]="expandedSections.has('sales')">
+              <li>
+                <a pRipple class="submenu-link">
+                  <i class="pi pi-cart-minus submenu-icon"></i>
+                  <span>{{ "home.modules.sales.managment.products" | translate }}</span>
+                </a>
+              </li>
+              <li>
+                <a pRipple class="submenu-link">
+                  <i class="pi pi-calendar submenu-icon"></i>
+                  <span>{{ "home.modules.sales.managment.services" | translate }}</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Administration Section -->
+          <li class="menu-category">
+            <div
+              pRipple
+              class="menu-category-header"
+              (click)="toggleMenuSection('administration')">
+              <span class="category-title">{{ "home.modules.administrator" | translate }}</span>
+              <i class="pi" [class]="getMenuChevron('administration')"></i>
+            </div>
+
+            <ul class="submenu" [class.expanded]="expandedSections.has('administration')">
+              <li>
+                <a pRipple routerLink="/users" routerLinkActive="active" class="submenu-link">
+                  <i class="pi pi-user submenu-icon"></i>
+                  <span>{{ "home.modules.users.managment" | translate }}</span>
+                </a>
+              </li>
+              <li>
+                <a pRipple class="submenu-link">
+                  <i class="pi pi-cog submenu-icon"></i>
+                  <span>{{ "home.modules.settings" | translate }}</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <ng-template pTemplate="footer">
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <p-avatar
+            [image]="getUserAvatar()"
+            shape="circle"
+            size="large">
+          </p-avatar>
+          <div class="profile-info">
+            <div class="profile-name">{{ getUserDisplayName() }}</div>
+            <div class="profile-role">
+              {{ currentUser?.roles && currentUser?.roles!.length > 0 ? currentUser!.roles[0].name : 'Usuario' }}
+            </div>
+          </div>
+          <p-button
+            (onClick)="logout()"
+            icon="pi pi-sign-out"
+            [rounded]="true"
+            [outlined]="true"
+            severity="danger"
+            size="small"
+            pTooltip="Cerrar sesión"
+            tooltipPosition="top">
+          </p-button>
+        </div>
+      </div>
+    </ng-template>
+  </p-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="layout-main" [class.sidebar-active]="sidebarVisible">
+  <div class="content-wrapper">
+
+        <div class="page-header">
+      <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome"></p-breadcrumb>
+    </div>
+
+    <router-outlet></router-outlet>
+
+  </div>
 </div>
 
-<div class="m-5">
-  <router-outlet></router-outlet>
-</div>
-<!-- COMPONENTES NECESARIOS PARA LOGOUT - AGREGAR AL FINAL -->
+<!-- Dialogs and Toasts -->
 <p-confirmDialog
-    [style]="{width: '450px'}"
-    [baseZIndex]="10000"
-    rejectButtonStyleClass="p-button-outlined">
+  [style]="{width: '450px'}"
+  [baseZIndex]="10000"
+  rejectButtonStyleClass="p-button-outlined">
 </p-confirmDialog>
 
 <p-toast
-    position="top-right"
-    [baseZIndex]="5000">
+  position="top-right"
+  [baseZIndex]="5000">
 </p-toast>

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { map, Observable, Subject } from 'rxjs';
 import { environment } from '../../../../environments/environments.prod';
 import { RequestService, ResponseService, ResponseServicePageable, ServiceDTO } from '../../../shared/models/reservations/services.interface';
+import { ApiResponse } from '../../../../@utils/interfaces/ApiResponse';
 
 @Injectable({providedIn: 'root'})
 export class ServiceService {
@@ -23,30 +24,42 @@ export class ServiceService {
   }
 
   getPageableServices(pageNo: number = 0, pageSize: number = 10, sortBy: string = '', sortDir: string = 'asc'): Observable<ResponseServicePageable> {
-    return this.http.get<ResponseServicePageable>(
+    return this.http.get<ApiResponse<ResponseServicePageable>>(
       `${this.baseUrl}/list?pageNo=${pageNo}&pageSize=${pageSize}&sortBy=${sortBy}&sortDir=${sortDir}`
-    );
+    ).pipe(
+              map(response => response.data)
+            )
   }
 
   getServiceById(serviceId: number): Observable<ResponseService> {
-    return this.http.get<ResponseService>(`${this.baseUrl}/${serviceId}`);
+    return this.http.get<ApiResponse<ResponseService>>(`${this.baseUrl}/${serviceId}`).pipe(
+              map(response => response.data)
+            )
   }
   //get paginable by categoryId
   getPageableServicesByCategoryId(categoryId: number, pageNo: number = 0, pageSize: number = 10, sortBy: string = '', sortDir: string = 'asc'): Observable<ResponseServicePageable> {
-    return this.http.get<ResponseServicePageable>(
+    return this.http.get<ApiResponse<ResponseServicePageable>>(
       `${this.baseUrl}/list/category/${categoryId}?pageNo=${pageNo}&pageSize=${pageSize}&sortBy=${sortBy}&sortDir=${sortDir}`
-    );
+    ).pipe(
+              map(response => response.data)
+            )
   }
 
   createService(service: RequestService ): Observable<ServiceDTO> {
-    return this.http.post<ServiceDTO>(this.baseUrl, service);
+    return this.http.post<ApiResponse<ServiceDTO>>(this.baseUrl, service).pipe(
+              map(response => response.data)
+            )
   }
 
   updateService(serviceId: number, service: RequestService): Observable<ServiceDTO> {
-    return this.http.put<ServiceDTO>(`${this.baseUrl}/${serviceId}`, service);
+    return this.http.put<ApiResponse<ServiceDTO>>(`${this.baseUrl}/${serviceId}`, service).pipe(
+              map(response => response.data)
+            )
   }
 
   deleteService(serviceId: number): Observable<ServiceDTO> {
-    return this.http.delete<ServiceDTO>(`${this.baseUrl}/${serviceId}`);
+    return this.http.delete<ApiResponse<ServiceDTO>>(`${this.baseUrl}/${serviceId}`).pipe(
+              map(response => response.data)
+            )
   }
 }

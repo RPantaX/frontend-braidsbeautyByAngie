@@ -11,7 +11,7 @@ export interface ResponseProduct {
   productId:                  number;
   productName:                string;
   productDescription:         string;
-  productImage?:               string;
+  productImage?:               string | null;
   responseCategory:           ResponseCategory;
   responseProductItemDetails: ResponseProductItemDetail[];
 }

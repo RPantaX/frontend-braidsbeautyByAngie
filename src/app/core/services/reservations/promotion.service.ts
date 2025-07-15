@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { map, Observable, Subject } from 'rxjs';
 import { PromotionDTO, PromotionResponsePageable, PromotionWithCategories } from '../../../shared/models/promotions/promotion.interface';
 import { environment } from '../../../../environments/environments.prod';
+import { ApiResponse } from '../../../../@utils/interfaces/ApiResponse';
 
 @Injectable({providedIn: 'root'})
 export class PromotionService {
@@ -22,28 +23,40 @@ export class PromotionService {
     this.refreshSource.next();
   }
   getPageablePromotions(pageNo: number = 0, pageSize: number = 10, sortBy: string = '', sortDir: string = 'asc'): Observable<PromotionResponsePageable> {
-    return this.http.get<PromotionResponsePageable>(
+    return this.http.get<ApiResponse<PromotionResponsePageable>>(
       `${this.baseUrl}/list/pageable?pageNo=${pageNo}&pageSize=${pageSize}&sortBy=${sortBy}&sortDir=${sortDir}`
-    );
+    ).pipe(
+          map(response => response.data)
+        )
   }
 
   getPromotionById(promotionId: number): Observable<PromotionDTO> {
-    return this.http.get<PromotionDTO>(`${this.baseUrl}/${promotionId}`);
+    return this.http.get<ApiResponse<PromotionDTO>>(`${this.baseUrl}/${promotionId}`).pipe(
+          map(response => response.data)
+        )
   }
 
   getAllPromotions(): Observable<PromotionDTO[]> {
-    return this.http.get<PromotionDTO[]>(`${this.baseUrl}/list`);
+    return this.http.get<ApiResponse<PromotionDTO[]>>(`${this.baseUrl}/list`).pipe(
+          map(response => response.data )
+        )
   }
 
   createPromotion(promotion: any): Observable<PromotionDTO> {
-    return this.http.post<PromotionDTO>(this.baseUrl, promotion);
+    return this.http.post<ApiResponse<PromotionDTO>>(this.baseUrl, promotion).pipe(
+          map(response => response.data)
+        )
   }
 
   updatePromotion(promotionId: number, promotion: any): Observable<PromotionDTO> {
-    return this.http.put<PromotionDTO>(`${this.baseUrl}/${promotionId}`, promotion);
+    return this.http.put<ApiResponse<PromotionDTO>>(`${this.baseUrl}/${promotionId}`, promotion).pipe(
+          map(response => response.data)
+        )
   }
 
   deletePromotion(promotionId: number): Observable<PromotionDTO> {
-    return this.http.delete<PromotionDTO>(`${this.baseUrl}/${promotionId}`);
+    return this.http.delete<ApiResponse<PromotionDTO>>(`${this.baseUrl}/${promotionId}`).pipe(
+          map(response => response.data)
+        )
   }
 }

@@ -48,7 +48,7 @@ import { AuthEffect } from '../@security/redux/effects/auth.effect';
       useClass: SecurityInterceptor,
       multi: true
     },
-    provideClientHydration(),
+    //provideClientHydration(),
     provideAnimationsAsync(),
     provideHttpClient(withInterceptorsFromDi())
   ],

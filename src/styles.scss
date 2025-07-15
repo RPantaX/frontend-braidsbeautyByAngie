@@ -1,0 +1,41 @@
+:root {
+  --primary-color: #3B82F6;
+  --primary-50: #EFF6FF;
+  --primary-100: #DBEAFE;
+  --primary-200: #BFDBFE;
+  --primary-500: #3B82F6;
+  --primary-600: #2563EB;
+  --primary-700: #1D4ED8;
+
+  --surface-ground: #F8FAFC;
+  --surface-card: #FFFFFF;
+  --surface-section: #F1F5F9;
+  --surface-border: #E2E8F0;
+  --surface-hover: #F1F5F9;
+
+  --text-color: #334155;
+  --text-color-secondary: #64748B;
+}
+
+[data-theme="dark"] {
+  --surface-ground: #0F172A;
+  --surface-card: #1E293B;
+  --surface-section: #334155;
+  --surface-border: #475569;
+  --surface-hover: #475569;
+
+  --text-color: #F1F5F9;
+  --text-color-secondary: #CBD5E1;
+}
+// Responsive utilities
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hidden-desktop {
+    display: none !important;
+  }
+}

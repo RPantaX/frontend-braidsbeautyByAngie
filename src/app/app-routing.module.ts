@@ -8,69 +8,84 @@ import { AuthGuard } from '../@security/guards/auth.guard';
 import { UserGuard } from '../@security/guards/user.guard';
 import { EnumRolesUsuario } from '../@utils/enums/EnumRoles';
 
-//dominio.com/
 const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
     component: HomeComponent,
     children: [
-    {
-      path: '',
-      redirectTo: 'home',
-      pathMatch: 'full'
-    },
-    {
-      path: 'products',
-      canActivate: [AuthGuard, UserGuard],
-      data: { rol: EnumRolesUsuario.ADMIN },
-      loadChildren: ()=> import('./modules/products/products.module').then(m=>m.ProductsModule),
-    },
-    {
-      path: 'reservations',
-      canActivate: [AuthGuard, UserGuard],
-      data: { rol: EnumRolesUsuario.ADMIN },
-      loadChildren: ()=> import('./modules/reservations/reservations.module').then(m=>m.ReservationsModule),
-    },
-    {
-      path: 'itemProduct',
-      canActivate: [AuthGuard, UserGuard],
-      data: { rol: EnumRolesUsuario.ADMIN },
-      loadChildren: () =>
-        import('./modules/products/pages/products/item-products/item-product.module').then(
-          (m) => m.ItemProductModule
-        ),
-    },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'home',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard', // ← ESTA RUTA FALTABA
+        loadChildren: () => import('./shared/pages/home/components/dashboard/dashboard.module').then(m => m.DashboardModule),
+      },
+      {
+        path: 'products',
+        canActivate: [AuthGuard, UserGuard],
+        data: { rol: EnumRolesUsuario.ADMIN },
+        loadChildren: () => import('./modules/products/products.module').then(m => m.ProductsModule),
+      },
+      {
+        path: 'reservations',
+        canActivate: [AuthGuard, UserGuard],
+        data: { rol: EnumRolesUsuario.ADMIN },
+        loadChildren: () => import('./modules/reservations/reservations.module').then(m => m.ReservationsModule),
+      },
+      /*{
+        path: 'orders',
+        canActivate: [AuthGuard, UserGuard],
+        data: { rol: EnumRolesUsuario.ADMIN },
+        loadChildren: () => import('./modules/orders/orders.module').then(m => m.OrdersModule),
+      },*/
+      {
+        path: 'users',
+        canActivate: [AuthGuard, UserGuard],
+        data: { rol: EnumRolesUsuario.ADMIN },
+        loadChildren: () => import('./modules/auth/auth.module').then(m => m.AuthModule),
+      },
+      {
+        path: 'itemProduct',
+        canActivate: [AuthGuard, UserGuard],
+        data: { rol: EnumRolesUsuario.ADMIN },
+        loadChildren: () =>
+          import('./modules/products/pages/products/item-products/item-product.module').then(
+            (m) => m.ItemProductModule
+          ),
+      },
     ]
   },
   {
-      path: 'auth',
-      component: AuthComponent,
-      children: [
-        {
-          path: '',
-				  loadChildren: (): Promise<typeof AuthModule> =>
-					import('./modules/auth/auth.module').then((m) => m.AuthModule),
-        },
-      ]
-    },
-  {
-    path:'404',
-    component:Error404PageComponent,
+    path: 'auth',
+    component: AuthComponent,
+    children: [
+      {
+        path: '',
+        loadChildren: (): Promise<typeof AuthModule> =>
+          import('./modules/auth/auth.module').then((m) => m.AuthModule),
+      },
+    ]
   },
   {
-    path:'home',
-    component: HomeComponent,
+    path: '404',
+    component: Error404PageComponent,
   },
-  //pordefecto
   {
-    path:'**',
-    redirectTo:'auth',
+    path: '**',
+    redirectTo: 'auth',
     pathMatch: 'full'
   },
   {
-    path:'not-found',
-    redirectTo:'404',
+    path: 'not-found',
+    redirectTo: '404',
   }
 ];
 

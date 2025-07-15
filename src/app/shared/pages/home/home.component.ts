@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Sidebar } from 'primeng/sidebar';
 import { Store } from '@ngrx/store';
@@ -8,94 +8,76 @@ import { takeUntil } from 'rxjs/operators';
 import { User } from '../../models/auth/auth.interface';
 import { logoutAction } from '../../../../@security/redux/actions/auth.action';
 import { SecurityState } from '../../../../@security/interfaces/SecurityState';
+import { DashboardService } from '../../../core/services/dashboard/dashboard.service';
+
+interface QuickStats {
+  ordersToday: number;
+  salesToday: number;
+}
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styles: `
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .user-name {
-      font-weight: 600;
-      color: var(--text-color);
-      max-width: 150px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .logout-btn {
-      color: var(--red-500) !important;
-      transition: color 0.3s ease;
-    }
-
-    .logout-btn:hover {
-      color: var(--red-600) !important;
-    }
-
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .user-section {
-      background: var(--surface-ground);
-      border-radius: 8px;
-      padding: 1rem;
-      margin: 1rem;
-    }
-
-    @media (max-width: 768px) {
-      .user-name {
-        max-width: 100px;
-      }
-
-      .header-controls {
-        gap: 0.5rem;
-      }
-
-      .user-section {
-        margin: 0.5rem;
-        padding: 0.75rem;
-      }
-    }
-  `
+  styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('sidebarRef') sidebarRef!: Sidebar;
 
   private destroy$ = new Subject<void>();
 
+  // Sidebar state
   sidebarVisible: boolean = false;
+  expandedSections = new Set<string>();
+
+  // User data
   currentUser$: Observable<User | null>;
   currentUser: User | null = null;
 
-  // Definir el menú del usuario en el componente
+  // Theme
+  isDarkTheme = false;
+
+  // Search
+  searchTerm = '';
+
+  // Notifications
+  notificationCount = 3;
+  notificationItems: MenuItem[] = [];
+
+  // Breadcrumb
+  breadcrumbItems: MenuItem[] = [];
+  breadcrumbHome: MenuItem = { icon: 'pi pi-home', routerLink: '/dashboard' };
+
+  // Quick stats
+  quickStats: QuickStats = {
+    ordersToday: 0,
+    salesToday: 0
+  };
+
+  // Menu items
   userMenuItems: MenuItem[] = [];
 
-  constructor(private store: Store<SecurityState>,
-    private confirmationService: ConfirmationService,  // ← NUEVO
-    private messageService: MessageService
+  constructor(
+    private store: Store<SecurityState>,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService,
+    private router: Router,
+    private dashboardService: DashboardService
   ) {
-    // Selector para obtener el usuario del estado
     this.currentUser$ = this.store.select(state => state.userState.user);
-
-    // Inicializar el menú del usuario
-    this.initializeUserMenu();
+    this.initializeMenus();
+    this.loadThemePreference();
+    this.initializeExpandedSections();
   }
 
   ngOnInit(): void {
-    // Suscribirse al usuario actual
     this.currentUser$.pipe(
       takeUntil(this.destroy$)
     ).subscribe(user => {
       this.currentUser = user;
     });
+
+    this.updateBreadcrumb();
+    this.loadQuickStats();
   }
 
   ngOnDestroy(): void {
@@ -103,10 +85,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private initializeUserMenu(): void {
+  private initializeMenus(): void {
+    // User menu
     this.userMenuItems = [
       {
-        label: 'Perfil',
+        label: 'Mi Perfil',
         icon: 'pi pi-user',
         command: () => this.navigateToProfile()
       },
@@ -114,6 +97,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         label: 'Configuración',
         icon: 'pi pi-cog',
         command: () => this.navigateToSettings()
+      },
+      {
+        label: 'Ayuda',
+        icon: 'pi pi-question-circle',
+        command: () => this.openHelp()
       },
       {
         separator: true
@@ -125,13 +113,149 @@ export class HomeComponent implements OnInit, OnDestroy {
         styleClass: 'text-red-500'
       }
     ];
+
+    // Notification items
+    this.notificationItems = [
+      {
+        label: 'Nueva orden recibida',
+        icon: 'pi pi-shopping-cart',
+        command: () => this.router.navigate(['/orders'])
+      },
+      {
+        label: 'Producto con stock bajo',
+        icon: 'pi pi-exclamation-triangle',
+        command: () => this.router.navigate(['/products'])
+      },
+      {
+        label: 'Nueva reserva',
+        icon: 'pi pi-calendar',
+        command: () => this.router.navigate(['/reservations'])
+      },
+      {
+        separator: true
+      },
+      {
+        label: 'Ver todas las notificaciones',
+        icon: 'pi pi-bell',
+        command: () => this.router.navigate(['/notifications'])
+      }
+    ];
   }
 
-  closeCallback(e: any): void {
-    this.sidebarRef.close(e);
+  private initializeExpandedSections(): void {
+    // Keep management section expanded by default
+    this.expandedSections.add('management');
   }
 
-    logout(): void {
+  private loadThemePreference(): void {
+    const savedTheme = localStorage.getItem('theme-preference');
+    this.isDarkTheme = savedTheme === 'dark';
+    this.applyTheme();
+  }
+
+  private updateBreadcrumb(): void {
+    // This would be updated based on current route
+    this.breadcrumbItems = [
+      { label: 'Dashboard', routerLink: '/dashboard' },
+      { label: 'Inicio' }
+    ];
+  }
+
+  private loadQuickStats(): void {
+    // Load quick stats from dashboard service
+    this.dashboardService.getTodayTransactions()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(transactions => {
+        this.quickStats.ordersToday = transactions.length;
+        this.quickStats.salesToday = transactions.reduce((sum, t) => sum + t.amount, 0);
+      });
+  }
+
+  // Sidebar methods
+  toggleSidebar(): void {
+    this.sidebarVisible = !this.sidebarVisible;
+  }
+
+  toggleMenuSection(section: string): void {
+    if (this.expandedSections.has(section)) {
+      this.expandedSections.delete(section);
+    } else {
+      this.expandedSections.add(section);
+    }
+  }
+
+  getMenuChevron(section: string): string {
+    return this.expandedSections.has(section) ? 'pi-chevron-down' : 'pi-chevron-right';
+  }
+
+  // Theme methods
+  toggleTheme(): void {
+    this.isDarkTheme = !this.isDarkTheme;
+    this.applyTheme();
+    localStorage.setItem('theme-preference', this.isDarkTheme ? 'dark' : 'light');
+
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Tema cambiado',
+      detail: `Tema ${this.isDarkTheme ? 'oscuro' : 'claro'} aplicado`,
+      life: 2000
+    });
+  }
+
+  private applyTheme(): void {
+    const themeLink = document.getElementById('app-theme') as HTMLLinkElement;
+    if (themeLink) {
+      themeLink.href = this.isDarkTheme
+        ? 'assets/themes/arya-blue/theme.css'
+        : 'assets/themes/saga-blue/theme.css';
+    }
+  }
+
+  // Search methods
+  performSearch(): void {
+    if (this.searchTerm.trim()) {
+      // Implement global search logic
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Búsqueda',
+        detail: `Buscando: ${this.searchTerm}`,
+        life: 2000
+      });
+
+      // Navigate to search results or filter current view
+      this.router.navigate(['/search'], { queryParams: { q: this.searchTerm } });
+    }
+  }
+
+  // User methods
+  getUserDisplayName(): string {
+    if (!this.currentUser) return 'Usuario';
+    return this.currentUser.username ||
+           this.currentUser.email?.split('@')[0] ||
+           'Usuario';
+  }
+
+  getUserAvatar(): string {
+    /*return this.currentUser?.imagen ||
+           'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png';*/
+           return'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png';
+  }
+
+  // Navigation methods
+  navigateToProfile(): void {
+    this.router.navigate(['/profile']);
+  }
+
+  navigateToSettings(): void {
+    this.router.navigate(['/settings']);
+  }
+
+  openHelp(): void {
+    window.open('/help', '_blank');
+  }
+
+  // Logout method
+  logout(): void {
     this.confirmationService.confirm({
       message: '¿Estás seguro de que deseas cerrar sesión?',
       header: 'Confirmar Logout',
@@ -142,47 +266,18 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.store.dispatch(logoutAction());
         this.sidebarVisible = false;
 
-        // Opcional: Mostrar mensaje de éxito
         this.messageService.add({
           severity: 'success',
           summary: 'Sesión cerrada',
-          detail: 'Has cerrado sesión correctamente'
+          detail: 'Has cerrado sesión correctamente',
+          life: 2000
         });
-      },
-      reject: () => {
-        // Opcional: El usuario canceló
-        console.log('Logout cancelado');
       }
     });
   }
 
-  getUserDisplayName(): string {
-    if (!this.currentUser) return 'Usuario';
-
-    // Priorizar nombre completo, luego nombre de usuario, luego email
-    return this.currentUser.username ||
-           this.currentUser.email?.split('@')[0] ||
-           'Usuario';
-  }
-
-  getUserAvatar(): string {
-    // Si el usuario tiene avatar, usarlo, sino usar uno por defecto
-    /*return this.currentUser?.imagen ||
-           'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png';*/
-    return 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png';
-  }
-
-  navigateToProfile(): void {
-    // Implementar navegación al perfil
-    console.log('Navegando al perfil...');
-  }
-
-  navigateToSettings(): void {
-    // Implementar navegación a configuración
-    console.log('Navegando a configuración...');
-  }
-
-  toggleSidebar(): void {
-    this.sidebarVisible = !this.sidebarVisible;
+  // Utility methods
+  closeCallback(e: any): void {
+    this.sidebarRef.close(e);
   }
 }
