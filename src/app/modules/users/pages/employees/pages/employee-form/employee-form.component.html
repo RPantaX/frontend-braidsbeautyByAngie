@@ -1,0 +1,502 @@
+<!-- pages/employee-form/employee-form.component.html -->
+<div class="employee-form-container">
+  <p-toast></p-toast>
+
+  <!-- Header Section -->
+  <div class="form-header">
+    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3">
+      <div>
+        <h2 class="text-900 font-bold text-3xl mb-2">{{ formTitle() }}</h2>
+        <p class="text-600 mt-0 mb-0">
+          {{ isEditMode() ? 'Modifica la información del empleado' : 'Completa la información para crear un nuevo empleado' }}
+        </p>
+      </div>
+
+      <div class="flex gap-2">
+        <p-button
+          icon="pi pi-arrow-left"
+          label="Volver"
+          styleClass="p-button-outlined p-button-sm"
+          (onClick)="onCancel()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Form -->
+  <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="employee-form">
+    <div class="grid">
+
+      <!-- Personal Information Card -->
+      <div class="col-12 lg:col-8">
+        <p-panel header="Información Personal" styleClass="mb-4">
+          <div class="grid">
+            <!-- Name -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="name" class="block text-900 font-medium mb-2">
+                  Nombre <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  pInputText
+                  formControlName="name"
+                  placeholder="Ingrese el nombre"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('name')"
+                  autocomplete="given-name">
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('name')">
+                  {{ getControlError('name') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="lastName" class="block text-900 font-medium mb-2">
+                  Apellido <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="lastName"
+                  type="text"
+                  pInputText
+                  formControlName="lastName"
+                  placeholder="Ingrese el apellido"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('lastName')"
+                  autocomplete="family-name">
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('lastName')">
+                  {{ getControlError('lastName') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="emailAddress" class="block text-900 font-medium mb-2">
+                  Email <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="emailAddress"
+                  type="email"
+                  pInputText
+                  formControlName="emailAddress"
+                  placeholder="ejemplo@correo.com"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('emailAddress')"
+                  autocomplete="email">
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('emailAddress')">
+                  {{ getControlError('emailAddress') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="phoneNumber" class="block text-900 font-medium mb-2">
+                  Teléfono <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="phoneNumber"
+                  type="tel"
+                  pInputText
+                  formControlName="phoneNumber"
+                  placeholder="+1 234 567 8900"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('phoneNumber')"
+                  autocomplete="tel">
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('phoneNumber')">
+                  {{ getControlError('phoneNumber') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Document Type -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="documentTypeId" class="block text-900 font-medium mb-2">
+                  Tipo de Documento <span class="text-red-500">*</span>
+                </label>
+                <p-dropdown
+                  id="documentTypeId"
+                  [options]="documentTypeOptions()"
+                  formControlName="documentTypeId"
+                  placeholder="Seleccionar tipo"
+                  optionLabel="label"
+                  optionValue="value"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('documentTypeId')"
+                  [loading]="loading()">
+                </p-dropdown>
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('documentTypeId')">
+                  {{ getControlError('documentTypeId') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Document Number -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="documentNumber" class="block text-900 font-medium mb-2">
+                  Número de Documento <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="documentNumber"
+                  type="text"
+                  pInputText
+                  formControlName="documentNumber"
+                  placeholder="Ingrese el número"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('documentNumber')">
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('documentNumber')">
+                  {{ getControlError('documentNumber') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Employee Type -->
+            <div class="col-12">
+              <div class="field">
+                <label for="employeeTypeId" class="block text-900 font-medium mb-2">
+                  Tipo de Empleado <span class="text-red-500">*</span>
+                </label>
+                <p-dropdown
+                  id="employeeTypeId"
+                  [options]="employeeTypeOptions()"
+                  formControlName="employeeTypeId"
+                  placeholder="Seleccionar tipo de empleado"
+                  optionLabel="label"
+                  optionValue="value"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('employeeTypeId')"
+                  [loading]="loading()">
+                </p-dropdown>
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('employeeTypeId')">
+                  {{ getControlError('employeeTypeId') }}
+                </small>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+
+        <!-- Address Information Card -->
+        <p-panel header="Información de Dirección" styleClass="mb-4">
+          <div class="grid">
+            <!-- Street -->
+            <div class="col-12">
+              <div class="field">
+                <label for="street" class="block text-900 font-medium mb-2">
+                  Dirección <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="street"
+                  type="text"
+                  pInputText
+                  formControlName="street"
+                  placeholder="Calle, número, apartamento"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('street')"
+                  autocomplete="street-address">
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('street')">
+                  {{ getControlError('street') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- City -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="city" class="block text-900 font-medium mb-2">
+                  Ciudad <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="city"
+                  type="text"
+                  pInputText
+                  formControlName="city"
+                  placeholder="Ingrese la ciudad"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('city')"
+                  autocomplete="address-level2">
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('city')">
+                  {{ getControlError('city') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- State -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="state" class="block text-900 font-medium mb-2">
+                  Estado/Provincia <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="state"
+                  type="text"
+                  pInputText
+                  formControlName="state"
+                  placeholder="Ingrese el estado"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('state')"
+                  autocomplete="address-level1">
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('state')">
+                  {{ getControlError('state') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Postal Code -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="postalCode" class="block text-900 font-medium mb-2">
+                  Código Postal <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="postalCode"
+                  type="text"
+                  pInputText
+                  formControlName="postalCode"
+                  placeholder="00000"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('postalCode')"
+                  autocomplete="postal-code">
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('postalCode')">
+                  {{ getControlError('postalCode') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Country -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="country" class="block text-900 font-medium mb-2">
+                  País <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="country"
+                  type="text"
+                  pInputText
+                  formControlName="country"
+                  placeholder="Ingrese el país"
+                  class="w-full"
+                  [class.ng-invalid]="isControlInvalid('country')"
+                  autocomplete="country">
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('country')">
+                  {{ getControlError('country') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Address Description -->
+            <div class="col-12">
+              <div class="field">
+                <label for="addressDescription" class="block text-900 font-medium mb-2">
+                  Descripción Adicional
+                </label>
+                <textarea
+                  id="addressDescription"
+                  pInputTextarea
+                  formControlName="addressDescription"
+                  placeholder="Referencias adicionales, apartamento, etc."
+                  class="w-full"
+                  rows="3"
+                  [class.ng-invalid]="isControlInvalid('addressDescription')">
+                </textarea>
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="isControlInvalid('addressDescription')">
+                  {{ getControlError('addressDescription') }}
+                </small>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+      </div>
+
+      <!-- Image Upload Card -->
+      <div class="col-12 lg:col-4">
+        <p-panel header="Foto del Empleado" styleClass="mb-4">
+          <div class="flex flex-column align-items-center gap-3">
+
+            <!-- Current Image Preview -->
+            <div class="image-preview-container">
+              <img
+                *ngIf="getCurrentImageUrl()"
+                [src]="getCurrentImageUrl()"
+                alt="Vista previa"
+                class="employee-image-preview"
+                [class.editing]="isEditMode()">
+
+              <div
+                *ngIf="!getCurrentImageUrl()"
+                class="no-image-placeholder">
+                <i class="pi pi-user text-4xl text-400"></i>
+                <span class="text-600 text-sm mt-2">Sin imagen</span>
+              </div>
+
+              <!-- Delete button for existing image -->
+              <p-button
+                *ngIf="getCurrentImageUrl() && isEditMode()"
+                icon="pi pi-times"
+                styleClass="p-button-rounded p-button-danger p-button-sm image-delete-btn"
+                pTooltip="Eliminar imagen"
+                tooltipPosition="left"
+                (onClick)="onFileRemove()">
+              </p-button>
+            </div>
+
+            <!-- File Upload -->
+            <p-fileUpload
+              mode="basic"
+              name="employeeImage"
+              accept="image/*"
+              [maxFileSize]="5000000"
+              [auto]="false"
+              chooseLabel="Seleccionar Imagen"
+              styleClass="p-button-outlined w-full"
+              (onSelect)="onFileSelect($event)"
+              [disabled]="saving()">
+            </p-fileUpload>
+
+            <!-- Upload Instructions -->
+            <div class="text-center">
+              <small class="text-600 block">
+                Formatos: JPG, PNG, GIF
+              </small>
+              <small class="text-600 block">
+                Tamaño máximo: 5MB
+              </small>
+              <small class="text-600 block">
+                Recomendado: 400x400px
+              </small>
+            </div>
+
+            <!-- Delete File Checkbox (for edit mode) -->
+            <div class="field-checkbox" *ngIf="isEditMode() && currentEmployee()?.employeeImage">
+              <p-checkbox
+                id="deleteFile"
+                formControlName="deleteFile"
+                binary="true">
+              </p-checkbox>
+              <label for="deleteFile" class="ml-2 text-sm">
+                Eliminar imagen actual
+              </label>
+            </div>
+          </div>
+        </p-panel>
+
+        <!-- Form Actions Card -->
+        <p-panel header="Acciones" styleClass="mb-4">
+          <div class="flex flex-column gap-3">
+            <!-- Save Button -->
+            <p-button
+              [label]="submitButtonLabel()"
+              icon="pi pi-check"
+              type="submit"
+              styleClass="w-full"
+              [loading]="saving()"
+              [disabled]="loading() || saving()">
+            </p-button>
+
+            <!-- Cancel Button -->
+            <p-button
+              label="Cancelar"
+              icon="pi pi-times"
+              styleClass="p-button-outlined w-full"
+              (onClick)="onCancel()"
+              [disabled]="saving()">
+            </p-button>
+
+            <!-- Save as Draft (future feature) -->
+            <p-button
+              label="Guardar Borrador"
+              icon="pi pi-save"
+              styleClass="p-button-text w-full"
+              [disabled]="true"
+              pTooltip="Funcionalidad próximamente"
+              tooltipPosition="top">
+            </p-button>
+          </div>
+        </p-panel>
+
+        <!-- Form Status Card -->
+        <p-panel header="Estado del Formulario" *ngIf="!loading()">
+          <div class="flex flex-column gap-2">
+            <div class="flex align-items-center gap-2">
+              <i
+                class="pi"
+                [class]="employeeForm.valid ? 'pi-check-circle text-green-500' : 'pi-exclamation-circle text-red-500'">
+              </i>
+              <span class="text-sm">
+                {{ employeeForm.valid ? 'Formulario válido' : 'Formulario con errores' }}
+              </span>
+            </div>
+
+            <div class="flex align-items-center gap-2">
+              <i
+                class="pi"
+                [class]="employeeForm.dirty ? 'pi-pencil text-blue-500' : 'pi-circle text-400'">
+              </i>
+              <span class="text-sm">
+                {{ employeeForm.dirty ? 'Cambios pendientes' : 'Sin cambios' }}
+              </span>
+            </div>
+
+            <div class="flex align-items-center gap-2" *ngIf="selectedFile()">
+              <i class="pi pi-image text-purple-500"></i>
+              <span class="text-sm">
+                Nueva imagen seleccionada
+              </span>
+            </div>
+          </div>
+        </p-panel>
+      </div>
+    </div>
+  </form>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading()">
+    <div class="loading-content">
+      <p-progressSpinner strokeWidth="3" animationDuration="2s"></p-progressSpinner>
+      <span class="text-lg font-medium mt-3">Cargando datos...</span>
+    </div>
+  </div>
+
+  <!-- Form Validation Summary -->
+  <div class="validation-summary" *ngIf="hasFormErrors()"> <p-panel header="Errores de Validación" styleClass="p-panel-danger">
+    <ul class="validation-errors">
+      <li *ngFor="let error of formErrorValues()" class="text-red-600 text-sm">
+        {{ error }}
+      </li>
+    </ul>
+  </p-panel>
+</div>
+</div>

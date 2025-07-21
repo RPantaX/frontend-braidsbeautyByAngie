@@ -65,10 +65,10 @@
 
         <div class="employee-info">
           <h4 class="employee-name">
-            {{ employee.person.name }} {{ employee.person.lastName }}
+            {{ employee.person!.name }} {{ employee.person!.lastName }}
           </h4>
-          <p class="employee-type">{{ employee.employeeType.value }}</p>
-          <p class="employee-email">{{ employee.person.emailAddress }}</p>
+          <p class="employee-type">{{ employee.employeeType!.value }}</p>
+          <p class="employee-email">{{ employee.person!.emailAddress }}</p>
         </div>
 
         <div class="selection-button">

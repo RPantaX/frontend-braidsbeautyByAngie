@@ -53,6 +53,12 @@ const routes: Routes = [
         loadChildren: () => import('./modules/auth/auth.module').then(m => m.AuthModule),
       },
       {
+        path: 'test',
+        canActivate: [AuthGuard, UserGuard],
+        data: { rol: EnumRolesUsuario.ADMIN },
+        loadChildren: () => import('./modules/users/users.module').then(m => m.UsersModule),
+      },
+      {
         path: 'itemProduct',
         canActivate: [AuthGuard, UserGuard],
         data: { rol: EnumRolesUsuario.ADMIN },

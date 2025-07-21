@@ -1,0 +1,442 @@
+<!-- pages/employee-detail/employee-detail.component.html -->
+<div class="employee-detail-container">
+  <p-toast></p-toast>
+  <p-confirmDialog
+    [style]="{width: '450px'}"
+    [baseZIndex]="10000"
+    rejectButtonStyleClass="p-button-outlined">
+  </p-confirmDialog>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading()">
+    <div class="text-center">
+      <p-progressSpinner strokeWidth="3" animationDuration="2s"></p-progressSpinner>
+      <p class="text-lg font-medium mt-3">Cargando información del empleado...</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="detail-content" *ngIf="!loading() && employee()">
+
+    <!-- Header Section -->
+    <div class="detail-header">
+      <div class="flex flex-column lg:flex-row lg:justify-content-between lg:align-items-start gap-4">
+
+        <!-- Employee Info -->
+        <div class="flex align-items-start gap-4">
+          <div class="employee-avatar-container">
+            <img
+              [src]="employeeAvatar()"
+              [alt]="employeeFullName()"
+              class="employee-avatar">
+            <div class="avatar-badge">
+              <i [class]="statusInfo().icon" [style.color]="statusInfo().severity === 'success' ? '#22c55e' : '#ef4444'"></i>
+            </div>
+          </div>
+
+          <div class="employee-basic-info">
+            <h1 class="employee-name">{{ employeeFullName() }}</h1>
+            <div class="employee-meta">
+              <p-tag
+                [value]="employeeTypeInfo().value"
+                [styleClass]="employeeTypeInfo().color"
+                [rounded]="true"
+                class="mr-2 mb-2">
+                <i [class]="employeeTypeInfo().icon" class="mr-1"></i>
+                {{ employeeTypeInfo().value }}
+              </p-tag>
+              <p-tag
+                [value]="statusInfo().label"
+                [severity]="statusInfo().severity"
+                [rounded]="true"
+                class="mb-2">
+                <i [class]="statusInfo().icon" class="mr-1"></i>
+                {{ statusInfo().label }}
+              </p-tag>
+            </div>
+            <div class="employee-id text-600">
+              ID: #{{ employee()?.id }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="detail-actions">
+          <div class="flex flex-column sm:flex-row gap-2">
+            <p-button
+              icon="pi pi-refresh"
+              label="Actualizar"
+              styleClass="p-button-outlined p-button-sm"
+              (onClick)="refreshData()"
+              [loading]="loading()">
+            </p-button>
+
+            <p-button
+              icon="pi pi-pencil"
+              label="Editar"
+              styleClass="p-button-warning p-button-sm"
+              (onClick)="navigateToEdit()">
+            </p-button>
+
+            <p-button
+              icon="pi pi-trash"
+              label="Eliminar"
+              styleClass="p-button-danger p-button-sm"
+              (onClick)="confirmDelete()">
+            </p-button>
+
+            <p-button
+              icon="pi pi-arrow-left"
+              label="Volver"
+              styleClass="p-button-outlined p-button-sm"
+              (onClick)="navigateToList()">
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="grid">
+
+      <!-- Personal Information -->
+      <div class="col-12 lg:col-8">
+        <p-panel header="Información Personal" styleClass="mb-4">
+          <div class="grid">
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Nombre Completo</label>
+                <div class="info-value">
+                  <span>{{ employeeFullName() }}</span>
+                  <p-button
+                    icon="pi pi-copy"
+                    styleClass="p-button-text p-button-sm ml-2"
+                    pTooltip="Copiar nombre"
+                    tooltipPosition="top"
+                    (onClick)="copyToClipboard(employeeFullName(), 'Nombre')">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Email</label>
+                <div class="info-value">
+                  <span>{{ employee()?.person?.emailAddress || 'No disponible' }}</span>
+                  <div class="ml-2">
+                    <p-button
+                      icon="pi pi-copy"
+                      styleClass="p-button-text p-button-sm mr-1"
+                      pTooltip="Copiar email"
+                      tooltipPosition="top"
+                      (onClick)="copyToClipboard(employee()?.person?.emailAddress || '', 'Email')"
+                      [disabled]="!employee()?.person?.emailAddress">
+                    </p-button>
+                    <p-button
+                      icon="pi pi-envelope"
+                      styleClass="p-button-text p-button-sm"
+                      pTooltip="Enviar email"
+                      tooltipPosition="top"
+                      (onClick)="openEmailClient()"
+                      [disabled]="!employee()?.person?.emailAddress">
+                    </p-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Teléfono</label>
+                <div class="info-value">
+                  <span>{{ formatPhone(employee()?.person?.phoneNumber || '') }}</span>
+                  <div class="ml-2">
+                    <p-button
+                      icon="pi pi-copy"
+                      styleClass="p-button-text p-button-sm mr-1"
+                      pTooltip="Copiar teléfono"
+                      tooltipPosition="top"
+                      (onClick)="copyToClipboard(employee()?.person?.phoneNumber || '', 'Teléfono')"
+                      [disabled]="!employee()?.person?.phoneNumber">
+                    </p-button>
+                    <p-button
+                      icon="pi pi-phone"
+                      styleClass="p-button-text p-button-sm"
+                      pTooltip="Llamar"
+                      tooltipPosition="top"
+                      (onClick)="callEmployee()"
+                      [disabled]="!employee()?.person?.phoneNumber">
+                    </p-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Tipo de Empleado</label>
+                <div class="info-value">
+                  <p-tag
+                    [value]="employeeTypeInfo().value"
+                    [styleClass]="employeeTypeInfo().color"
+                    [rounded]="true">
+                    <i [class]="employeeTypeInfo().icon" class="mr-1"></i>
+                    {{ employeeTypeInfo().value }}
+                  </p-tag>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Tipo de Documento</label>
+                <div class="info-value">
+                  <span>{{ employee()?.person?.documentType?.value || 'No disponible' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Número de Documento</label>
+                <div class="info-value">
+                  <span>{{ employee()?.person?.documentNumber || 'No disponible' }}</span>
+                  <p-button
+                    icon="pi pi-copy"
+                    styleClass="p-button-text p-button-sm ml-2"
+                    pTooltip="Copiar documento"
+                    tooltipPosition="top"
+                    (onClick)="copyToClipboard(employee()?.person?.documentNumber || '', 'Documento')"
+                    [disabled]="!employee()?.person?.documentNumber">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+
+        <!-- Address Information -->
+        <p-panel header="Información de Dirección" styleClass="mb-4">
+          <div class="grid">
+            <div class="col-12">
+              <div class="info-item">
+                <label class="info-label">Dirección Completa</label>
+                <div class="info-value">
+                  <span>{{ getFullAddress() }}</span>
+                  <p-button
+                    icon="pi pi-copy"
+                    styleClass="p-button-text p-button-sm ml-2"
+                    pTooltip="Copiar dirección"
+                    tooltipPosition="top"
+                    (onClick)="copyToClipboard(getFullAddress(), 'Dirección')"
+                    [disabled]="getFullAddress() === 'No disponible'">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Calle</label>
+                <div class="info-value">
+                  <span>{{ employee()?.person?.address?.street || 'No disponible' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Ciudad</label>
+                <div class="info-value">
+                  <span>{{ employee()?.person?.address?.city || 'No disponible' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Estado/Provincia</label>
+                <div class="info-value">
+                  <span>{{ employee()?.person?.address?.state || 'No disponible' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Código Postal</label>
+                <div class="info-value">
+                  <span>{{ employee()?.person?.address?.postalCode || 'No disponible' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">País</label>
+                <div class="info-value">
+                  <span>{{ employee()?.person?.address?.country || 'No disponible' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Descripción</label>
+                <div class="info-value">
+                  <span>{{ employee()?.person?.address?.description || 'Sin descripción adicional' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+      </div>
+
+      <!-- Sidebar Information -->
+      <div class="col-12 lg:col-4">
+
+        <!-- Quick Actions -->
+        <p-panel header="Acciones Rápidas" styleClass="mb-4">
+          <div class="flex flex-column gap-2">
+            <p-button
+              icon="pi pi-download"
+              label="Exportar Información"
+              styleClass="p-button-outlined w-full p-button-sm"
+              (onClick)="exportEmployeeInfo()">
+            </p-button>
+
+            <p-button
+              icon="pi pi-print"
+              label="Imprimir"
+              styleClass="p-button-outlined w-full p-button-sm"
+              (onClick)="printEmployeeInfo()">
+            </p-button>
+          </div>
+        </p-panel>
+
+        <!-- User Account Info -->
+        <p-panel header="Cuenta de Usuario" styleClass="mb-4" *ngIf="hasUser()">
+          <div class="user-account-info">
+            <div class="info-item mb-3">
+              <label class="info-label">Usuario</label>
+              <div class="info-value">
+                <span>{{ employee()?.user?.username || 'No disponible' }}</span>
+              </div>
+            </div>
+
+            <div class="info-item mb-3">
+              <label class="info-label">Email de Usuario</label>
+              <div class="info-value">
+                <span>{{ employee()?.user?.email || 'No disponible' }}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <label class="info-label">Estado del Usuario</label>
+              <div class="info-value">
+                <p-tag
+                  [value]="getUserStatus().label"
+                  [severity]="getUserStatus().severity"
+                  [rounded]="true">
+                  <i [class]="getUserStatus().icon" class="mr-1"></i>
+                  {{ getUserStatus().label }}
+                </p-tag>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+
+        <!-- No User Account -->
+        <p-panel header="Cuenta de Usuario" styleClass="mb-4" *ngIf="!hasUser()">
+          <div class="text-center">
+            <i class="pi pi-user-minus text-4xl text-400 mb-3"></i>
+            <p class="text-600 mb-3">Este empleado no tiene una cuenta de usuario asignada.</p>
+            <p-button
+              icon="pi pi-user-plus"
+              label="Crear Cuenta"
+              styleClass="p-button-outlined p-button-sm"
+              [disabled]="true"
+              pTooltip="Funcionalidad próximamente">
+            </p-button>
+          </div>
+        </p-panel>
+
+        <!-- Contracts Info -->
+        <p-panel header="Contratos" styleClass="mb-4">
+          <div class="contracts-info">
+            <div class="text-center" *ngIf="!hasContracts()">
+              <i class="pi pi-file-o text-4xl text-400 mb-3"></i>
+              <p class="text-600 mb-3">No hay contratos registrados para este empleado.</p>
+              <p-button
+                icon="pi pi-plus"
+                label="Agregar Contrato"
+                styleClass="p-button-outlined p-button-sm"
+                [disabled]="true"
+                pTooltip="Funcionalidad próximamente">
+              </p-button>
+            </div>
+
+            <div *ngIf="hasContracts()">
+              <div class="flex align-items-center justify-content-between mb-3">
+                <span class="font-medium">Contratos Activos</span>
+                <p-tag
+                  [value]="getContractCount().toString()"
+                  severity="info"
+                  [rounded]="true">
+                </p-tag>
+              </div>
+              <p-button
+                icon="pi pi-eye"
+                label="Ver Contratos"
+                styleClass="p-button-outlined w-full p-button-sm"
+                [disabled]="true"
+                pTooltip="Funcionalidad próximamente">
+              </p-button>
+            </div>
+          </div>
+        </p-panel>
+
+        <!-- System Information -->
+        <p-panel header="Información del Sistema" styleClass="mb-4">
+          <div class="system-info">
+            <div class="info-item mb-2">
+              <label class="info-label">Fecha de Creación</label>
+              <div class="info-value">
+                <span>{{ formatDate(employee()?.person!.createdAt!) }}</span>
+              </div>
+            </div>
+
+            <div class="info-item mb-2">
+              <label class="info-label">Última Modificación</label>
+              <div class="info-value">
+                <span>{{ formatDate(employee()?.person?.modifiedAt || '') }}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <label class="info-label">Modificado por</label>
+              <div class="info-value">
+                <span>{{ employee()?.person?.modifiedByUser || 'Sistema' }}</span>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="!loading() && !employee()">
+    <div class="text-center">
+      <i class="pi pi-exclamation-triangle text-6xl text-400 mb-4"></i>
+      <h3 class="text-900 font-bold mb-3">Empleado no encontrado</h3>
+      <p class="text-600 mb-4">No se pudo cargar la información del empleado solicitado.</p>
+      <p-button
+        icon="pi pi-arrow-left"
+        label="Volver al Listado"
+        (onClick)="navigateToList()">
+      </p-button>
+    </div>
+  </div>
+</div>

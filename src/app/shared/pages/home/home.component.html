@@ -342,7 +342,13 @@
                 </a>
               </li>
               <li>
-                <a pRipple class="submenu-link">
+                <a pRipple routerLink="test/employees" routerLinkActive="active" class="submenu-link">
+                  <i class="pi pi-users submenu-icon"></i>
+                  <span>{{ "employees.title" | translate }}</span>
+                </a>
+              </li>
+              <li>
+                <a pRipple routerLink="/settings" routerLinkActive="active" class="submenu-link">
                   <i class="pi pi-cog submenu-icon"></i>
                   <span>{{ "home.modules.settings" | translate }}</span>
                 </a>

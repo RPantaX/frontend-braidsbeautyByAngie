@@ -1,0 +1,366 @@
+<!-- pages/employee-list/employee-list.component.html -->
+<div class="employee-list-container">
+  <p-toast></p-toast>
+  <p-confirmDialog
+    [style]="{width: '450px'}"
+    [baseZIndex]="10000"
+    rejectButtonStyleClass="p-button-outlined">
+  </p-confirmDialog>
+
+  <!-- Header Section -->
+  <div class="card">
+    <div class="card-header">
+      <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3">
+        <div>
+          <h2 class="text-900 font-bold text-3xl mb-2">Gestión de Empleados</h2>
+          <p class="text-600 mt-0 mb-0">Administra la información de los empleados del salón</p>
+        </div>
+
+        <div class="flex flex-column md:flex-row gap-2">
+          <p-button
+            icon="pi pi-refresh"
+            label="Actualizar"
+            styleClass="p-button-outlined p-button-sm"
+            (onClick)="loadEmployees()"
+            [loading]="loading()">
+          </p-button>
+
+          <p-button
+            icon="pi pi-plus"
+            label="Nuevo Empleado"
+            styleClass="p-button-sm"
+            (onClick)="navigateToCreate()">
+          </p-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="card-body">
+      <div class="flex flex-column lg:flex-row gap-3 mb-4">
+        <!-- Global Search -->
+        <div class="flex-1">
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              pInputText
+              placeholder="Buscar empleados..."
+              class="w-full"
+              [value]="globalFilterValue()"
+              (input)="onGlobalFilter($event)">
+          </span>
+        </div>
+
+        <!-- State Filter -->
+        <div class="flex-none">
+          <p-dropdown
+            [options]="statusOptions()"
+            placeholder="Estado"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="filters().state" (onChange)="onStateFilterChange($event.value)"
+            styleClass="p-bottomdown-sm w-full lg:w-auto">
+          </p-dropdown>
+        </div>
+
+        <div class="flex-none">
+          <p-dropdown
+            [options]="filteredEmployeeTypes()"
+            placeholder="Tipo de Empleado"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="filters().employeeTypeId" (onChange)="onEmployeeTypeFilterChange($event.value)"
+            styleClass="p-dropdown-sm w-full lg:w-auto">
+          </p-dropdown>
+        </div>
+
+        <!-- Clear Filters -->
+        <div class="flex-none">
+          <p-button
+            icon="pi pi-filter-slash"
+            label="Limpiar"
+            styleClass="p-button-outlined p-button-sm"
+            (onClick)="clearFilters()">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Action Toolbar -->
+      <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3 mb-4">
+        <div class="flex align-items-center gap-2">
+          <p-button
+            icon="pi pi-trash"
+            label="Eliminar Seleccionados"
+            styleClass="p-button-danger p-button-outlined p-button-sm"
+            (onClick)="confirmDeleteSelected()"
+            [disabled]="selectedEmployees().length === 0">
+          </p-button>
+
+          <span class="text-sm text-600" *ngIf="selectedEmployees().length > 0">
+            {{ selectedEmployees().length }} empleado(s) seleccionado(s)
+          </span>
+        </div>
+
+        <div class="flex gap-2">
+          <p-button
+            icon="pi pi-file-excel"
+            label="Excel"
+            styleClass="p-button-success p-button-outlined p-button-sm"
+            (onClick)="exportExcel()">
+          </p-button>
+
+          <p-button
+            icon="pi pi-file-pdf"
+            label="PDF"
+            styleClass="p-button-danger p-button-outlined p-button-sm"
+            (onClick)="exportPDF()">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <p-table
+        #dt
+        [value]="employees()"
+        [loading]="loading()"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="pagination().rows"
+        [totalRecords]="totalRecords()"
+        [rowsPerPageOptions]="rowsPerPageOptions"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} empleados"
+        [globalFilterFields]="['person.name', 'person.lastName', 'person.emailAddress', 'employeeType.value']"
+        [(selection)]="selectedEmployees"
+        dataKey="id"
+        [styleClass]="getTableStyleClass()"
+        responsiveLayout="scroll"
+        [scrollable]="true"
+        scrollHeight="flex"
+        (onLazyLoad)="loadEmployees($event)">
+
+        <!-- Table Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th style="width: 5rem">Avatar</th>
+            <th pSortableColumn="person.name" style="min-width: 12rem">
+              Nombre
+              <p-sortIcon field="person.name"></p-sortIcon>
+            </th>
+            <th pSortableColumn="person.lastName" style="min-width: 12rem">
+              Apellido
+              <p-sortIcon field="person.lastName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="person.emailAddress" style="min-width: 15rem">
+              Email
+              <p-sortIcon field="person.emailAddress"></p-sortIcon>
+            </th>
+            <th style="min-width: 10rem">Teléfono</th>
+            <th pSortableColumn="employeeType.value" style="min-width: 12rem">
+              Tipo
+              <p-sortIcon field="employeeType.value"></p-sortIcon>
+            </th>
+            <th style="min-width: 8rem">Estado</th>
+            <th style="min-width: 10rem">Acciones</th>
+          </tr>
+        </ng-template>
+
+        <!-- Table Body -->
+        <ng-template pTemplate="body" let-employee>
+          <tr>
+            <!-- Checkbox -->
+            <td>
+              <p-tableCheckbox [value]="employee"></p-tableCheckbox>
+            </td>
+
+            <!-- Avatar -->
+            <td>
+              <p-avatar
+                [image]="getEmployeeAvatar(employee)"
+                shape="circle"
+                size="large"
+                styleClass="employee-avatar">
+              </p-avatar>
+            </td>
+
+            <!-- Name -->
+            <td>
+              <span class="font-medium text-900">
+                {{ employee.person?.name || 'N/A' }}
+              </span>
+            </td>
+
+            <!-- Last Name -->
+            <td>
+              <span class="font-medium text-900">
+                {{ employee.person?.lastName || 'N/A' }}
+              </span>
+            </td>
+
+            <!-- Email -->
+            <td>
+              <span class="text-600">
+                {{ employee.person?.emailAddress || 'N/A' }}
+              </span>
+            </td>
+
+            <!-- Phone -->
+            <td>
+              <span class="text-600">
+                {{ employee.person?.phoneNumber || 'N/A' }}
+              </span>
+            </td>
+
+            <!-- Employee Type -->
+            <td>
+              <p-tag
+                [value]="employee.employeeType?.value || 'N/A'"
+                [styleClass]="getEmployeeTypeColor(employee.employeeType?.value || '')"
+                [rounded]="true">
+              </p-tag>
+            </td>
+
+            <!-- Status -->
+            <td>
+              <p-tag
+                [value]="getEmployeeStatusLabel(employee.person?.state ?? true)"
+                [severity]="getEmployeeStatusSeverity(employee.person?.state ?? true)"
+                [rounded]="true">
+              </p-tag>
+            </td>
+
+            <!-- Actions -->
+            <td>
+              <div class="flex gap-2">
+                <p-button
+                  icon="pi pi-eye"
+                  styleClass="p-button-rounded p-button-text p-button-sm"
+                  pTooltip="Ver detalles"
+                  tooltipPosition="top"
+                  (onClick)="navigateToDetail(employee)">
+                </p-button>
+
+                <p-button
+                  icon="pi pi-pencil"
+                  styleClass="p-button-rounded p-button-text p-button-warning p-button-sm"
+                  pTooltip="Editar"
+                  tooltipPosition="top"
+                  (onClick)="navigateToEdit(employee)">
+                </p-button>
+
+                <p-button
+                  icon="pi pi-trash"
+                  styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
+                  pTooltip="Eliminar"
+                  tooltipPosition="top"
+                  (onClick)="confirmDelete(employee)">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty State -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="9" class="text-center p-4">
+              <div class="flex flex-column align-items-center gap-3">
+                <i class="pi pi-users text-4xl text-400"></i>
+                <span class="text-600 text-lg">No se encontraron empleados</span>
+                <p-button
+                  icon="pi pi-plus"
+                  label="Crear Primer Empleado"
+                  styleClass="p-button-sm"
+                  (onClick)="navigateToCreate()">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Loading Template -->
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="9">
+              <div class="flex align-items-center justify-content-center p-4">
+                <p-progressSpinner strokeWidth="3" animationDuration="2s"></p-progressSpinner>
+                <span class="ml-3">Cargando empleados...</span>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Mobile View (shown on small screens) -->
+  <div class="mobile-view md:hidden" *ngIf="!loading() && employees().length > 0">
+    <div class="grid">
+      <div class="col-12" *ngFor="let employee of employees()">
+        <div class="card employee-card">
+          <div class="flex align-items-center gap-3 mb-3">
+            <p-avatar
+              [image]="getEmployeeAvatar(employee)"
+              shape="circle"
+              size="large">
+            </p-avatar>
+
+            <div class="flex-1">
+              <div class="font-bold text-900 text-lg">
+                {{ getEmployeeFullName(employee) }}
+              </div>
+              <div class="text-600 text-sm">
+                {{ employee.person?.emailAddress }}
+              </div>
+            </div>
+
+            <p-tag
+              [value]="getEmployeeStatusLabel(employee.person?.state ?? true)"
+              [severity]="getEmployeeStatusSeverity(employee.person?.state ?? true)"
+              [rounded]="true">
+            </p-tag>
+          </div>
+
+          <div class="grid mb-3">
+            <div class="col-6">
+              <span class="text-600 text-sm">Teléfono:</span>
+              <div class="font-medium">{{ employee.person?.phoneNumber || 'N/A' }}</div>
+            </div>
+            <div class="col-6">
+              <span class="text-600 text-sm">Tipo:</span>
+              <div>
+                <p-tag
+                  [value]="employee.employeeType?.value || 'N/A'"
+                  [styleClass]="getEmployeeTypeColor(employee.employeeType?.value || '')"
+                  [rounded]="true">
+                </p-tag>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-content-end gap-2">
+            <p-button
+              icon="pi pi-eye"
+              styleClass="p-button-rounded p-button-outlined p-button-sm"
+              (onClick)="navigateToDetail(employee)">
+            </p-button>
+            <p-button
+              icon="pi pi-pencil"
+              styleClass="p-button-rounded p-button-warning p-button-sm"
+              (onClick)="navigateToEdit(employee)">
+            </p-button>
+            <p-button
+              icon="pi pi-trash"
+              styleClass="p-button-rounded p-button-danger p-button-outlined p-button-sm"
+              (onClick)="confirmDelete(employee)">
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
