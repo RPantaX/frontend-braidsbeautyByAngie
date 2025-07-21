@@ -1,0 +1,144 @@
+<div class="select-datetime-container">
+  <div class="employee-preview">
+    <div class="employee-info">
+      <img
+        [src]="selectedEmployee()?.employeeImage || '/assets/images/default-avatar.png'"
+        [alt]="selectedEmployee()?.person?.name"
+        class="employee-avatar">
+      <div class="employee-details">
+        <h3>{{ selectedEmployee()?.person?.name }} {{ selectedEmployee()?.person?.lastName }}</h3>
+        <p>{{ selectedEmployee()?.employeeType?.value }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="datetime-selection">
+    <h2>Selecciona el día y los horarios disponibles</h2>
+
+    <div class="selection-form">
+      <div class="form-row">
+        <!-- Date Selection -->
+        <div class="form-group">
+          <label>Selecciona el día</label>
+          <p-calendar
+            [(ngModel)]="selectedDate"
+            (ngModelChange)="onDateSelect($event)"
+            [inline]="true"
+            dateFormat="dd/mm/yy"
+            [minDate]="today"> </p-calendar>
+        </div>
+
+        <!-- Time Selection -->
+        <div class="form-group">
+          <label>Selecciona la hora</label>
+
+          <div class="time-selection">
+            <div class="time-input-group">
+              <label for="startTime">Inicio:</label>
+              <p-dropdown
+                id="startTime"
+                [options]="timeSlots"
+                [(ngModel)]="startTime"
+                (onChange)="onStartTimeSelect($event.value)"
+                optionLabel="display"
+                placeholder="09:00"
+                styleClass="time-dropdown">
+              </p-dropdown>
+            </div>
+
+            <div class="time-input-group">
+              <label for="endTime">Fin:</label>
+              <p-dropdown
+                id="endTime"
+                [options]="timeSlots"
+                [(ngModel)]="endTime"
+                (onChange)="onEndTimeSelect($event.value)"
+                optionLabel="display"
+                placeholder="10:00"
+                styleClass="time-dropdown"
+                [disabled]="!startTime()">
+              </p-dropdown>
+            </div>
+          </div>
+
+          <div class="add-button-container">
+            <p-button
+              label="Agregar"
+              icon="pi pi-plus"
+              styleClass="p-button-success"
+              (onClick)="addSchedule()"
+              [disabled]="!selectedDate() || !startTime() || !endTime()">
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week Schedule View -->
+  <div class="week-schedule" *ngIf="currentSchedules().length > 0">
+    <h3>Horarios de la semana</h3>
+    <div class="week-navigation">
+      <p-button
+        icon="pi pi-chevron-left"
+        (onClick)="previousWeek()"
+        [disabled]="isPreviousWeekDisabled()"
+        styleClass="p-button-rounded p-button-text">
+      </p-button>
+
+      <h3>{{ weekRange() }}</h3>
+
+      <p-button
+        icon="pi pi-chevron-right"
+        (onClick)="nextWeek()"
+        styleClass="p-button-rounded p-button-text">
+      </p-button>
+    </div>
+    <div class="week-grid">
+      <div *ngFor="let day of currentWeek()" class="day-column">
+        <div class="day-header">
+          <h4>{{ day.dayName | titlecase }}</h4>
+          <span class="day-number">{{ day.dayNumber }}</span>
+        </div>
+
+        <div class="day-schedules">
+          <div
+            *ngFor="let schedule of day.schedules; let i = index"
+            class="schedule-item">
+            <div class="schedule-time">
+              {{ formatScheduleTime(schedule) }}
+            </div>
+            <button
+              class="remove-schedule"
+              (click)="removeScheduleByIndex(schedule)"
+              title="Eliminar horario">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+
+          <div *ngIf="day.schedules.length === 0" class="no-schedules">
+            Sin horarios
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="step-actions">
+    <p-button
+      label="Atrás"
+      icon="pi pi-arrow-left"
+      styleClass="p-button-outlined"
+      (onClick)="goBack()">
+    </p-button>
+
+    <p-button
+      label="Guardar"
+      icon="pi pi-save"
+      styleClass="p-button-primary"
+      [disabled]="!canProceed()"
+      (onClick)="proceedToNextStep()">
+    </p-button>
+  </div>
+</div>

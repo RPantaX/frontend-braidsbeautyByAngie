@@ -1,0 +1,97 @@
+<div class="employee-detail-container">
+  <p-toast></p-toast>
+
+  <!-- Header -->
+  <div class="detail-header">
+    <p-button
+      icon="pi pi-arrow-left"
+      styleClass="p-button-rounded p-button-text"
+      (onClick)="goBack()"
+      pTooltip="Volver a horarios">
+    </p-button>
+
+    <h1>Horarios del Empleado</h1>
+
+    <p-button
+      icon="pi pi-download"
+      styleClass="p-button-rounded p-button-outlined"
+      (onClick)="exportEmployeeSchedules()"
+      pTooltip="Exportar horarios">
+    </p-button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-container">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Cargando información del empleado...</p>
+  </div>
+
+  <!-- Employee Info -->
+  <div *ngIf="!loading() && employee()" class="employee-info-card">
+    <div class="employee-header">
+      <img
+        [src]="employee()?.employeeImage || '/assets/images/default-avatar.png'"
+        [alt]="employee()?.person?.name"
+        class="employee-avatar">
+
+      <div class="employee-details">
+        <h2>{{ employee()?.person?.name }} {{ employee()?.person?.lastName }}</h2>
+        <p class="employee-type">{{ employee()?.employeeType?.value }}</p>
+        <p class="employee-email">{{ employee()?.person?.emailAddress }}</p>
+        <p class="employee-phone">{{ employee()?.person?.phoneNumber }}</p>
+      </div>
+
+      <div class="employee-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ totalSchedules() }}</span>
+          <span class="stat-label">Total Horarios</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedules Timeline -->
+  <div *ngIf="!loading()" class="schedules-timeline">
+    <h3>Historial de Horarios</h3>
+
+    <!-- Empty State -->
+    <div *ngIf="groupedSchedules().length === 0" class="empty-state">
+      <i class="pi pi-calendar" style="font-size: 3rem; color: #64748b;"></i>
+      <h4>Sin horarios registrados</h4>
+      <p>Este empleado no tiene horarios asignados.</p>
+    </div>
+
+    <!-- Schedule Groups by Date -->
+    <div *ngFor="let group of groupedSchedules()" class="date-group">
+      <div class="date-header">
+        <h4>{{ formatDate(group.date) }}</h4>
+        <span class="schedule-count">{{ group.schedules.length }} horario(s)</span>
+      </div>
+
+      <div class="schedules-for-date">
+        <div *ngFor="let schedule of group.schedules" class="schedule-timeline-item">
+          <div class="timeline-marker"></div>
+
+          <div class="schedule-card">
+            <div class="schedule-time-range">
+              <span class="time-start">{{ formatTime(schedule.scheduleDTO.scheduleHourStart) }}</span>
+              <span class="time-separator">-</span>
+              <span class="time-end">{{ formatTime(schedule.scheduleDTO.scheduleHourEnd) }}</span>
+            </div>
+
+            <div class="schedule-status">
+              <p-tag
+                [value]="getScheduleStatusText(schedule.scheduleDTO.scheduleState)"
+                [severity]="getScheduleStatusSeverity(schedule.scheduleDTO.scheduleState)">
+              </p-tag>
+            </div>
+
+            <div class="schedule-id">
+              ID: {{ schedule.scheduleDTO.scheduleId }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

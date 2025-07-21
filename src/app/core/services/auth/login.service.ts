@@ -10,7 +10,7 @@ import { LocalStorageService } from '../../../shared/services/storage/local-stor
 @Injectable({providedIn: 'root'})
 export class AuthService {
 
-  private baseUrl: string = environment.baseUrl + '/user-service/user';
+  private baseUrl: string = environment.baseUrl + '/user-service';
   private router = inject(Router);
   private http = inject(HttpClient);
   private _localStorageService = inject(LocalStorageService);
@@ -24,7 +24,7 @@ export class AuthService {
     );
   }
   getUserById(id: string): Observable<User> {
-    return this.http.get<User>(`${this.baseUrl}/${id}`);
+    return this.http.get<User>(`${this.baseUrl}/auth/${id}`);
   }
 
 

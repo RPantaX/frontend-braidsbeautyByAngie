@@ -1,0 +1,105 @@
+<div class="select-employee-container">
+  <div class="section-header">
+    <h2>Trabajadores</h2>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="employeeDropdown">Seleccionar un trabajador</label>
+      <p-dropdown
+        id="employeeDropdown"
+        [options]="dropdownOptions()"
+        [(ngModel)]="selectedEmployeeFromDropdown"
+        (onChange)="onDropdownChange($event.value)"
+        optionLabel="label"
+        placeholder="Seleccionar un trabajador"
+        [filter]="true"
+        filterBy="label"
+        styleClass="w-full">
+      </p-dropdown>
+    </div>
+
+    <div class="filter-group">
+      <p-button
+        label="Buscar por nombre"
+        icon="pi pi-search"
+        styleClass="p-button-outlined"
+        (onClick)="searchInput.focus()">
+      </p-button>
+      <input
+        #searchInput
+        type="text"
+        pInputText
+        placeholder="Buscar empleado..."
+        [value]="searchTerm()"
+        (input)="onSearchChange(searchInput.value)"
+        class="search-input">
+    </div>
+  </div>
+
+  <!-- Employee Selection -->
+  <div class="selection-section">
+    <h3>Selecciona al trabajador</h3>
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="loading-container">
+      <p-progressSpinner></p-progressSpinner>
+      <p>Cargando empleados...</p>
+    </div>
+
+    <!-- Employee Grid -->
+    <div *ngIf="!loading()" class="employees-grid">
+      <div
+        *ngFor="let employee of filteredEmployees()"
+        class="employee-card"
+        [class.selected]="isEmployeeSelected(employee)"
+        (click)="selectEmployee(employee)">
+
+        <div class="employee-image">
+          <img
+            [src]="employee?.employeeImage || '/assets/images/default-avatar.png'"
+            [alt]="employee?.person?.name"
+            class="avatar">
+        </div>
+
+        <div class="employee-info">
+          <h4 class="employee-name">
+            {{ employee.person.name }} {{ employee.person.lastName }}
+          </h4>
+          <p class="employee-type">{{ employee.employeeType.value }}</p>
+          <p class="employee-email">{{ employee.person.emailAddress }}</p>
+        </div>
+
+        <div class="selection-button">
+          <p-button
+            [label]="isEmployeeSelected(employee) ? 'Seleccionado' : 'Seleccionar'"
+            [icon]="isEmployeeSelected(employee) ? 'pi pi-check' : 'pi pi-plus'"
+            [styleClass]="isEmployeeSelected(employee) ? 'p-button-success' : 'p-button-primary'"
+            [disabled]="isEmployeeSelected(employee)"
+            (onClick)="selectEmployee(employee); $event.stopPropagation()">
+          </p-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading() && filteredEmployees().length === 0" class="empty-state">
+      <i class="pi pi-users" style="font-size: 3rem; color: #64748b;"></i>
+      <h3>No se encontraron empleados</h3>
+      <p>No hay empleados que coincidan con tu búsqueda.</p>
+    </div>
+  </div>
+
+  <!-- Next Button -->
+  <div class="step-actions">
+    <p-button
+      label="Siguiente"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      styleClass="p-button-primary"
+      [disabled]="!selectedEmployee()"
+      (onClick)="proceedToNextStep()">
+    </p-button>
+  </div>
+</div>

@@ -6,11 +6,11 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 
 @Component({
-  selector: 'app-reservation-page',
-  templateUrl: './reservation.component.html',
-  styleUrls: ['./reservation.component.css']
+  selector: 'app-services-services-page',
+  templateUrl: './services.component.html',
+  styleUrls: ['./services.component.css']
 })
-export class ReservationComponent implements OnInit {
+export class ServicesComponent implements OnInit {
   services: ResponseService[] = [];
   serviceDialog: boolean = false;
   deleteDialog: boolean = false;

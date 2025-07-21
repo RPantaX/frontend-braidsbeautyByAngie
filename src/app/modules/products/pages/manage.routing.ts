@@ -6,6 +6,11 @@ import { ProductsInModule } from './products/products-in.module';
 
 const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'list',
+    pathMatch: 'full'
+  },
+  {
     path: 'list',
     loadChildren: (): Promise<typeof ProductsInModule> =>
       import('./products/products-in.module').then((m) => m.ProductsInModule),

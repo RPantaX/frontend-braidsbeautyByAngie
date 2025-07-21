@@ -1,0 +1,17 @@
+<div class="create-schedule-container">
+  <div class="schedule-header">
+    <h1>Agregar horarios disponibles por trabajador</h1>
+  </div>
+
+  <div class="steps-container">
+    <p-steps
+      [model]="items()"
+      [activeIndex]="activeIndex()"
+      [readonly]="false"
+      (activeIndexChange)="onStepChange($event)">
+    </p-steps>
+  </div>
+
+  <div class="step-content">
+    <router-outlet></router-outlet>
+  </div>

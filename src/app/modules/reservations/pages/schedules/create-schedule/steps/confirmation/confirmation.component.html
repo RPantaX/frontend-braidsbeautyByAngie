@@ -1,0 +1,70 @@
+<div class="confirmation-container">
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-state">
+    <p-progressSpinner></p-progressSpinner>
+    <h2>Creando horarios...</h2>
+    <p>Por favor espera mientras procesamos la información</p>
+  </div>
+
+  <!-- Success State -->
+  <div *ngIf="success() && !loading()" class="success-state">
+    <div class="success-icon">
+      <i class="pi pi-check-circle"></i>
+    </div>
+
+    <h1>Horario creado con éxito</h1>
+
+    <div class="confirmation-details">
+      <div class="detail-row">
+        <span class="label">Fecha:</span>
+         <span class="value">
+      {{ selectedEmployee()?.person?.name }} {{ selectedEmployee()?.person?.lastName }}
+    </span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Usuario Asignado:</span>
+        <span class="value">
+          {{ selectedEmployee()?.person?.name }} {{ selectedEmployee()?.person?.lastName }}
+        </span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Total de horarios:</span>
+        <span class="value">{{ schedules().length }}</span>
+      </div>
+    </div>
+
+    <!-- Schedule Summary -->
+    <div class="schedule-summary">
+      <h3>Resumen de horarios creados:</h3>
+      <div class="schedule-list">
+        <div *ngFor="let schedule of schedules()" class="schedule-item">
+          <div class="schedule-date">
+            {{ formatDate(schedule.scheduleDate) }}
+          </div>
+          <div class="schedule-time">
+            {{ formatTime(schedule.scheduleHourStart) }} - {{ formatTime(schedule.scheduleHourEnd) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <p-button
+        label="Regresar al registro de horarios"
+        icon="pi pi-plus"
+        styleClass="p-button-primary"
+        (onClick)="returnToEmployeeSelection()">
+      </p-button>
+
+      <p-button
+        label="Salir"
+        icon="pi pi-home"
+        styleClass="p-button-outlined"
+        (onClick)="goToSchedulesList()">
+      </p-button>
+    </div>
+  </div>
+</div>

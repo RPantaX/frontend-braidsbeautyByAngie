@@ -1,0 +1,46 @@
+// Estilos base para el contenedor de la imagen.
+// Ya no tiene un ancho y alto fijos.
+.product-image-container {
+  aspect-ratio: 1 / 1; // La propiedad clave: mantiene una proporción cuadrada (1:1)
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #f8f9fa; // Un gris claro de fondo
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; // Necesario para la etiqueta <p-tag>
+}
+
+// Estilos para la imagen, que se adapta a su contenedor.
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; // Cubre el espacio sin deformarse
+  object-position: center;
+}
+
+// --- ESTILOS RESPONSIVOS ESPECÍFICOS PARA CADA LAYOUT ---
+
+// Cuando la vista es de tipo LISTA
+:host ::ng-deep .p-dataview-list {
+  .product-image-container {
+    width: 100px; // Un tamaño fijo y razonable para la miniatura en la lista
+    flex-shrink: 0; // Evita que la imagen se encoja si el texto es muy largo
+  }
+}
+
+// Cuando la vista es de tipo CUADRÍCULA
+:host ::ng-deep .p-dataview-grid {
+  .product-image-container {
+    width: 75%; // La imagen ocupará el 75% del ancho de su columna en el grid
+    margin: 0 auto; // La centramos dentro de la columna
+  }
+
+  // Hacemos que todas las tarjetas en la misma fila tengan la misma altura
+  .p-dataview-grid .p-grid .col {
+    display: flex;
+    > div {
+      flex: 1 1 0;
+    }
+  }
+}

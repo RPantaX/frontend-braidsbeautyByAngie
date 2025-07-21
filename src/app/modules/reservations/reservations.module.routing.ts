@@ -2,12 +2,12 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { PromotionModule } from './pages/promotions/promotion.module';
 import { CategoryModule } from './pages/categories/category.module';
-import { ReservationModule } from './pages/reservations/reservation.module';
+import { ServicesModule } from './pages/services/services.module';
 const routes: Routes = [
   {
     path: '',
-    loadChildren: (): Promise<typeof ReservationModule> =>
-      import('./pages/reservations/reservation.module').then((m) => m.ReservationModule),
+    loadChildren: (): Promise<typeof ServicesModule> =>
+      import('./pages/services/services.module').then((m) => m.ServicesModule),
   },
   {
     path: 'promotions',
@@ -18,6 +18,10 @@ const routes: Routes = [
     path: 'categories',
     loadChildren: (): Promise<typeof CategoryModule> =>
       import('./pages/categories/category.module').then((m) => m.CategoryModule),
+  },
+  {
+    path: 'schedules',
+    loadChildren: () => import('./pages/schedules/schedules.module').then(m => m.SchedulesModule),
   },
   //CATEGORIA
   //PROMOTIONS

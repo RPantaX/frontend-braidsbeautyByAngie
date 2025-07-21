@@ -1,0 +1,49 @@
+.create-schedule-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.schedule-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+  }
+}
+
+.steps-container {
+  margin-bottom: 3rem;
+
+  ::ng-deep .p-steps {
+    .p-steps-item {
+      .p-menuitem-link {
+        padding: 1rem;
+
+        .p-steps-number {
+          font-size: 1.2rem;
+          width: 3rem;
+          height: 3rem;
+          line-height: 3rem;
+        }
+
+        .p-steps-title {
+          font-weight: 600;
+          margin-top: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+.step-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}

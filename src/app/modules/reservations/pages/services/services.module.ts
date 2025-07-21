@@ -3,22 +3,22 @@ import { RouterModule, Routes } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { DialogModule } from "primeng/dialog";
-import { ReservationComponent } from "./reservation.component";
 import { ServiceListComponent } from "./list-page/list-page.component";
 import { NewServicePageModule } from "./pages/new-page/new-page.module";
 import { ToastModule } from "primeng/toast";
 import { ToolbarModule } from "primeng/toolbar";
+import { ServicesComponent } from "./services.component";
 
 const routes: Routes = [
   {
     path: '',
-    component: ReservationComponent,
+    component: ServicesComponent,
   }
 ];
 
 @NgModule({
   declarations: [
-    ReservationComponent,
+    ServicesComponent,
   ],
   imports: [
     CommonModule,
@@ -34,4 +34,4 @@ const routes: Routes = [
   providers: [],
 
 })
-export class ReservationModule { }
+export class ServicesModule { }

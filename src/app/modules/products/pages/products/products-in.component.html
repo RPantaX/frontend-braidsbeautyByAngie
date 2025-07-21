@@ -1,26 +1,99 @@
-<div style="text-align: center; margin-bottom: 1rem; display: flex; justify-content: space-between;">
-  <h1>Listado de Productos</h1>
-  <button pButton label="Agregar Nuevo Item" icon="pi pi-plus" class="add-item-button" (click)="onCreateProduct()"></button>
+<div class="card">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h1 class="m-0">Listado de Productos</h1>
+    <div class="flex gap-2 align-items-center">
+      <button pButton label="Agregar Nuevo Item" icon="pi pi-plus" (click)="openNew()"></button>
+      <p-selectButton
+        [options]="layoutOptions"
+        [(ngModel)]="layout"
+        optionLabel="label"
+        optionValue="value"
+      >
+        <ng-template let-item>
+            <i [class]="item.icon"></i>
+        </ng-template>
+      </p-selectButton>
+    </div>
   </div>
-
   <p-divider></p-divider>
 
-<product-list-page
-  [products]="products"
->
-</product-list-page>
+  <div *ngIf="isLoading()" class="flex justify-content-center p-6">
+    <p-progressSpinner />
+  </div>
 
-    <!-- Diálogo -->
-    <p-dialog
-    header="Detalles del producto"
-    [(visible)]="productDialog"
-    [style]="{ width: '450px' }"
-    [modal]="true"
-    styleClass="p-fluid"
-  >
-    <app-new-product-page
-      (closeDialog)="hideDialog()"
-      (refreshEntities)="reloadProducts()"
-    ></app-new-product-page>
-  </p-dialog>
-  <p-confirmDialog [style]="{ width: '450px' }" />
+  <p-dataView #dv [value]="productList()" [layout]="layout()" *ngIf="!isLoading()">
+    <ng-template pTemplate="list" let-products>
+      <div class="grid grid-nogutter">
+        <div class="col-12" *ngFor="let product of products; let first = first">
+          <div class="flex flex-column sm:flex-row sm:align-items-center p-4 gap-3" [ngClass]="{ 'border-top-1 surface-border': !first }">
+            <div class="product-image-container relative">
+              <img class="product-image" [src]="product.productImage! | productImage" [alt]="product.productName" />
+              <p-tag [value]="getInventoryStatus(product).status" [severity]="getInventoryStatus(product).severity" class="absolute" [style.left.px]="4" [style.top.px]="4"></p-tag>
+            </div>
+            <div class="flex flex-column md:flex-row justify-content-between md:align-items-center flex-1 gap-4">
+              <div class="flex flex-row md:flex-column justify-content-between align-items-start gap-2">
+                <div>
+                  <span class="font-medium text-secondary text-sm">{{ product.responseCategory?.productCategoryName }}</span>
+                  <div class="text-lg font-medium text-900 mt-2">{{ product.productName }}</div>
+
+                  <div *ngIf="product.responseProductItemDetails?.length > 0" class="mt-3">
+                    <div class="flex flex-wrap gap-2 align-items-center">
+                      <p-chip *ngFor="let item of product.responseProductItemDetails.slice(0, 3)" [label]="item.productItemSKU" styleClass="text-xs"></p-chip>
+                      <p-chip *ngIf="product.responseProductItemDetails.length > 3" [label]="'+' + (product.responseProductItemDetails.length - 3)" styleClass="p-chip-secondary text-xs font-bold"></p-chip>
+                    </div>
+                  </div>
+                  </div>
+              </div>
+              <div class="flex flex-column md:align-items-end gap-5">
+                <div class="flex flex-row-reverse md:flex-row gap-2">
+                  <button pButton icon="pi pi-info" [rounded]="true" class="p-button-secondary" [routerLink]="['/products/manage/edit', product.productId]"></button>
+                  <button pButton icon="pi pi-trash" [rounded]="true" class="p-button-danger"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="grid" let-products>
+      <div class="grid grid-nogutter">
+        <div class="col-12 sm:col-6 md:col-4 xl:col-6 p-2" *ngFor="let product of products">
+          <div class="p-4 border-1 surface-border surface-card border-round flex flex-column">
+            <div class="flex justify-content-center">
+              <div class="product-image-container relative">
+                <img class="product-image" [src]="product.productImage! | productImage" [alt]="product.productName" />
+                <p-tag [value]="getInventoryStatus(product).status" [severity]="getInventoryStatus(product).severity" class="absolute" [style.left.px]="4" [style.top.px]="4"></p-tag>
+              </div>
+            </div>
+            <div class="pt-4 flex flex-column flex-1">
+              <div class="flex flex-row justify-content-between align-items-start gap-2">
+                <div>
+                  <span class="font-medium text-secondary text-sm">{{ product.responseCategory?.productCategoryName }}</span>
+                  <div class="text-lg font-medium text-900 mt-1">{{ product.productName }}</div>
+                </div>
+              </div>
+              <div *ngIf="product.responseProductItemDetails?.length > 0" class="mt-3">
+                <div class="flex flex-wrap gap-2 align-items-center">
+                  <p-chip *ngFor="let item of product.responseProductItemDetails.slice(0, 3)" [label]="item.productItemSKU" styleClass="text-xs"></p-chip>
+                  <p-chip *ngIf="product.responseProductItemDetails.length > 3" [label]="'+' + (product.responseProductItemDetails.length - 3)" styleClass="p-chip-secondary text-xs font-bold"></p-chip>
+                </div>
+              </div>
+              <div class="flex flex-column gap-4 mt-auto pt-3">
+                <div class="flex gap-2">
+                  <button pButton icon="pi pi-info" [rounded]="true" class="p-button-secondary" [routerLink]="['/products/manage/edit', product.productId]"></button>
+                  <button pButton icon="pi pi-trash" [rounded]="true" class="p-button-danger"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-dataView>
+</div>
+
+<p-dialog header="Detalles del producto" [(visible)]="productDialog" [style]="{ width: '450px' }" [modal]="true" styleClass="p-fluid">
+    <app-new-product-page (closeDialog)="hideDialog(true)" (refreshEntities)="loadPageableProducts()"></app-new-product-page>
+</p-dialog>
+<p-confirmDialog [style]="{ width: '450px' }" />

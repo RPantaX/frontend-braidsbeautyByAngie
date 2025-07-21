@@ -1,0 +1,166 @@
+<!-- schedules-list.component.html -->
+<div class="schedules-container">
+  <p-toast></p-toast>
+
+  <!-- Header -->
+  <div class="schedules-header">
+    <h1 class="page-title">HORARIOS</h1>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <p-button
+        label="Descargar registro"
+        icon="pi pi-download"
+        styleClass="p-button-success p-button-sm"
+        (onClick)="exportToCsv()">
+      </p-button>
+
+      <p-button
+        label="Asignar Horario"
+        icon="pi pi-plus"
+        styleClass="p-button-primary p-button-sm"
+        (onClick)="navigateToCreateSchedule()">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="dateFilter">Filtrar por:</label>
+        <p-dropdown
+          id="dateFilter"
+          [options]="dateFilterOptions"
+          [(ngModel)]="selectedDateFilter"
+          optionLabel="label"
+          placeholder="Seleccionar período"
+          (onChange)="onDateFilterChange($event.value)"
+          styleClass="w-200px">
+        </p-dropdown>
+      </div>
+
+      <div class="filter-group" *ngIf="selectedDateFilter()?.type === 'from'">
+        <label for="fromDate">Desde fecha:</label>
+        <p-calendar
+          id="fromDate"
+          [(ngModel)]="customFromDate"
+          (ngModelChange)="onCustomFromDateChange($event)"
+          dateFormat="dd/mm/yy"
+          placeholder="Seleccionar fecha"
+          [showIcon]="true">
+        </p-calendar>
+      </div>
+
+      <div class="filter-group" *ngIf="selectedDateFilter()?.type === 'custom'">
+        <label for="fromDate">Desde:</label>
+        <p-calendar
+          id="fromDate"
+          [(ngModel)]="customFromDate"
+          (ngModelChange)="onCustomDateRangeChange()"
+          dateFormat="dd/mm/yy"
+          placeholder="Fecha inicio"
+          [showIcon]="true">
+        </p-calendar>
+
+        <label for="toDate">Hasta:</label>
+        <p-calendar
+          id="toDate"
+          [(ngModel)]="customToDate"
+          (ngModelChange)="onCustomDateRangeChange()"
+          dateFormat="dd/mm/yy"
+          placeholder="Fecha fin"
+          [showIcon]="true">
+        </p-calendar>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="results-summary">
+    <p class="summary-text">
+      Mostrando {{ totalSchedules() }} horario(s)
+      <span *ngIf="selectedDateFilter()"> - {{ selectedDateFilter()?.label }}</span>
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-container">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Cargando horarios...</p>
+  </div>
+
+  <!-- Weekly Schedule View -->
+  <div *ngIf="!loading()" class="weekly-schedule-grid">
+    <div class="employee-schedule-card" *ngFor="let employeeSchedule of groupedSchedules()">
+
+      <!-- Employee Header -->
+      <div class="employee-header">
+        <div class="employee-avatar">
+          <img
+            [src]="employeeSchedule.employee.employeeImage || '/assets/images/default-avatar.png'"
+            [alt]="employeeSchedule.employee.person?.name"
+            class="avatar-image">
+        </div>
+        <div class="employee-info">
+          <h3 class="employee-name">
+            {{ employeeSchedule.employee.person?.name }} {{ employeeSchedule.employee.person?.lastName }}
+          </h3>
+          <div class="employee-type">
+            {{ employeeSchedule.employee.employeeType?.value }}
+          </div>
+        </div>
+        <div class="schedule-actions">
+          <p-button
+            icon="pi pi-search"
+            styleClass="p-button-rounded p-button-text p-button-sm action-btn"
+            pTooltip="Ver horarios completos del empleado"
+            (onClick)="viewEmployeeDetail(employeeSchedule.employee.id || 0)">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Days Grid -->
+      <div class="days-grid">
+        <div class="day-column" *ngFor="let day of weekDays">
+          <div class="day-header">{{ day.name }}</div>
+
+          <div
+            class="time-slot"
+            [ngClass]="getTimeSlotClasses(schedule)"
+            *ngFor="let schedule of getSchedulesForDay(employeeSchedule.schedules, day.value)"
+            (click)="onTimeSlotClick(schedule)">
+
+            <div class="time-range">
+              {{ formatTime(schedule.scheduleDTO.scheduleHourStart) }} -
+              {{ formatTime(schedule.scheduleDTO.scheduleHourEnd) }}
+            </div>
+
+            <div class="status-badge" [ngClass]="getStatusBadgeClass(schedule.scheduleDTO.scheduleState)">
+              {{ getScheduleStatusText(schedule.scheduleDTO.scheduleState) }}
+            </div>
+          </div>
+
+          <!-- Empty day slot -->
+          <div class="empty-day-slot" *ngIf="getSchedulesForDay(employeeSchedule.schedules, day.value).length === 0">
+            <span class="empty-text">Sin horarios</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading() && groupedSchedules().length === 0" class="empty-state">
+    <div class="empty-icon">
+      <i class="pi pi-calendar" style="font-size: 4rem; color: #64748b;"></i>
+    </div>
+    <h3>No hay horarios disponibles</h3>
+    <p>No se encontraron horarios para el filtro seleccionado.</p>
+    <p-button
+      label="Asignar primer horario"
+      icon="pi pi-plus"
+      (onClick)="navigateToCreateSchedule()">
+    </p-button>
+  </div>
+</div>

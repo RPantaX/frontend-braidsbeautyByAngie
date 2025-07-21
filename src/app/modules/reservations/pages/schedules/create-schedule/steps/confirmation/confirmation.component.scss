@@ -1,0 +1,146 @@
+.confirmation-container {
+  text-align: center;
+  padding: 2rem;
+
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem 2rem;
+
+    h2 {
+      margin: 1.5rem 0 0.5rem 0;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    p {
+      color: #6b7280;
+      margin: 0;
+    }
+  }
+
+  .success-state {
+    max-width: 600px;
+    margin: 0 auto;
+
+    .success-icon {
+      margin-bottom: 2rem;
+
+      i {
+        font-size: 5rem;
+        color: #10b981;
+      }
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0 0 2rem 0;
+    }
+
+    .confirmation-details {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e5e7eb;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .label {
+          font-weight: 600;
+          color: #374151;
+        }
+
+        .value {
+          color: #1f2937;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .schedule-summary {
+      margin-bottom: 3rem;
+
+      h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+      }
+
+      .schedule-list {
+        display: grid;
+        gap: 0.75rem;
+
+        .schedule-item {
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 1rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .schedule-date {
+            font-weight: 500;
+            color: #1f2937;
+            text-transform: capitalize;
+          }
+
+          .schedule-time {
+            background: #3b82f6;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .confirmation-container .success-state {
+    .confirmation-details .detail-row {
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .schedule-summary .schedule-list .schedule-item {
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+      align-items: center;
+
+      ::ng-deep .p-button {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+  }
+}
