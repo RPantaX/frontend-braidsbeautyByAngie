@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable, Subject, tap } from 'rxjs';
 import { environment } from '../../../../environments/environments.prod';
-import { CreateEmployeeRequest, DocumentTypeDto, EmployeeDto, EmployeeTypeDto, ResponseListPageableEmployee } from '../../../shared/models/users/employee.interface';
+import { CreateEmployeeRequest, EmployeeDto, ResponseListPageableEmployee } from '../../../shared/models/users/employee.interface';
 import { ApiResponse } from '../../../../@utils/interfaces/ApiResponse';
 import { EmployeeTypeEnum } from '../../../shared/models/users/employee-type.enum';
 
@@ -10,7 +10,6 @@ import { EmployeeTypeEnum } from '../../../shared/models/users/employee-type.enu
 export class EmployeeService {
 
   private baseUrl: string = environment.baseUrl + '/user-service/employee';
-  private documentTypesUrl = `${environment.baseUrl}/user-service/document-types`;
 
   // Signals para manejo de estado
   private employeesSignal = signal<EmployeeDto[]>([]);

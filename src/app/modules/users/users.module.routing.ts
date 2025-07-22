@@ -7,6 +7,11 @@ const routes: Routes = [
     loadChildren: (): Promise<typeof EmployeesModule> =>
       import('./pages/employees/employees.module').then((m) => m.EmployeesModule),
   },
+  {
+    path: 'users',
+    loadChildren: (): Promise<typeof EmployeesModule> =>
+      import('./pages/users/users.module').then((m) => m.UsersModule),
+  },
 
 ];
 

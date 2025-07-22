@@ -1,0 +1,496 @@
+<!-- pages/user-list/user-list.component.html -->
+<div class="user-list-container">
+  <p-toast></p-toast>
+  <p-confirmDialog
+    [style]="{width: '450px'}"
+    [baseZIndex]="10000"
+    rejectButtonStyleClass="p-button-outlined">
+  </p-confirmDialog>
+
+  <!-- Header Section -->
+  <div class="card">
+    <div class="card-header">
+      <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3">
+        <div>
+          <h2 class="text-900 font-bold text-3xl mb-2">Gestión de Usuarios</h2>
+          <p class="text-600 mt-0 mb-0">Administra las cuentas de usuario del sistema</p>
+        </div>
+
+        <div class="flex flex-column md:flex-row gap-2">
+          <p-button
+            icon="pi pi-refresh"
+            label="Actualizar"
+            styleClass="p-button-outlined p-button-sm"
+            (onClick)="refreshData()"
+            [loading]="loading()">
+          </p-button>
+
+          <p-button
+            icon="pi pi-plus"
+            label="Nuevo Usuario"
+            styleClass="p-button-sm"
+            (onClick)="navigateToCreate()">
+          </p-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="statistics-section">
+      <div class="grid">
+        <div class="col-6 md:col-3">
+          <div class="stat-card total">
+            <div class="stat-icon">
+              <i class="pi pi-users"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ getStatistics().total }}</div>
+              <div class="stat-label">Total Usuarios</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 md:col-3">
+          <div class="stat-card active">
+            <div class="stat-icon">
+              <i class="pi pi-check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ getStatistics().active }}</div>
+              <div class="stat-label">Usuarios Activos</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 md:col-3">
+          <div class="stat-card admin">
+            <div class="stat-icon">
+              <i class="pi pi-crown"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ getStatistics().admins }}</div>
+              <div class="stat-label">Administradores</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 md:col-3">
+          <div class="stat-card inactive">
+            <div class="stat-icon">
+              <i class="pi pi-times-circle"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ getStatistics().inactive }}</div>
+              <div class="stat-label">Usuarios Inactivos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="card-body">
+      <div class="flex flex-column lg:flex-row gap-3 mb-4">
+        <!-- Global Search -->
+        <div class="flex-1">
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              pInputText
+              placeholder="Buscar usuarios..."
+              class="w-full"
+              [value]="globalFilterValue()"
+              (input)="onGlobalFilter($event)">
+          </span>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="flex-none">
+          <p-dropdown
+            [options]="statusOptions()"
+            placeholder="Estado"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="filters().enabled" (onChange)="onStatusFilterChange($event.value)"
+            styleClass="p-dropdown-sm w-full lg:w-auto">
+          </p-dropdown>
+        </div>
+
+        <div class="flex-none">
+          <p-dropdown
+            [options]="adminOptions()"
+            placeholder="Tipo de Usuario"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="filters().admin" (onChange)="onAdminFilterChange($event.value)"
+            styleClass="p-dropdown-sm w-full lg:w-auto">
+          </p-dropdown>
+        </div>
+
+        <div class="flex-none">
+          <p-dropdown
+            [options]="roleOptions()"
+            placeholder="Rol"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="filters().roleId" (onChange)="onRoleFilterChange($event.value)"
+            styleClass="p-dropdown-sm w-full lg:w-auto">
+          </p-dropdown>
+        </div>
+
+        <!-- Clear Filters -->
+        <div class="flex-none">
+          <p-button
+            icon="pi pi-filter-slash"
+            label="Limpiar"
+            styleClass="p-button-outlined p-button-sm"
+            (onClick)="clearFilters()">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Action Toolbar -->
+      <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3 mb-4">
+        <div class="flex align-items-center gap-2">
+          <p-button
+            icon="pi pi-trash"
+            label="Eliminar Seleccionados"
+            styleClass="p-button-danger p-button-outlined p-button-sm"
+            (onClick)="confirmDeleteSelected()"
+            [disabled]="selectedUsers().length === 0">
+          </p-button>
+
+          <span class="text-sm text-600" *ngIf="selectedUsers().length > 0">
+            {{ selectedUsers().length }} usuario(s) seleccionado(s)
+          </span>
+        </div>
+
+        <div class="flex gap-2">
+          <p-button
+            icon="pi pi-file-excel"
+            label="Excel"
+            styleClass="p-button-success p-button-outlined p-button-sm"
+            (onClick)="exportExcel()">
+          </p-button>
+
+          <p-button
+            icon="pi pi-file-pdf"
+            label="PDF"
+            styleClass="p-button-danger p-button-outlined p-button-sm"
+            (onClick)="exportPDF()">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <p-table
+        #dt
+        [value]="filteredUsers()"
+        [loading]="loading()"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 15, 20, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+        [globalFilterFields]="['username', 'email', 'roles']"
+        [(selection)]="selectedUsers"
+        dataKey="id"
+        [styleClass]="getTableStyleClass()"
+        responsiveLayout="scroll"
+        [scrollable]="true"
+        scrollHeight="flex">
+
+        <!-- Table Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th style="width: 5rem">Avatar</th>
+            <th pSortableColumn="username" style="min-width: 12rem">
+              Usuario
+              <p-sortIcon field="username"></p-sortIcon>
+            </th>
+            <th pSortableColumn="email" style="min-width: 15rem">
+              Email
+              <p-sortIcon field="email"></p-sortIcon>
+            </th>
+            <th style="min-width: 12rem">Roles</th>
+            <th pSortableColumn="enabled" style="min-width: 8rem">
+              Estado
+              <p-sortIcon field="enabled"></p-sortIcon>
+            </th>
+            <th style="min-width: 10rem">Tipo</th>
+            <th pSortableColumn="createdAt" style="min-width: 12rem">
+              Fecha Creación
+              <p-sortIcon field="createdAt"></p-sortIcon>
+            </th>
+            <th style="min-width: 12rem">Acciones</th>
+          </tr>
+        </ng-template>
+
+        <!-- Table Body -->
+        <ng-template pTemplate="body" let-user>
+          <tr>
+            <!-- Checkbox -->
+            <td>
+              <p-tableCheckbox [value]="user"></p-tableCheckbox>
+            </td>
+
+            <!-- Avatar -->
+            <td>
+              <p-avatar
+                [label]="getUserInitials(user)"
+                shape="circle"
+                size="large"
+                styleClass="user-avatar"
+                [style.background-color]="'var(--primary-500)'"
+                [style.color]="'white'">
+              </p-avatar>
+            </td>
+
+            <!-- Username -->
+            <td>
+              <div class="flex align-items-center gap-2">
+                <span class="font-medium text-900">{{ user.username }}</span>
+                <p-button
+                  icon="pi pi-copy"
+                  styleClass="p-button-text p-button-sm"
+                  pTooltip="Copiar usuario"
+                  tooltipPosition="top"
+                  (onClick)="copyToClipboard(user.username, 'Usuario')">
+                </p-button>
+              </div>
+            </td>
+
+            <!-- Email -->
+            <td>
+              <div class="flex align-items-center gap-2">
+                <span class="text-600">{{ user.email }}</span>
+                <p-button
+                  icon="pi pi-copy"
+                  styleClass="p-button-text p-button-sm"
+                  pTooltip="Copiar email"
+                  tooltipPosition="top"
+                  (onClick)="copyToClipboard(user.email, 'Email')">
+                </p-button>
+              </div>
+            </td>
+
+            <!-- Roles -->
+            <td>
+              <div class="flex flex-wrap gap-1">
+                <p-tag
+                  *ngFor="let role of user.roles"
+                  [value]="role.name.replace('ROLE_', '')"
+                  severity="info"
+                  [rounded]="true"
+                  styleClass="text-xs">
+                </p-tag>
+              </div>
+            </td>
+
+            <!-- Status -->
+            <td>
+              <div class="flex align-items-center gap-2">
+                <p-tag
+                  [value]="getUserStatusInfo(user).label"
+                  [severity]="getUserStatusInfo(user).severity"
+                  [rounded]="true">
+                  <i [class]="getUserStatusInfo(user).icon" class="mr-1"></i>
+                  {{ getUserStatusInfo(user).label }}
+                </p-tag>
+                <p-button
+                  [icon]="user.enabled ? 'pi pi-times' : 'pi pi-check'"
+                  [styleClass]="user.enabled ? 'p-button-text p-button-warning p-button-sm' : 'p-button-text p-button-success p-button-sm'"
+                  [pTooltip]="user.enabled ? 'Desactivar usuario' : 'Activar usuario'"
+                  tooltipPosition="top"
+                  (onClick)="toggleUserStatus(user)">
+                </p-button>
+              </div>
+            </td>
+
+            <!-- Type -->
+            <td>
+              <p-tag
+                [value]="getUserTypeInfo(user).label"
+                [severity]="getUserTypeInfo(user).severity"
+                [rounded]="true">
+                <i [class]="getUserTypeInfo(user).icon" class="mr-1"></i>
+                {{ getUserTypeInfo(user).label }}
+              </p-tag>
+            </td>
+
+            <!-- Created Date -->
+            <td>
+              <span class="text-600">{{ formatDate(user.createdAt) }}</span>
+            </td>
+
+            <!-- Actions -->
+            <td>
+              <div class="flex gap-2">
+                <p-button
+                  icon="pi pi-eye"
+                  styleClass="p-button-rounded p-button-text p-button-sm"
+                  pTooltip="Ver detalles"
+                  tooltipPosition="top"
+                  (onClick)="navigateToDetail(user)">
+                </p-button>
+
+                <p-button
+                  icon="pi pi-pencil"
+                  styleClass="p-button-rounded p-button-text p-button-warning p-button-sm"
+                  pTooltip="Editar"
+                  tooltipPosition="top"
+                  (onClick)="navigateToEdit(user)">
+                </p-button>
+
+                <p-button
+                  icon="pi pi-trash"
+                  styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
+                  pTooltip="Eliminar"
+                  tooltipPosition="top"
+                  (onClick)="confirmDelete(user)">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty State -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="9" class="text-center p-4">
+              <div class="flex flex-column align-items-center gap-3">
+                <i class="pi pi-users text-4xl text-400"></i>
+                <span class="text-600 text-lg">No se encontraron usuarios</span>
+                <p-button
+                  icon="pi pi-plus"
+                  label="Crear Primer Usuario"
+                  styleClass="p-button-sm"
+                  (onClick)="navigateToCreate()">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Loading Template -->
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="9">
+              <div class="flex align-items-center justify-content-center p-4">
+                <p-progressSpinner strokeWidth="3" animationDuration="2s"></p-progressSpinner>
+                <span class="ml-3">Cargando usuarios...</span>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Mobile View (shown on small screens) -->
+  <div class="mobile-view md:hidden" *ngIf="!loading() && filteredUsers().length > 0">
+    <div class="grid">
+      <div class="col-12" *ngFor="let user of filteredUsers()">
+        <div class="card user-card">
+          <div class="flex align-items-center gap-3 mb-3">
+            <p-avatar
+              [label]="getUserInitials(user)"
+              shape="circle"
+              size="large"
+              [style.background-color]="'var(--primary-500)'"
+              [style.color]="'white'">
+            </p-avatar>
+
+            <div class="flex-1">
+              <div class="font-bold text-900 text-lg">{{ user.username }}</div>
+              <div class="text-600 text-sm">{{ user.email }}</div>
+            </div>
+
+            <div class="flex flex-column gap-1">
+              <p-tag
+                [value]="getUserStatusInfo(user).label"
+                [severity]="getUserStatusInfo(user).severity"
+                [rounded]="true"
+                styleClass="text-xs">
+              </p-tag>
+              <p-tag
+                [value]="getUserTypeInfo(user).label"
+                [severity]="getUserTypeInfo(user).severity"
+                [rounded]="true"
+                styleClass="text-xs">
+              </p-tag>
+            </div>
+          </div>
+
+          <div class="grid mb-3">
+            <div class="col-12">
+              <span class="text-600 text-sm">Roles:</span>
+              <div class="flex flex-wrap gap-1 mt-1">
+                <p-tag
+                  *ngFor="let role of user.roles"
+                  [value]="role.name.replace('ROLE_', '')"
+                  severity="info"
+                  [rounded]="true"
+                  styleClass="text-xs">
+                </p-tag>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <span class="text-600 text-sm">Creado:</span>
+              <div class="font-medium">{{ formatDate(user.createdAt) }}</div>
+            </div>
+
+            <div class="col-6">
+              <span class="text-600 text-sm">ID:</span>
+              <div class="font-medium">#{{ user.id }}</div>
+            </div>
+          </div>
+
+          <div class="flex justify-content-end gap-2">
+            <p-button
+              icon="pi pi-eye"
+              styleClass="p-button-rounded p-button-outlined p-button-sm"
+              (onClick)="navigateToDetail(user)">
+            </p-button>
+            <p-button
+              icon="pi pi-pencil"
+              styleClass="p-button-rounded p-button-warning p-button-sm"
+              (onClick)="navigateToEdit(user)">
+            </p-button>
+            <p-button
+              [icon]="user.enabled ? 'pi pi-times' : 'pi pi-check'"
+              [styleClass]="user.enabled ? 'p-button-rounded p-button-warning p-button-outlined p-button-sm' : 'p-button-rounded p-button-success p-button-sm'"
+              (onClick)="toggleUserStatus(user)">
+            </p-button>
+            <p-button
+              icon="pi pi-trash"
+              styleClass="p-button-rounded p-button-danger p-button-outlined p-button-sm"
+              (onClick)="confirmDelete(user)">
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Empty State -->
+  <div class="mobile-view md:hidden" *ngIf="!loading() && filteredUsers().length === 0">
+    <div class="card">
+      <div class="text-center p-4">
+        <i class="pi pi-users text-4xl text-400 mb-3"></i>
+        <p class="text-600 text-lg mb-3">No se encontraron usuarios</p>
+        <p-button
+          icon="pi pi-plus"
+          label="Crear Primer Usuario"
+          styleClass="p-button-sm"
+          (onClick)="navigateToCreate()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+</div>

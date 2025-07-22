@@ -1,0 +1,707 @@
+/* pages/user-detail/user-detail.component.scss */
+
+.user-detail-container {
+  padding: 1rem;
+  min-height: 100vh;
+  background: var(--surface-ground);
+
+  // ================= LOADING STATE =================
+
+  .loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+
+    p {
+      color: var(--text-color-secondary);
+    }
+  }
+
+  // ================= HEADER SECTION =================
+
+  .detail-header {
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--surface-200);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+    .user-avatar-container {
+      position: relative;
+
+      .user-avatar {
+        width: 120px;
+        height: 120px;
+        border: 4px solid white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        font-size: 2rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+
+      .avatar-badge {
+        position: absolute;
+        bottom: -8px;
+        right: -8px;
+        width: 32px;
+        height: 32px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        border: 2px solid white;
+
+        i {
+          font-size: 1rem;
+        }
+      }
+    }
+
+    .user-basic-info {
+      flex: 1;
+
+      .user-name {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-700);
+        margin: 0 0 0.5rem 0;
+        line-height: 1.2;
+      }
+
+      .user-email {
+        font-size: 1.1rem;
+        color: var(--text-color-secondary);
+        margin: 0 0 1rem 0;
+      }
+
+      .user-meta {
+        margin-bottom: 0.5rem;
+
+        ::ng-deep .p-tag {
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
+      }
+
+      .user-id {
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+    }
+
+    .detail-actions {
+      .flex {
+        gap: 0.5rem;
+      }
+    }
+  }
+
+  // ================= CONTENT PANELS =================
+
+  ::ng-deep .p-panel {
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--surface-200);
+    overflow: hidden;
+
+    .p-panel-header {
+      background: var(--surface-50);
+      border-bottom: 1px solid var(--surface-200);
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      color: var(--text-color);
+
+      .p-panel-title {
+        font-size: 1.1rem;
+      }
+    }
+
+    .p-panel-content {
+      padding: 1.5rem;
+    }
+  }
+
+  // ================= INFO ITEMS =================
+
+  .info-item {
+    margin-bottom: 1rem;
+
+    .info-label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-color-secondary);
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      color: var(--text-color);
+
+      span {
+        flex: 1;
+        word-break: break-word;
+      }
+
+      ::ng-deep .p-button {
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  // ================= STATISTICS =================
+
+  .statistics-content {
+    .stat-item {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--surface-200);
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  // ================= ROLES INFO =================
+
+  .roles-info {
+    .role-item {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--surface-200);
+
+      &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // ================= SECURITY INFO =================
+
+  .security-info {
+    .security-item {
+      padding: 0.25rem 0;
+    }
+  }
+
+  // ================= TAG STYLES =================
+
+  ::ng-deep .p-tag {
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+
+    &.p-tag-success {
+      background: var(--green-100);
+      color: var(--green-800);
+    }
+
+    &.p-tag-danger {
+      background: var(--red-100);
+      color: var(--red-800);
+    }
+
+    &.p-tag-info {
+      background: var(--blue-100);
+      color: var(--blue-800);
+    }
+
+    &.p-tag-warning {
+      background: var(--yellow-100);
+      color: var(--yellow-800);
+    }
+
+    &.p-tag-secondary {
+      background: var(--gray-100);
+      color: var(--gray-800);
+    }
+  }
+
+  // ================= BUTTON STYLES =================
+
+  ::ng-deep .p-button {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &.p-button-sm {
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+    }
+
+    &.w-full {
+      justify-content: center;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  // ================= ERROR STATE =================
+
+  .error-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 2rem;
+
+    .text-center {
+      max-width: 400px;
+
+      i {
+        margin-bottom: 1rem;
+        opacity: 0.6;
+      }
+
+      h3 {
+        margin-bottom: 1rem;
+      }
+
+      p {
+        color: var(--text-color-secondary);
+        line-height: 1.6;
+      }
+    }
+  }
+
+  // ================= RESPONSIVE DESIGN =================
+
+  @media (max-width: 1024px) {
+    padding: 0.75rem;
+
+    .detail-header {
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+
+      .user-avatar-container .user-avatar {
+        width: 100px;
+        height: 100px;
+        font-size: 1.5rem;
+      }
+
+      .user-basic-info .user-name {
+        font-size: 1.75rem;
+      }
+    }
+
+    ::ng-deep .p-panel .p-panel-content {
+      padding: 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+
+    .detail-header {
+      padding: 1rem;
+      border-radius: 8px;
+
+      .flex {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+      }
+
+      .user-avatar-container {
+        align-self: center;
+
+        .user-avatar {
+          width: 80px;
+          height: 80px;
+          font-size: 1.25rem;
+        }
+      }
+
+      .user-basic-info {
+        text-align: center;
+
+        .user-name {
+          font-size: 1.5rem;
+        }
+
+        .user-email {
+          font-size: 1rem;
+        }
+
+        .user-meta {
+          justify-content: center;
+        }
+      }
+
+      .detail-actions {
+        .flex {
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+      }
+    }
+
+    ::ng-deep .p-panel {
+      border-radius: 8px;
+      margin-bottom: 1rem !important;
+
+      .p-panel-header {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .p-panel-content {
+        padding: 0.75rem;
+      }
+    }
+
+    .info-item {
+      margin-bottom: 0.75rem;
+
+      .info-label {
+        font-size: 0.8rem;
+      }
+
+      .info-value {
+        font-size: 0.9rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+
+        .ml-2 {
+          margin-left: 0;
+          align-self: flex-end;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.25rem;
+
+    .detail-header {
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+
+      .user-basic-info .user-name {
+        font-size: 1.25rem;
+      }
+    }
+
+    ::ng-deep .p-panel .p-panel-content {
+      padding: 0.5rem;
+    }
+
+    .info-item {
+      margin-bottom: 0.5rem;
+    }
+
+    ::ng-deep .p-button {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8rem;
+    }
+  }
+
+  // ================= PRINT STYLES =================
+
+  @media print {
+    .detail-header,
+    .detail-actions,
+    .loading-container,
+    ::ng-deep .p-button {
+      display: none !important;
+    }
+
+    .user-detail-container {
+      padding: 0;
+      background: white;
+      color: black;
+    }
+
+    ::ng-deep .p-panel {
+      box-shadow: none;
+      border: 1px solid #000;
+      break-inside: avoid;
+
+      .p-panel-header {
+        background: #f0f0f0;
+        border-bottom: 1px solid #000;
+      }
+    }
+
+    .info-item {
+      break-inside: avoid;
+
+      .info-label {
+        font-weight: bold;
+      }
+    }
+
+    .detail-content::before {
+      content: "Información del Usuario: " attr(data-username);
+      display: block;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #000;
+    }
+  }
+
+  // ================= DARK THEME SUPPORT =================
+
+  :host-context(.dark-theme) {
+    .detail-header {
+      background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-800) 100%);
+      border-color: var(--surface-700);
+    }
+
+    ::ng-deep .p-panel {
+      background: var(--surface-800);
+      border-color: var(--surface-700);
+
+      .p-panel-header {
+        background: var(--surface-900);
+        border-bottom-color: var(--surface-700);
+      }
+    }
+
+    .user-avatar-container {
+      .user-avatar {
+        border-color: var(--surface-700);
+      }
+
+      .avatar-badge {
+        background: var(--surface-800);
+        border-color: var(--surface-700);
+      }
+    }
+
+    .loading-container,
+    .error-state {
+      color: var(--text-color);
+    }
+  }
+
+  // ================= HIGH CONTRAST MODE =================
+
+  @media (prefers-contrast: high) {
+    .detail-header,
+    ::ng-deep .p-panel,
+    .user-avatar-container .user-avatar {
+      border-width: 2px;
+      border-color: var(--text-color);
+    }
+
+    ::ng-deep .p-button {
+      border-width: 2px;
+    }
+
+    .info-item .info-value {
+      border-bottom: 1px solid var(--text-color-secondary);
+      padding-bottom: 0.25rem;
+    }
+  }
+
+  // ================= REDUCED MOTION =================
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::ng-deep * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    .user-avatar:hover,
+    ::ng-deep .p-button:hover {
+      transform: none !important;
+    }
+  }
+
+  // ================= FOCUS MANAGEMENT =================
+
+  ::ng-deep {
+    .p-button:focus-visible {
+      outline: 2px solid var(--primary-500);
+      outline-offset: 2px;
+    }
+  }
+
+  // ================= ANIMATIONS =================
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .detail-content {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  ::ng-deep .p-panel {
+    animation: slideInUp 0.3s ease-out;
+  }
+
+  // ================= CUSTOM SCROLLBAR =================
+
+  .detail-content {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-300) var(--surface-200);
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--surface-200);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--primary-300);
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--primary-400);
+      }
+    }
+  }
+
+  // ================= HOVER EFFECTS =================
+
+  .info-item {
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    border-radius: 6px;
+
+    &:hover {
+      background: var(--surface-50);
+      transform: translateX(4px);
+    }
+  }
+
+  .stat-item,
+  .role-item,
+  .security-item {
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--surface-50);
+    }
+  }
+
+  :host-context(.dark-theme) {
+    .info-item:hover,
+    .stat-item:hover,
+    .role-item:hover,
+    .security-item:hover {
+      background: var(--surface-700);
+    }
+  }
+
+  // ================= BADGE STYLES =================
+
+  .avatar-badge {
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  // ================= LOADING ANIMATION =================
+
+  .loading-container {
+    ::ng-deep .p-progress-spinner {
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+
+  // ================= COPY FEEDBACK =================
+
+  .info-value {
+    position: relative;
+
+    &.copied::after {
+      content: "¡Copiado!";
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--green-600);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      animation: copyFeedback 2s ease-out;
+    }
+  }
+
+  @keyframes copyFeedback {
+    0% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(10px);
+    }
+    20% {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    80% {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-10px);
+    }
+  }
+}

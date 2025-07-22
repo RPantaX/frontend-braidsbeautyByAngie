@@ -1,0 +1,389 @@
+<!-- pages/user-detail/user-detail.component.html -->
+<div class="user-detail-container">
+  <p-toast></p-toast>
+  <p-confirmDialog
+    [style]="{width: '450px'}"
+    [baseZIndex]="10000"
+    rejectButtonStyleClass="p-button-outlined">
+  </p-confirmDialog>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading()">
+    <div class="text-center">
+      <p-progressSpinner strokeWidth="3" animationDuration="2s"></p-progressSpinner>
+      <p class="text-lg font-medium mt-3">Cargando información del usuario...</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="detail-content" *ngIf="!loading() && user()">
+
+    <!-- Header Section -->
+    <div class="detail-header">
+      <div class="flex flex-column lg:flex-row lg:justify-content-between lg:align-items-start gap-4">
+
+        <!-- User Info -->
+        <div class="flex align-items-start gap-4">
+          <div class="user-avatar-container">
+            <p-avatar
+              [label]="userInitials()"
+              shape="circle"
+              size="xlarge"
+              styleClass="user-avatar"
+              [style.background-color]="'var(--primary-500)'"
+              [style.color]="'white'">
+            </p-avatar>
+            <div class="avatar-badge">
+              <i [class]="statusInfo()?.enabled?.icon"
+                 [style.color]="statusInfo()?.enabled?.severity === 'success' ? '#22c55e' : '#ef4444'">
+              </i>
+            </div>
+          </div>
+
+          <div class="user-basic-info">
+            <h1 class="user-name">{{ userFullInfo()?.username }}</h1>
+            <p class="user-email">{{ userFullInfo()?.email }}</p>
+            <div class="user-meta">
+              <p-tag
+                [value]="statusInfo()?.type?.label"
+                [severity]="statusInfo()?.type?.severity"
+                [rounded]="true"
+                class="mr-2 mb-2">
+                <i [class]="statusInfo()?.type?.icon" class="mr-1"></i>
+                {{ statusInfo()?.type?.label }}
+              </p-tag>
+              <p-tag
+                [value]="statusInfo()?.enabled?.label"
+                [severity]="statusInfo()?.enabled?.severity"
+                [rounded]="true"
+                class="mb-2">
+                <i [class]="statusInfo()?.enabled?.icon" class="mr-1"></i>
+                {{ statusInfo()?.enabled?.label }}
+              </p-tag>
+            </div>
+            <div class="user-id text-600">
+              ID: #{{ userFullInfo()?.id }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="detail-actions">
+          <div class="flex flex-column sm:flex-row gap-2">
+            <p-button
+              icon="pi pi-refresh"
+              label="Actualizar"
+              styleClass="p-button-outlined p-button-sm"
+              (onClick)="refreshData()"
+              [loading]="loading()">
+            </p-button>
+
+            <p-button
+              icon="pi pi-pencil"
+              label="Editar"
+              styleClass="p-button-warning p-button-sm"
+              (onClick)="navigateToEdit()">
+            </p-button>
+
+            <p-button
+              [icon]="userFullInfo()?.enabled ? 'pi pi-times' : 'pi pi-check'"
+              [label]="userFullInfo()?.enabled ? 'Desactivar' : 'Activar'"
+              [styleClass]="userFullInfo()?.enabled ? 'p-button-warning p-button-sm' : 'p-button-success p-button-sm'"
+              (onClick)="toggleUserStatus()">
+            </p-button>
+
+            <p-button
+              icon="pi pi-trash"
+              label="Eliminar"
+              styleClass="p-button-danger p-button-sm"
+              (onClick)="confirmDelete()">
+            </p-button>
+
+            <p-button
+              icon="pi pi-arrow-left"
+              label="Volver"
+              styleClass="p-button-outlined p-button-sm"
+              (onClick)="navigateToList()">
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="grid">
+
+      <!-- User Information -->
+      <div class="col-12 lg:col-8">
+        <p-panel header="Información del Usuario" styleClass="mb-4">
+          <div class="grid">
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Nombre de Usuario</label>
+                <div class="info-value">
+                  <span>{{ userFullInfo()?.username }}</span>
+                  <p-button
+                    icon="pi pi-copy"
+                    styleClass="p-button-text p-button-sm ml-2"
+                    pTooltip="Copiar username"
+                    tooltipPosition="top"
+                    (onClick)="copyToClipboard(userFullInfo()?.username || '', 'Username')">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Email</label>
+                <div class="info-value">
+                  <span>{{ userFullInfo()?.email }}</span>
+                  <div class="ml-2">
+                    <p-button
+                      icon="pi pi-copy"
+                      styleClass="p-button-text p-button-sm mr-1"
+                      pTooltip="Copiar email"
+                      tooltipPosition="top"
+                      (onClick)="copyToClipboard(userFullInfo()?.email || '', 'Email')">
+                    </p-button>
+
+                    <p-button
+                      icon="pi pi-envelope"
+                      styleClass="p-button-text p-button-sm"
+                      pTooltip="Enviar email"
+                      tooltipPosition="top"
+                      (onClick)="sendEmail()">  </p-button>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Estado</label>
+                <div class="info-value">
+                  <p-tag
+                    [value]="statusInfo()?.enabled?.label"
+                    [severity]="statusInfo()?.enabled?.severity"
+                    [rounded]="true">
+                    <i [class]="statusInfo()?.enabled?.icon" class="mr-1"></i>
+                    {{ statusInfo()?.enabled?.label }}
+                  </p-tag>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Tipo de Usuario</label>
+                <div class="info-value">
+                  <p-tag
+                    [value]="statusInfo()?.type?.label"
+                    [severity]="statusInfo()?.type?.severity"
+                    [rounded]="true">
+                    <i [class]="statusInfo()?.type?.icon" class="mr-1"></i>
+                    {{ statusInfo()?.type?.label }}
+                  </p-tag>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="info-item">
+                <label class="info-label">Roles del Sistema</label>
+                <div class="info-value">
+                  <div class="flex flex-wrap gap-1">
+                    <p-tag
+                      *ngFor="let role of userFullInfo()?.roles"
+                      [value]="role.name.replace('ROLE_', '')"
+                      [styleClass]="getRoleColor(role.name)"
+                      [rounded]="true">
+                      {{ role.name.replace('ROLE_', '') }}
+                    </p-tag>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6" *ngIf="userFullInfo()?.keycloakId">
+              <div class="info-item">
+                <label class="info-label">Keycloak ID</label>
+                <div class="info-value">
+                  <span>{{ userFullInfo()?.keycloakId }}</span>
+                  <p-button
+                    icon="pi pi-copy"
+                    styleClass="p-button-text p-button-sm ml-2"
+                    pTooltip="Copiar Keycloak ID"
+                    tooltipPosition="top"
+                    (onClick)="copyToClipboard(userFullInfo()?.keycloakId || '', 'Keycloak ID')">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+
+        <!-- System Information -->
+        <p-panel header="Información del Sistema" styleClass="mb-4">
+          <div class="grid">
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Fecha de Creación</label>
+                <div class="info-value">
+                  <span>{{ formatDate(userFullInfo()?.createdAt || '') }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">Última Modificación</label>
+                <div class="info-value">
+                  <span>{{ formatDate(userFullInfo()?.modifiedAt || '') }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+              <div class="info-item">
+                <label class="info-label">ID de Usuario</label>
+                <div class="info-value">
+                  <span>#{{ userFullInfo()?.id }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+      </div>
+
+      <!-- Sidebar Information -->
+      <div class="col-12 lg:col-4">
+
+        <!-- Quick Actions -->
+        <p-panel header="Acciones Rápidas" styleClass="mb-4">
+          <div class="flex flex-column gap-2">
+            <p-button
+              [icon]="userFullInfo()?.isAdmin ? 'pi pi-user' : 'pi pi-crown'"
+              [label]="userFullInfo()?.isAdmin ? 'Quitar Admin' : 'Hacer Admin'"
+              [styleClass]="userFullInfo()?.isAdmin ? 'p-button-warning p-button-outlined w-full p-button-sm' : 'p-button-success w-full p-button-sm'"
+              (onClick)="toggleAdminStatus()">
+            </p-button>
+
+            <p-button
+              icon="pi pi-download"
+              label="Exportar Información"
+              styleClass="p-button-outlined w-full p-button-sm"
+              (onClick)="exportUserInfo()">
+            </p-button>
+
+            <p-button
+              icon="pi pi-print"
+              label="Imprimir"
+              styleClass="p-button-outlined w-full p-button-sm"
+              (onClick)="printUserInfo()">
+            </p-button>
+          </div>
+        </p-panel>
+
+        <!-- User Statistics (if available) -->
+        <p-panel header="Estadísticas del Sistema" styleClass="mb-4" *ngIf="userStatistics()">
+          <div class="statistics-content">
+            <div class="stat-item mb-3">
+              <div class="flex justify-content-between align-items-center">
+                <span class="text-600">Total de Usuarios:</span>
+                <span class="font-bold">{{ userStatistics()?.total || 0 }}</span>
+              </div>
+            </div>
+
+            <div class="stat-item mb-3">
+              <div class="flex justify-content-between align-items-center">
+                <span class="text-600">Usuarios Activos:</span>
+                <span class="font-bold text-green-600">{{ userStatistics()?.active || 0 }}</span>
+              </div>
+            </div>
+
+            <div class="stat-item mb-3">
+              <div class="flex justify-content-between align-items-center">
+                <span class="text-600">Administradores:</span>
+                <span class="font-bold text-blue-600">{{ userStatistics()?.admins || 0 }}</span>
+              </div>
+            </div>
+
+            <div class="stat-item">
+              <div class="flex justify-content-between align-items-center">
+                <span class="text-600">Usuarios Inactivos:</span>
+                <span class="font-bold text-red-600">{{ userStatistics()?.inactive || 0 }}</span>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+
+        <!-- Role Information -->
+        <p-panel header="Información de Roles" styleClass="mb-4">
+          <div class="roles-info">
+            <div class="role-item mb-3" *ngFor="let role of userFullInfo()?.roles">
+              <div class="flex align-items-center gap-2">
+                <p-tag
+                  [value]="role.name.replace('ROLE_', '')"
+                  [styleClass]="getRoleColor(role.name)"
+                  [rounded]="true">
+                </p-tag>
+                <span class="text-sm text-600">ID: {{ role.id }}</span>
+              </div>
+            </div>
+
+            <div class="text-center mt-3" *ngIf="!userFullInfo()?.roles || userFullInfo()?.roles?.length === 0">
+              <i class="pi pi-exclamation-triangle text-4xl text-400 mb-3"></i>
+              <p class="text-600">No hay roles asignados</p>
+            </div>
+          </div>
+        </p-panel>
+
+        <!-- Security Information -->
+        <p-panel header="Información de Seguridad" styleClass="mb-4">
+          <div class="security-info">
+            <div class="security-item mb-2">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-shield text-blue-500"></i>
+                <span class="text-sm">
+                  {{ userFullInfo()?.enabled ? 'Cuenta activa' : 'Cuenta bloqueada' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="security-item mb-2">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-key text-purple-500"></i>
+                <span class="text-sm">
+                  {{ userFullInfo()?.isAdmin ? 'Permisos de administrador' : 'Permisos de usuario' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="security-item" *ngIf="userFullInfo()?.keycloakId">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-link text-green-500"></i>
+                <span class="text-sm">Vinculado con Keycloak</span>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="!loading() && !user()">
+    <div class="text-center">
+      <i class="pi pi-exclamation-triangle text-6xl text-400 mb-4"></i>
+      <h3 class="text-900 font-bold mb-3">Usuario no encontrado</h3>
+      <p class="text-600 mb-4">No se pudo cargar la información del usuario solicitado.</p>
+      <p-button
+        icon="pi pi-arrow-left"
+        label="Volver al Listado"
+        (onClick)="navigateToList()">
+      </p-button>
+    </div>
+  </div>
+</div>
