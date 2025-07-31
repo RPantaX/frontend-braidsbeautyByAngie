@@ -1,0 +1,338 @@
+<!-- Service Detail Template -->
+<div class="service-detail-page" *ngIf="!loading && service">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-section">
+    <div class="container">
+      <!--<app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb> -->
+    </div>
+  </div>
+
+  <!-- Service Header -->
+  <div class="service-header">
+    <div class="container">
+      <div class="grid">
+
+        <!-- Service Images -->
+        <div class="col-12 md:col-6">
+          <div class="service-image-gallery">
+            <div class="main-image">
+              <img
+                [src]="service.serviceDTO.serviceImage || 'assets/images/service-placeholder.jpg'"
+                [alt]="service.serviceDTO.serviceName"
+                class="service-main-image" />
+
+              <!-- Service Badges -->
+              <div class="service-badges">
+                <span
+                  *ngIf="hasDiscount()"
+                  class="badge discount-badge">
+                  -{{ getDiscountPercentage() }}% OFF
+                </span>
+                <span
+                  *ngIf="service.featured"
+                  class="badge featured-badge">
+                  DESTACADO
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Info -->
+        <div class="col-12 md:col-6">
+          <div class="service-info">
+
+            <!-- Category -->
+            <div class="service-category">
+              {{ getCategoryName() }}
+            </div>
+
+            <!-- Title -->
+            <h1 class="service-title">{{ service.serviceDTO.serviceName }}</h1>
+
+            <!-- Rating -->
+            <div class="service-rating" *ngIf="averageRating > 0">
+              <p-rating
+                [(ngModel)]="averageRating"
+                [readonly]="true"
+                [cancel]="false"
+                styleClass="service-rating-stars">
+              </p-rating>
+              <span class="rating-text">
+                {{ averageRating.toFixed(1) }} ({{ totalReviews }} reseña{{ totalReviews !== 1 ? 's' : '' }})
+              </span>
+            </div>
+
+            <!-- Price -->
+            <div class="service-pricing">
+              <div class="price-container">
+                <span
+                  *ngIf="hasDiscount()"
+                  class="original-price">
+                  S/{{ service.serviceDTO.servicePrice.toFixed(2) }}
+                </span>
+                <span class="current-price">
+                  S/{{ getServicePrice().toFixed(2) }}
+                </span>
+              </div>
+              <div class="price-note">
+                <i class="pi pi-info-circle"></i>
+                <span>Precio por sesión</span>
+              </div>
+            </div>
+
+            <!-- Duration -->
+            <div class="service-duration">
+              <div class="duration-item">
+                <i class="pi pi-clock"></i>
+                <span>{{ formatDuration(service.serviceDTO.durationTimeAprox) }}</span>
+                <label>Duración aproximada</label>
+              </div>
+            </div>
+
+            <!-- Availability -->
+            <div class="service-availability" *ngIf="isAvailableForBooking()">
+              <div class="availability-item">
+                <i class="pi pi-calendar text-green-500"></i>
+                <span>Disponible para reserva</span>
+              </div>
+              <div class="next-appointment" *ngIf="getNextAvailableAppointment() as nextSlot">
+                <span class="next-label">Próximo horario:</span>
+                <span class="next-time">{{ formatTimeSlot(nextSlot) }}</span>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="service-actions">
+              <p-button
+                label="Reservar Cita"
+                icon="pi pi-calendar"
+                styleClass="book-button"
+                [disabled]="!isAvailableForBooking()"
+                (onClick)="activeTab = 1">
+              </p-button>
+
+              <p-button
+                label="Agregar al Carrito"
+                icon="pi pi-shopping-cart"
+                [outlined]="true"
+                [loading]="addingToCart"
+                [disabled]="!isAvailableForBooking()"
+                (onClick)="addToCart()">
+              </p-button>
+
+              <p-button
+                icon="pi pi-share-alt"
+                [outlined]="true"
+                [rounded]="true"
+                pTooltip="Compartir"
+                tooltipPosition="top"
+                (onClick)="shareService()">
+              </p-button>
+            </div>
+
+            <!-- Features -->
+            <div class="service-features">
+              <div class="feature-item">
+                <i class="pi pi-shield"></i>
+                <span>Profesionales certificados</span>
+              </div>
+              <div class="feature-item">
+                <i class="pi pi-calendar-plus"></i>
+                <span>Reagendamiento gratuito</span>
+              </div>
+              <div class="feature-item">
+                <i class="pi pi-star"></i>
+                <span>Garantía de satisfacción</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Tabs -->
+  <div class="service-tabs-section">
+    <div class="container">
+
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <p-tabView [(activeIndex)]="activeTab" (onChange)="onTabChange($event.index)">
+
+          <!-- Description Tab -->
+          <p-tabPanel header="Descripción" leftIcon="pi pi-info-circle">
+            <div class="tab-content description-tab">
+              <div class="grid">
+                <div class="col-12 md:col-8">
+                  <div class="service-description">
+                    <h3>Acerca de este servicio</h3>
+                    <p>{{ service.serviceDTO.serviceDescription }}</p>
+
+                    <!-- Service Details -->
+                    <div class="service-details">
+                      <h4>Detalles del servicio</h4>
+                      <div class="detail-list">
+                        <div class="detail-item">
+                          <span class="detail-label">Duración:</span>
+                          <span class="detail-value">{{ formatDuration(service.serviceDTO.durationTimeAprox) }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Categoría:</span>
+                          <span class="detail-value">{{ getCategoryName() }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Precio:</span>
+                          <span class="detail-value">S/{{ getServicePrice().toFixed(2) }}</span>
+                        </div>
+                        <div class="detail-item" *ngIf="availableEmployees.length > 0">
+                          <span class="detail-label">Especialistas disponibles:</span>
+                          <span class="detail-value">{{ availableEmployees.length }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- What's Included -->
+                    <div class="whats-included">
+                      <h4>¿Qué incluye?</h4>
+                      <ul class="included-list">
+                        <li><i class="pi pi-check text-green-500"></i> Consulta inicial personalizada</li>
+                        <li><i class="pi pi-check text-green-500"></i> Productos profesionales incluidos</li>
+                        <li><i class="pi pi-check text-green-500"></i> Cuidado post-servicio</li>
+                        <li><i class="pi pi-check text-green-500"></i> Garantía de satisfacción</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="service-sidebar">
+                    <div class="booking-card">
+                      <h4>Reserva rápida</h4>
+                      <p>¿Listo para reservar? Selecciona tu horario preferido</p>
+                      <p-button
+                        label="Reservar ahora"
+                        icon="pi pi-calendar"
+                        styleClass="w-full"
+                        (onClick)="activeTab = 1">
+                      </p-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </p-tabPanel>
+
+          <!-- Booking Tab -->
+          <p-tabPanel header="Reservar Cita" leftIcon="pi pi-calendar">
+            <div class="tab-content booking-tab">
+              <app-service-booking
+                [service]="service"
+                [availableEmployees]="availableEmployees"
+                [availableTimeSlots]="availableTimeSlots"
+                [(selectedEmployee)]="selectedEmployee"
+                [(selectedTimeSlot)]="selectedTimeSlot"
+                [(selectedDate)]="selectedDate"
+                (onEmployeeChange)="onEmployeeSelect($event)"
+                (onTimeSlotChange)="onTimeSlotSelect($event)"
+                (onDateChange)="onDateChange($event)"
+                (onBookAppointment)="bookAppointment()">
+              </app-service-booking>
+            </div>
+          </p-tabPanel>
+
+          <!-- Reviews Tab -->
+          <p-tabPanel header="Reseñas" leftIcon="pi pi-star">
+            <div class="tab-content reviews-tab">
+              <app-reviews
+                [reviews]="reviews"
+                [averageRating]="averageRating"
+                [totalReviews]="totalReviews"
+                [serviceId]="serviceId">
+              </app-reviews>
+            </div>
+          </p-tabPanel>
+
+          <!-- Related Services Tab -->
+          <p-tabPanel header="Servicios Relacionados" leftIcon="pi pi-clone">
+            <div class="tab-content related-services-tab">
+              <div class="related-services-grid" *ngIf="relatedServices.length > 0">
+                <div class="grid">
+                  <div
+                    class="col-12 md:col-6 lg:col-3"
+                    *ngFor="let relatedService of relatedServices; trackBy: trackByServiceId">
+                    <app-service-card
+                      [service]="relatedService"
+                      [compact]="true"
+                      (onViewDetails)="goToRelatedService($event)"
+                      (onAddToCart)="addToCart()">
+                    </app-service-card>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="relatedServices.length === 0" class="no-related-services">
+                <div class="text-center py-6">
+                  <i class="pi pi-info-circle" style="font-size: 3rem; color: var(--text-color-secondary);"></i>
+                  <h3>No hay servicios relacionados</h3>
+                  <p>Explora nuestros otros servicios disponibles</p>
+                  <p-button
+                    label="Ver todos los servicios"
+                    icon="pi pi-arrow-right"
+                    [outlined]="true"
+                    (onClick)="goBackToServices()">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+          </p-tabPanel>
+        </p-tabView>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="service-detail-loading">
+  <div class="container">
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <p-skeleton height="400px" styleClass="mb-3"></p-skeleton>
+      </div>
+      <div class="col-12 md:col-6">
+        <p-skeleton height="2rem" width="30%" styleClass="mb-2"></p-skeleton>
+        <p-skeleton height="3rem" width="80%" styleClass="mb-3"></p-skeleton>
+        <p-skeleton height="1.5rem" width="40%" styleClass="mb-3"></p-skeleton>
+        <p-skeleton height="2rem" width="25%" styleClass="mb-4"></p-skeleton>
+        <p-skeleton height="3rem" width="100%" styleClass="mb-2"></p-skeleton>
+        <p-skeleton height="3rem" width="100%"></p-skeleton>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Error State -->
+<div *ngIf="!loading && !service" class="service-not-found">
+  <div class="container">
+    <div class="not-found-content text-center">
+      <i class="pi pi-exclamation-triangle" style="font-size: 4rem; color: var(--orange-500);"></i>
+      <h2>Servicio no encontrado</h2>
+      <p>El servicio que buscas no existe o ha sido removido.</p>
+      <div class="not-found-actions">
+        <p-button
+          label="Volver a servicios"
+          icon="pi pi-arrow-left"
+          (onClick)="goBackToServices()">
+        </p-button>
+        <p-button
+          label="Ir al inicio"
+          icon="pi pi-home"
+          [outlined]="true"
+          routerLink="/shop/home">
+        </p-button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,586 @@
+<!-- Product Detail Template -->
+<div class="product-detail-page" *ngIf="!loading">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-section">
+    <div class="container">
+      <p-breadcrumb [model]="breadcrumbItems" [home]="{icon: 'pi pi-home', routerLink: '/shop/home'}"></p-breadcrumb>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Product Main Section -->
+    <div class="product-main" *ngIf="product">
+      <div class="grid">
+
+        <!-- Product Images -->
+        <div class="col-12 md:col-6">
+          <div class="product-images">
+
+            <!-- Main Image -->
+            <div class="main-image-container">
+              <img
+                [src]="productImages[selectedImageIndex]?.src"
+                [alt]="productImages[selectedImageIndex]?.alt"
+                class="main-image"
+                (click)="openImageGallery()" />
+
+              <!-- Discount Badge -->
+              <div class="image-badges" *ngIf="product && hasDiscount()">
+                <span class="badge discount-badge">
+                  -{{ getDiscountPercentage() }}% OFF
+                </span>
+              </div>
+
+              <!-- Zoom Icon -->
+              <div class="zoom-icon" (click)="openImageGallery()">
+                <i class="pi pi-search-plus"></i>
+              </div>
+            </div>
+
+            <!-- Thumbnail Images -->
+            <div class="thumbnail-images" *ngIf="productImages.length > 1">
+              <div
+                class="thumbnail"
+                [class.active]="i === selectedImageIndex"
+                *ngFor="let image of productImages; let i = index"
+                (click)="selectImage(i)">
+                <img [src]="image.thumbnail" [alt]="image.alt" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-12 md:col-6">
+          <div class="product-info">
+
+            <!-- Category -->
+            <div class="product-category">
+              <span class="category-link"
+                    [routerLink]="['/shop/products']"
+                    [queryParams]="{category: product.responseCategory.productCategoryId}">
+                {{ product.responseCategory.productCategoryName }}
+              </span>
+            </div>
+
+            <!-- Product Name -->
+            <h1 class="product-name">{{ product.productName }}</h1>
+
+            <!-- Rating -->
+            <div class="product-rating" *ngIf="averageRating > 0">
+              <p-rating
+                [(ngModel)]="averageRating"
+                [readonly]="true"
+                [cancel]="false"
+                styleClass="rating-stars">
+              </p-rating>
+              <span class="rating-text">{{ averageRating.toFixed(1) }}</span>
+              <span class="rating-count">({{ totalReviews }} reseñas)</span>
+            </div>
+
+            <!-- Price -->
+            <div class="product-pricing">
+              <div class="price-row">
+                <span *ngIf="hasDiscount()" class="original-price">
+                  {{ formatPrice(getOriginalPrice()) }}
+                </span>
+                <span class="current-price">
+                  {{ formatPrice(getDiscountedPrice()) }}
+                </span>
+              </div>
+              <div class="savings" *ngIf="hasDiscount()">
+                <span class="savings-text">
+                  Ahorras {{ formatPrice(getSavings()) }}
+                  ({{ getDiscountPercentage() }}%)
+                </span>
+              </div>
+            </div>
+
+            <!-- Stock Status -->
+            <div class="stock-status">
+              <p-tag
+                [value]="getStockStatus()"
+                [severity]="getStockSeverity()"
+                icon="pi pi-check-circle">
+              </p-tag>
+            </div>
+
+            <!-- Product Description -->
+            <div class="product-description">
+              <p>{{ product.productDescription }}</p>
+            </div>
+
+            <!-- Variations -->
+            <div class="product-variations" *ngIf="variationGroups.length > 0">
+              <div class="variation-group" *ngFor="let group of variationGroups">
+                <h4 class="variation-title">{{ group.name }}:</h4>
+                <div class="variation-options">
+                  <div
+                    class="variation-option"
+                    [class.selected]="group.selectedOption === option.value"
+                    [class.disabled]="!option.available"
+                    *ngFor="let option of group.options"
+                    (click)="option.available && onVariationChange(group.name, option.value)">
+                    <span class="option-text">{{ option.value }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Selected Item Info -->
+            <div class="selected-item-info" *ngIf="selectedItem">
+              <div class="item-details">
+                <div class="item-row">
+                  <span class="item-label">SKU:</span>
+                  <span class="item-value">{{ selectedItem.productItemSKU }}</span>
+                </div>
+                <div class="item-row" *ngIf="selectedItem.variations.length > 0">
+                  <span class="item-label">Seleccionado:</span>
+                  <span class="item-value">{{ getItemVariationText(selectedItem) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quantity Selector -->
+            <div class="quantity-section" *ngIf="isInStock()">
+              <h4 class="quantity-title">Cantidad:</h4>
+              <div class="quantity-controls">
+                <p-inputNumber
+                  [(ngModel)]="selectedQuantity"
+                  [min]="1"
+                  [max]="maxQuantity"
+                  [showButtons]="true"
+                  buttonLayout="horizontal"
+                  spinnerMode="horizontal"
+                  decrementButtonIcon="pi pi-minus"
+                  incrementButtonIcon="pi pi-plus"
+                  styleClass="quantity-input">
+                </p-inputNumber>
+                <span class="quantity-info">{{ maxQuantity }} disponibles</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="product-actions">
+              <div class="primary-actions">
+                <p-button
+                  label="Agregar al Carrito"
+                  icon="pi pi-shopping-cart"
+                  styleClass="add-to-cart-btn"
+                  [disabled]="!isInStock() || addingToCart"
+                  [loading]="addingToCart"
+                  (onClick)="addToCart()">
+                </p-button>
+
+                <p-button
+                  label="Comprar Ahora"
+                  icon="pi pi-credit-card"
+                  styleClass="buy-now-btn"
+                  [disabled]="!isInStock() || addingToCart"
+                  (onClick)="buyNow()">
+                </p-button>
+              </div>
+
+              <div class="secondary-actions">
+                <p-button
+                  [icon]="isInWishlist ? 'pi pi-heart-fill' : 'pi pi-heart'"
+                  [outlined]="!isInWishlist"
+                  [severity]="isInWishlist ? 'danger' : 'secondary'"
+                  pTooltip="Agregar a favoritos"
+                  tooltipPosition="top"
+                  (onClick)="toggleWishlist()">
+                </p-button>
+
+                <p-button
+                  icon="pi pi-share-alt"
+                  [outlined]="true"
+                  severity="secondary"
+                  pTooltip="Compartir producto"
+                  tooltipPosition="top">
+                </p-button>
+              </div>
+            </div>
+
+            <!-- Promotions -->
+            <div class="product-promotions" *ngIf="product.responseCategory.promotionDTOList.length > 0">
+              <h4 class="promotions-title">
+                <i class="pi pi-tag"></i>
+                Ofertas Especiales
+              </h4>
+              <div class="promotion-list">
+                <div class="promotion-item" *ngFor="let promotion of product.responseCategory.promotionDTOList">
+                  <div class="promotion-header">
+                    <span class="promotion-name">{{ promotion.promotionName }}</span>
+                    <span class="promotion-discount">-{{ (promotion.promotionDiscountRate * 100).toFixed(0) }}%</span>
+                  </div>
+                  <p class="promotion-description">{{ promotion.promotionDescription }}</p>
+                  <div class="promotion-dates" *ngIf="promotion.promotionEndDate">
+                    <small>Válido hasta: {{ promotion.promotionEndDate | date:'dd/MM/yyyy' }}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Features -->
+            <div class="product-features">
+              <div class="feature-item">
+                <i class="pi pi-truck feature-icon"></i>
+                <div class="feature-text">
+                  <span class="feature-title">Envío Gratis</span>
+                  <span class="feature-desc">En compras mayores a S/100</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <i class="pi pi-shield feature-icon"></i>
+                <div class="feature-text">
+                  <span class="feature-title">Garantía de Calidad</span>
+                  <span class="feature-desc">Productos 100% auténticos</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <i class="pi pi-refresh feature-icon"></i>
+                <div class="feature-text">
+                  <span class="feature-title">Devoluciones</span>
+                  <span class="feature-desc">30 días para cambios</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Details Tabs -->
+    <div class="product-details-section" *ngIf="product">
+      <p-tabView [(activeIndex)]="activeTab" styleClass="product-tabs">
+
+        <!-- Description Tab -->
+        <p-tabPanel header="Descripción" leftIcon="pi pi-align-left">
+          <div class="tab-content description-content">
+            <h3>Sobre este producto</h3>
+            <div class="description-text">
+              <p>{{ product.productDescription }}</p>
+
+              <!-- Additional product details -->
+              <div class="product-highlights" *ngIf="product.responseProductItemDetails.length > 0">
+                <h4>Características principales:</h4>
+                <ul>
+                  <li *ngFor="let item of product.responseProductItemDetails.slice(0, 3)">
+                    <strong>{{ getItemVariationText(item) }}:</strong>
+                    SKU {{ item.productItemSKU }} - {{ item.productItemQuantityInStock }} disponibles
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Care Instructions -->
+              <div class="care-instructions">
+                <h4>Instrucciones de cuidado:</h4>
+                <p>Para mantener la calidad del producto, sigue estas recomendaciones de uso y almacenamiento.</p>
+              </div>
+            </div>
+          </div>
+        </p-tabPanel>
+
+        <!-- Specifications Tab -->
+        <p-tabPanel header="Especificaciones" leftIcon="pi pi-list">
+          <div class="tab-content specifications-content">
+            <h3>Especificaciones del producto</h3>
+
+            <div class="specifications-table">
+              <div class="spec-row">
+                <span class="spec-label">Categoría:</span>
+                <span class="spec-value">{{ product.responseCategory.productCategoryName }}</span>
+              </div>
+
+              <div class="spec-row" *ngIf="selectedItem">
+                <span class="spec-label">SKU:</span>
+                <span class="spec-value">{{ selectedItem.productItemSKU }}</span>
+              </div>
+
+              <div class="spec-row" *ngIf="selectedItem">
+                <span class="spec-label">Stock disponible:</span>
+                <span class="spec-value">{{ selectedItem.productItemQuantityInStock }} unidades</span>
+              </div>
+
+              <!-- Variations as specifications -->
+              <div class="spec-row" *ngFor="let group of variationGroups">
+                <span class="spec-label">{{ group.name }}:</span>
+                <span class="spec-value">
+                  <span class="variation-values">
+                    {{ getVariationOptionsText(group.options) }}
+                  </span>
+                </span>
+              </div>
+
+              <!-- Additional specs -->
+              <div class="spec-row">
+                <span class="spec-label">Marca:</span>
+                <span class="spec-value">AngieBraids</span>
+              </div>
+
+              <div class="spec-row">
+                <span class="spec-label">Origen:</span>
+                <span class="spec-value">Importado</span>
+              </div>
+            </div>
+          </div>
+        </p-tabPanel>
+
+        <!-- Reviews Tab -->
+        <p-tabPanel header="Reseñas ({{ totalReviews }})" leftIcon="pi pi-star">
+          <div class="tab-content reviews-content">
+
+            <!-- Reviews Summary -->
+            <div class="reviews-summary">
+              <div class="rating-overview">
+                <div class="average-rating">
+                  <span class="rating-number">{{ averageRating.toFixed(1) }}</span>
+                  <p-rating
+                    [(ngModel)]="averageRating"
+                    [readonly]="true"
+                    [cancel]="false"
+                    styleClass="rating-stars">
+                  </p-rating>
+                  <span class="total-reviews">Basado en {{ totalReviews }} reseñas</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reviews List -->
+            <div class="reviews-list" *ngIf="reviews.length > 0">
+              <div class="review-item" *ngFor="let review of reviews">
+                <div class="review-header">
+                  <div class="reviewer-info">
+                    <p-avatar
+                      [image]="review.customerAvatar || 'assets/images/default-avatar.jpg'"
+                      shape="circle"
+                      size="large">
+                    </p-avatar>
+                    <div class="reviewer-details">
+                      <span class="reviewer-name">{{ review.customerName }}</span>
+                      <div class="review-meta">
+                        <p-rating
+                          [(ngModel)]="review.rating"
+                          [readonly]="true"
+                          [cancel]="false"
+                          styleClass="review-rating">
+                        </p-rating>
+                        <span class="review-date">{{ review.date | date:'dd/MM/yyyy' }}</span>
+                        <span class="verified-badge" *ngIf="review.verified">
+                          <i class="pi pi-check-circle"></i>
+                          Compra verificada
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-content">
+                  <p>{{ review.comment }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- No Reviews -->
+            <div class="no-reviews" *ngIf="reviews.length === 0">
+              <div class="no-reviews-content">
+                <i class="pi pi-star no-reviews-icon"></i>
+                <h4>Aún no hay reseñas</h4>
+                <p>Sé el primero en reseñar este producto</p>
+                <p-button
+                  label="Escribir Reseña"
+                  icon="pi pi-pencil"
+                  [outlined]="true">
+                </p-button>
+              </div>
+            </div>
+          </div>
+        </p-tabPanel>
+
+        <!-- Additional Info Tab -->
+        <p-tabPanel header="Información Adicional" leftIcon="pi pi-info-circle">
+          <div class="tab-content additional-info-content">
+            <div class="info-sections">
+
+              <!-- Shipping Info -->
+              <div class="info-section">
+                <h4>
+                  <i class="pi pi-truck"></i>
+                  Información de Envío
+                </h4>
+                <ul>
+                  <li>Envío gratis en compras mayores a S/100</li>
+                  <li>Entrega en 3-5 días hábiles</li>
+                  <li>Disponible para todo Lima Metropolitana</li>
+                  <li>Envío express disponible (24-48 horas)</li>
+                </ul>
+              </div>
+
+              <!-- Return Policy -->
+              <div class="info-section">
+                <h4>
+                  <i class="pi pi-refresh"></i>
+                  Política de Devoluciones
+                </h4>
+                <ul>
+                  <li>30 días para devoluciones</li>
+                  <li>Producto debe estar en condiciones originales</li>
+                  <li>Incluir comprobante de compra</li>
+                  <li>Devolución gratuita por defectos de fábrica</li>
+                </ul>
+              </div>
+
+              <!-- Care Instructions -->
+              <div class="info-section">
+                <h4>
+                  <i class="pi pi-heart"></i>
+                  Cuidado del Producto
+                </h4>
+                <ul>
+                  <li>Almacenar en lugar fresco y seco</li>
+                  <li>Evitar exposición directa al sol</li>
+                  <li>Cerrar bien después de usar</li>
+                  <li>Mantener fuera del alcance de niños</li>
+                </ul>
+              </div>
+
+              <!-- Contact Info -->
+              <div class="info-section">
+                <h4>
+                  <i class="pi pi-phone"></i>
+                  ¿Necesitas Ayuda?
+                </h4>
+                <p>Nuestro equipo de atención al cliente está disponible para ayudarte:</p>
+                <ul>
+                  <li>Teléfono: +51 999 888 777</li>
+                  <li>Email: soporteangiebraids.com</li>
+                  <li>WhatsApp: +51 999 888 777</li>
+                  <li>Horario: Lun-Vie 9:00-18:00, Sáb 9:00-14:00</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products-section" *ngIf="relatedProducts.length > 0">
+      <div class="section-header">
+        <h2 class="section-title">Productos Relacionados</h2>
+        <p class="section-subtitle">Otros productos que podrían interesarte</p>
+      </div>
+
+      <div class="related-products-loading" *ngIf="loadingRelated">
+        <div class="grid">
+          <div class="col-12 md:col-6 lg:col-3" *ngFor="let item of [1,2,3,4]">
+            <p-skeleton height="300px" styleClass="mb-3"></p-skeleton>
+          </div>
+        </div>
+      </div>
+
+      <div class="related-products-grid" *ngIf="!loadingRelated">
+        <div class="grid">
+          <div class="col-12 md:col-6 lg:col-3" *ngFor="let relatedProduct of relatedProducts">
+            <div class="related-product-card" pRipple (click)="goToRelatedProduct(relatedProduct)">
+
+              <!-- Product Image -->
+              <div class="related-product-image">
+                <img
+                  [src]="relatedProduct.productImage || 'assets/images/product-placeholder.jpg'"
+                  [alt]="relatedProduct.productName"
+                  loading="lazy" />
+
+                <!-- Badges -->
+                <div class="related-product-badges">
+                  <span
+                    *ngIf="hasPromotions(relatedProduct)"
+                    class="badge discount-badge">
+                    OFERTA
+                  </span>
+                </div>
+              </div>
+
+              <!-- Product Info -->
+              <div class="related-product-info">
+                <div class="related-product-category">
+                  {{ relatedProduct.responseCategory?.productCategoryName }}
+                </div>
+                <h4 class="related-product-name">{{ relatedProduct.productName }}</h4>
+
+                <div class="related-product-pricing">
+                  <span class="related-current-price">
+                    S/{{ getMinPrice(relatedProduct).toFixed(2) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Gallery Modal -->
+  <p-dialog
+    [(visible)]="showImageGallery"
+    [modal]="true"
+    [dismissableMask]="true"
+    [closable]="true"
+    styleClass="image-gallery-dialog"
+    [style]="{width: '90vw', height: '90vh'}"
+    (onHide)="closeImageGallery()">
+
+    <ng-template pTemplate="header">
+      <span>{{ product?.productName }} - Galería</span>
+    </ng-template>
+
+    <div class="gallery-content">
+      <p-galleria
+        [value]="productImages"
+        [numVisible]="5"
+        [circular]="true"
+        [showIndicators]="true"
+        [showThumbnails]="true"
+        [showItemNavigators]="true"
+        thumbnailsPosition="bottom"
+        styleClass="product-gallery">
+
+        <ng-template pTemplate="item" let-image>
+          <img [src]="image.src" [alt]="image.alt" class="gallery-image" />
+        </ng-template>
+
+        <ng-template pTemplate="thumbnail" let-image>
+          <img [src]="image.thumbnail" [alt]="image.alt" class="gallery-thumbnail" />
+        </ng-template>
+      </p-galleria>
+    </div>
+  </p-dialog>
+</div>
+
+<!-- Loading State -->
+<div class="product-detail-loading" *ngIf="loading">
+  <div class="container">
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <p-skeleton height="500px" styleClass="mb-3"></p-skeleton>
+        <div class="flex gap-2">
+          <p-skeleton width="80px" height="80px" *ngFor="let item of [1,2,3,4]"></p-skeleton>
+        </div>
+      </div>
+      <div class="col-12 md:col-6">
+        <p-skeleton height="1.5rem" width="60%" styleClass="mb-2"></p-skeleton>
+        <p-skeleton height="2.5rem" width="80%" styleClass="mb-3"></p-skeleton>
+        <p-skeleton height="1rem" width="40%" styleClass="mb-4"></p-skeleton>
+        <p-skeleton height="3rem" width="50%" styleClass="mb-4"></p-skeleton>
+        <p-skeleton height="4rem" width="100%" styleClass="mb-4"></p-skeleton>
+        <p-skeleton height="3rem" width="70%" styleClass="mb-3"></p-skeleton>
+        <div class="flex gap-2">
+          <p-skeleton height="3rem" width="150px"></p-skeleton>
+          <p-skeleton height="3rem" width="150px"></p-skeleton>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

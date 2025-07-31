@@ -29,6 +29,12 @@ const routes: Routes = [
         loadChildren: () => import('./shared/pages/home/components/dashboard/dashboard.module').then(m => m.DashboardModule),
       },
       {
+        path: 'ecommerce',
+        canActivate: [AuthGuard, UserGuard],
+        data: { rol: EnumRolesUsuario.ADMIN },
+        loadChildren: () => import('./modules/ecommerce/ecommerce.module').then(m => m.EcommerceModule),
+      },
+      {
         path: 'products',
         canActivate: [AuthGuard, UserGuard],
         data: { rol: EnumRolesUsuario.ADMIN },

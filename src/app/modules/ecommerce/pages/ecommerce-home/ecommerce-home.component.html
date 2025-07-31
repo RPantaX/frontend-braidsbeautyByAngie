@@ -1,0 +1,432 @@
+<!-- E-commerce Home Template -->
+<div class="ecommerce-home">
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background" [style.background-image]="'url(' + heroSection.backgroundImage + ')'">
+      <div class="hero-overlay">
+        <div class="hero-content">
+          <div class="container">
+            <div class="hero-text">
+              <h1 class="hero-title">{{ heroSection.title }}</h1>
+              <p class="hero-subtitle">{{ heroSection.subtitle }}</p>
+              <p-button
+                [label]="heroSection.ctaText"
+                icon="pi pi-arrow-right"
+                styleClass="hero-cta"
+                (onClick)="onHeroCTA()"
+                >
+
+              </p-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Collections Section -->
+  <section class="collections-section">
+    <div class="container">
+      <div class="section-header text-center mb-5">
+        <h2 class="section-title">Explorar Por Colección</h2>
+        <p class="section-subtitle">Descubre nuestras colecciones especializadas</p>
+      </div>
+
+      <div class="collections-grid">
+        <div
+          class="collection-card"
+          *ngFor="let collection of collections"
+          (click)="goToCollection(collection)"
+          pRipple>
+          <div class="collection-image">
+            <img [src]="collection.image" [alt]="collection.title" />
+            <div class="collection-overlay">
+              <div class="collection-content">
+                <h3 class="collection-title">{{ collection.title }}</h3>
+                <p class="collection-description">{{ collection.description }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products Section -->
+  <section class="featured-products-section">
+    <div class="container">
+      <div class="section-header">
+        <div class="flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="section-title">Productos Destacados</h2>
+            <p class="section-subtitle">Los mejores productos para el cuidado del cabello</p>
+          </div>
+          <p-button
+            label="Ver Todos"
+            icon="pi pi-arrow-right"
+            [outlined]="true"
+            (onClick)="goToProducts()">
+          </p-button>
+        </div>
+      </div>
+
+      <div *ngIf="featuredProductsLoading" class="loading-container">
+        <div class="grid">
+          <div class="col-12 md:col-6 lg:col-3" *ngFor="let item of [1,2,3,4]">
+            <p-skeleton height="300px" styleClass="mb-3"></p-skeleton>
+            <p-skeleton height="1.5rem" width="80%" styleClass="mb-2"></p-skeleton>
+            <p-skeleton height="1rem" width="60%"></p-skeleton>
+          </div>
+        </div>
+      </div>
+
+      <p-carousel
+        *ngIf="!featuredProductsLoading && featuredProducts.length > 0"
+        [value]="featuredProducts"
+        [numVisible]="4"
+        [numScroll]="1"
+        [responsiveOptions]="productResponsiveOptions"
+        [showIndicators]="false"
+        [showNavigators]="true"
+        styleClass="product-carousel">
+
+        <ng-template pTemplate="item" let-product>
+          <div class="product-card-wrapper">
+            <div class="product-card" pRipple>
+
+              <!-- Product Image -->
+              <div class="product-image-container">
+                <img
+                  [src]="product.productImage || 'assets/images/product-placeholder.jpg'"
+                  [alt]="product.productName"
+                  class="product-image"
+                  (click)="goToProductDetail(product)" />
+
+                <!-- Badges -->
+                <div class="product-badges">
+                  <span
+                    *ngIf="hasDiscount(product)"
+                    class="badge discount-badge">
+                    -{{ getDiscountPercentage(product) }}%
+                  </span>
+                  <span
+                    *ngIf="product.newProduct"
+                    class="badge new-badge">
+                    NEW
+                  </span>
+                  <span
+                    *ngIf="!isProductInStock(product)"
+                    class="badge out-of-stock-badge">
+                    SIN STOCK
+                  </span>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="product-actions">
+                  <p-button
+                    icon="pi pi-eye"
+                    [rounded]="true"
+                    [outlined]="true"
+                    pTooltip="Vista rápida"
+                    tooltipPosition="top"
+                    (onClick)="quickViewProduct(product)">
+                  </p-button>
+                  <p-button
+                    icon="pi pi-heart"
+                    [rounded]="true"
+                    [outlined]="true"
+                    pTooltip="Agregar a favoritos"
+                    tooltipPosition="top">
+                  </p-button>
+                </div>
+              </div>
+
+              <!-- Product Info -->
+              <div class="product-info" (click)="goToProductDetail(product)">
+                <div class="product-category">
+                  {{ product.responseCategory?.productCategoryName }}
+                </div>
+                <h3 class="product-name">{{ product.productName }}</h3>
+                <div class="product-rating" *ngIf="getProductRating(product) > 0">
+                  <p-rating
+                    [(ngModel)]="product.rating"
+                    [readonly]="true"
+                    [cancel]="false"
+                    styleClass="product-rating-stars">
+                  </p-rating>
+                  <span class="rating-count">({{ product.reviewCount || 0 }})</span>
+                </div>
+
+                <div class="product-pricing">
+                  <span
+                    *ngIf="hasDiscount(product)"
+                    class="original-price">
+                    S/{{ getProductPrice(product).toFixed(2) }}
+                  </span>
+                  <span class="current-price">
+                    S/{{ hasDiscount(product) ? getDiscountedPrice(product).toFixed(2) : getProductPrice(product).toFixed(2) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Add to Cart -->
+              <div class="product-cart-action">
+                <p-button
+                  label="Agregar al Carrito"
+                  icon="pi pi-shopping-cart"
+                  styleClass="w-full"
+                  [disabled]="!isProductInStock(product)"
+                  (onClick)="addToCart(product)">
+                </p-button>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-carousel>
+
+      <div *ngIf="!featuredProductsLoading && featuredProducts.length === 0" class="no-data-message">
+        <div class="text-center py-6">
+          <i class="pi pi-shopping-bag" style="font-size: 3rem; color: var(--text-color-secondary);"></i>
+          <h3>No hay productos destacados disponibles</h3>
+          <p>Vuelve más tarde para ver nuestros productos destacados.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- New Products Section -->
+  <section class="new-products-section">
+    <div class="container">
+      <div class="section-header text-center mb-5">
+        <h2 class="section-title">Nuevos Estilos</h2>
+        <p class="section-subtitle">Las últimas tendencias en peinados y productos</p>
+      </div>
+
+      <div *ngIf="newProductsLoading" class="loading-container">
+        <div class="grid">
+          <div class="col-12 md:col-6 lg:col-3" *ngFor="let item of [1,2,3,4]">
+            <p-skeleton height="400px" styleClass="mb-3"></p-skeleton>
+          </div>
+        </div>
+      </div>
+
+      <p-carousel
+        *ngIf="!newProductsLoading && newProducts.length > 0"
+        [value]="newProducts"
+        [numVisible]="4"
+        [numScroll]="1"
+        [responsiveOptions]="productResponsiveOptions"
+        [showIndicators]="true"
+        [showNavigators]="true"
+        styleClass="new-products-carousel">
+
+        <ng-template pTemplate="item" let-product>
+          <div class="new-product-card">
+            <div class="new-product-image">
+              <img
+                [src]="product.productImage || 'assets/images/product-placeholder.jpg'"
+                [alt]="product.productName"
+                (click)="goToProductDetail(product)" />
+              <div class="new-product-overlay">
+                <div class="new-product-actions">
+                  <p-button
+                    label="Ver detalles"
+                    styleClass="p-button-outlined p-button-secondary"
+                    (onClick)="goToProductDetail(product)">
+                  </p-button>
+                  <p-button
+                    label="Agregar Cita"
+                    styleClass="p-button-primary"
+                    (onClick)="addToCart(product)">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+            <div class="new-product-info">
+              <div class="new-product-details">
+                <h4 class="new-product-name">{{ product.productName }}</h4>
+                <p class="new-product-category">{{ product.responseCategory?.productCategoryName }}</p>
+                <p class="new-product-price">S/{{ getProductPrice(product).toFixed(2) }}</p>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-carousel>
+
+      <div class="text-center mt-4" *ngIf="!newProductsLoading">
+        <p-button
+          label="Explorar más"
+          icon="pi pi-arrow-right"
+          styleClass="p-button-outlined p-button-lg"
+          (onClick)="goToProducts()">
+        </p-button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Services Section -->
+  <section class="featured-services-section bg-section">
+    <div class="container">
+      <div class="section-header text-center mb-5">
+        <h2 class="section-title">Servicios Destacados</h2>
+        <p class="section-subtitle">Servicios profesionales de peluquería y belleza</p>
+      </div>
+
+      <div *ngIf="featuredServicesLoading" class="loading-container">
+        <div class="grid">
+          <div class="col-12 md:col-6 lg:col-4" *ngFor="let item of [1,2,3]">
+            <p-skeleton height="250px" styleClass="mb-3"></p-skeleton>
+            <p-skeleton height="1.5rem" width="70%" styleClass="mb-2"></p-skeleton>
+            <p-skeleton height="1rem" width="50%"></p-skeleton>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" *ngIf="!featuredServicesLoading && featuredServices.length > 0">
+        <div class="col-12 md:col-6 lg:col-4" *ngFor="let service of featuredServices">
+          <div class="service-card" pRipple (click)="goToServiceDetail(service)">
+
+            <!-- Service Image -->
+            <div class="service-image-container">
+              <img
+                [src]="service.serviceDTO.serviceImage || 'assets/images/service-placeholder.jpg'"
+                [alt]="service.serviceDTO.serviceName"
+                class="service-image" />
+
+              <!-- Service Badges -->
+              <div class="service-badges">
+                <span
+                  *ngIf="hasServiceDiscount(service)"
+                  class="badge discount-badge">
+                  -{{ getServiceDiscountPercentage(service) }}%
+                </span>
+                <span
+                  *ngIf="service.featured"
+                  class="badge featured-badge">
+                  DESTACADO
+                </span>
+              </div>
+            </div>
+
+            <!-- Service Info -->
+            <div class="service-info">
+              <div class="service-meta">
+                <span class="service-category">
+                  {{ service.responseCategoryWIthoutServices?.serviceCategoryDTO?.categoryName }}
+                </span>
+                <span class="service-duration">
+                  {{ formatDuration(service.serviceDTO.durationTimeAprox) }}
+                </span>
+              </div>
+
+              <h3 class="service-name">{{ service.serviceDTO.serviceName }}</h3>
+              <p class="service-description">{{ service.serviceDTO.serviceDescription }}</p>
+
+              <div class="service-rating" *ngIf="getServiceRating(service) > 0">
+                <p-rating
+                  [(ngModel)]="service.rating"
+                  [readonly]="true"
+                  [cancel]="false"
+                  styleClass="service-rating-stars">
+                </p-rating>
+                <span class="rating-count">({{ service.reviewCount || 0 }})</span>
+              </div>
+
+              <div class="service-pricing">
+                <span
+                  *ngIf="hasServiceDiscount(service)"
+                  class="original-price">
+                  S/{{ service.serviceDTO.servicePrice.toFixed(2) }}
+                </span>
+                <span class="current-price">
+                  S/{{ hasServiceDiscount(service) ? getServiceDiscountedPrice(service).toFixed(2) : service.serviceDTO.servicePrice.toFixed(2) }}
+                </span>
+              </div>
+
+              <div class="service-actions">
+                <p-button
+                  label="Reservar Cita"
+                  icon="pi pi-calendar"
+                  styleClass="w-full p-button-primary"
+                  (onClick)="addServiceToCart(service); $event.stopPropagation()">
+                </p-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!featuredServicesLoading && featuredServices.length === 0" class="no-data-message">
+        <div class="text-center py-6">
+          <i class="pi pi-calendar" style="font-size: 3rem; color: var(--text-color-secondary);"></i>
+          <h3>No hay servicios destacados disponibles</h3>
+          <p>Vuelve más tarde para ver nuestros servicios destacados.</p>
+        </div>
+      </div>
+
+      <div class="text-center mt-5" *ngIf="!featuredServicesLoading">
+        <p-button
+          label="Ver Todos los Servicios"
+          icon="pi pi-arrow-right"
+          styleClass="p-button-outlined p-button-lg"
+          (onClick)="goToServices()">
+        </p-button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter/CTA Section -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="newsletter-content text-center">
+        <h2 class="newsletter-title">Mantente Actualizada</h2>
+        <p class="newsletter-subtitle">
+          Recibe las últimas noticias sobre productos, servicios y ofertas especiales
+        </p>
+
+        <div class="newsletter-form">
+          <div class="p-inputgroup newsletter-input">
+            <input
+              type="email"
+              pInputText
+              placeholder="Ingresa tu email..."
+              class="newsletter-email" />
+            <p-button
+              label="Suscribirse"
+              icon="pi pi-send"
+              styleClass="p-button-primary">
+            </p-button>
+          </div>
+        </div>
+
+        <div class="newsletter-features mt-5">
+          <div class="grid">
+            <div class="col-12 md:col-4">
+              <div class="feature-item">
+                <i class="pi pi-truck feature-icon"></i>
+                <h4>Envío Gratis</h4>
+                <p>En compras mayores a S/100</p>
+              </div>
+            </div>
+            <div class="col-12 md:col-4">
+              <div class="feature-item">
+                <i class="pi pi-shield feature-icon"></i>
+                <h4>Garantía de Calidad</h4>
+                <p>Productos 100% auténticos</p>
+              </div>
+            </div>
+            <div class="col-12 md:col-4">
+              <div class="feature-item">
+                <i class="pi pi-clock feature-icon"></i>
+                <h4>Atención 24/7</h4>
+                <p>Soporte cuando lo necesites</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>

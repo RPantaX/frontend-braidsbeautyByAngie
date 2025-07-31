@@ -1,0 +1,593 @@
+<!-- Checkout Template -->
+<div class="checkout-page">
+
+  <!-- Checkout Steps -->
+  <div class="checkout-steps" *ngIf="!orderCompleted">
+    <div class="container">
+      <div class="steps-nav">
+        <div
+          class="step"
+          *ngFor="let step of steps; let i = index"
+          [class.active]="currentStep === i"
+          [class.completed]="step.completed"
+          [class.clickable]="step.completed || i <= currentStep"
+          (click)="goToStep(i)">
+
+          <div class="step-indicator">
+            <i *ngIf="!step.completed" [class]="step.icon"></i>
+            <i *ngIf="step.completed" class="pi pi-check"></i>
+          </div>
+
+          <span class="step-label">{{ step.label }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="checkout-container" *ngIf="!orderCompleted">
+
+      <!-- Main Content -->
+      <div class="checkout-main">
+
+        <!-- Step 0: Customer Information -->
+        <div class="checkout-step" *ngIf="currentStep === 0">
+          <h2 class="step-title">Información Personal</h2>
+          <p class="step-description">Completa tus datos para procesar el pedido</p>
+
+          <form [formGroup]="customerForm" class="customer-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="firstName">Nombre *</label>
+                <input
+                  id="firstName"
+                  type="text"
+                  pInputText
+                  formControlName="firstName"
+                  [class.p-invalid]="hasFieldError(customerForm, 'firstName')"
+                  placeholder="Tu nombre" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(customerForm, 'firstName')">
+                  {{ getFieldError(customerForm, 'firstName') }}
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="lastName">Apellido *</label>
+                <input
+                  id="lastName"
+                  type="text"
+                  pInputText
+                  formControlName="lastName"
+                  [class.p-invalid]="hasFieldError(customerForm, 'lastName')"
+                  placeholder="Tu apellido" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(customerForm, 'lastName')">
+                  {{ getFieldError(customerForm, 'lastName') }}
+                </small>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="email">Email *</label>
+                <input
+                  id="email"
+                  type="email"
+                  pInputText
+                  formControlName="email"
+                  [class.p-invalid]="hasFieldError(customerForm, 'email')"
+                  placeholder="tu@email.com" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(customerForm, 'email')">
+                  {{ getFieldError(customerForm, 'email') }}
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Teléfono *</label>
+                <input
+                  id="phone"
+                  type="tel"
+                  pInputText
+                  formControlName="phone"
+                  [class.p-invalid]="hasFieldError(customerForm, 'phone')"
+                  placeholder="999 999 999" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(customerForm, 'phone')">
+                  {{ getFieldError(customerForm, 'phone') }}
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="document">DNI *</label>
+                <input
+                  id="document"
+                  type="text"
+                  pInputText
+                  formControlName="document"
+                  [class.p-invalid]="hasFieldError(customerForm, 'document')"
+                  placeholder="12345678" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(customerForm, 'document')">
+                  {{ getFieldError(customerForm, 'document') }}
+                </small>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 1: Shipping Information -->
+        <div class="checkout-step" *ngIf="currentStep === 1 && hasProducts()">
+          <h2 class="step-title">Información de Envío</h2>
+          <p class="step-description">¿Dónde quieres recibir tu pedido?</p>
+
+          <!-- Shipping Methods -->
+          <div class="shipping-methods">
+            <h3>Método de entrega</h3>
+            <div class="shipping-options">
+              <div
+                class="shipping-option"
+                *ngFor="let method of shippingMethods"
+                [class.selected]="selectedShippingMethod?.id === method.id"
+                (click)="onShippingMethodSelect(method)">
+
+                <div class="option-content">
+                  <div class="option-header">
+                    <h4 class="option-title">{{ method.name }}</h4>
+                    <span class="option-price">
+                      {{ method.price === 0 ? 'Gratis' : (method.price | price) }}
+                    </span>
+                  </div>
+                  <p class="option-description">{{ method.description }}</p>
+                  <span class="option-time">{{ method.estimatedDays }}</span>
+                </div>
+
+                <div class="option-indicator">
+                  <i class="pi pi-check" *ngIf="selectedShippingMethod?.id === method.id"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping Address Form -->
+          <form [formGroup]="shippingForm" class="shipping-form" *ngIf="selectedShippingMethod?.id !== 'pickup'">
+            <h3>Dirección de entrega</h3>
+
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label for="address">Dirección *</label>
+                <input
+                  id="address"
+                  type="text"
+                  pInputText
+                  formControlName="address"
+                  [class.p-invalid]="hasFieldError(shippingForm, 'address')"
+                  placeholder="Av. Ejemplo 123" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(shippingForm, 'address')">
+                  {{ getFieldError(shippingForm, 'address') }}
+                </small>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="addressLine2">Departamento/Piso (opcional)</label>
+                <input
+                  id="addressLine2"
+                  type="text"
+                  pInputText
+                  formControlName="addressLine2"
+                  placeholder="Dpto. 101" />
+              </div>
+
+              <div class="form-group">
+                <label for="city">Ciudad *</label>
+                <input
+                  id="city"
+                  type="text"
+                  pInputText
+                  formControlName="city"
+                  [class.p-invalid]="hasFieldError(shippingForm, 'city')"
+                  placeholder="Lima" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(shippingForm, 'city')">
+                  {{ getFieldError(shippingForm, 'city') }}
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="district">Distrito *</label>
+                <input
+                  id="district"
+                  type="text"
+                  pInputText
+                  formControlName="district"
+                  [class.p-invalid]="hasFieldError(shippingForm, 'district')"
+                  placeholder="Miraflores" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(shippingForm, 'district')">
+                  {{ getFieldError(shippingForm, 'district') }}
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="postalCode">Código Postal *</label>
+                <input
+                  id="postalCode"
+                  type="text"
+                  pInputText
+                  formControlName="postalCode"
+                  [class.p-invalid]="hasFieldError(shippingForm, 'postalCode')"
+                  placeholder="15074" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(shippingForm, 'postalCode')">
+                  {{ getFieldError(shippingForm, 'postalCode') }}
+                </small>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="references">Referencias</label>
+                <textarea
+                  id="references"
+                  pInputTextarea
+                  formControlName="references"
+                  rows="3"
+                  placeholder="Puerta verde, al lado de farmacia...">
+                </textarea>
+              </div>
+            </div>
+          </form>
+
+          <!-- Pickup Location Info -->
+          <div class="pickup-info" *ngIf="selectedShippingMethod?.id === 'pickup'">
+            <h3>Información de recojo</h3>
+            <div class="pickup-details">
+              <div class="pickup-location">
+                <h4>AngieBraids Studio</h4>
+                <p>Av. Larco 1234, Miraflores</p>
+                <p>Lima, Perú</p>
+              </div>
+              <div class="pickup-hours">
+                <h4>Horarios de atención</h4>
+                <p>Lunes a Viernes: 9:00 AM - 7:00 PM</p>
+                <p>Sábados: 9:00 AM - 5:00 PM</p>
+                <p>Domingos: Cerrado</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estimated Delivery -->
+          <div class="delivery-estimate" *ngIf="selectedShippingMethod">
+            <div class="estimate-card">
+              <i class="pi pi-truck"></i>
+              <div class="estimate-info">
+                <h4>Entrega estimada</h4>
+                <p>{{ getEstimatedDeliveryDate() }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Payment Information -->
+        <div class="checkout-step" *ngIf="currentStep === 2">
+          <h2 class="step-title">Método de Pago</h2>
+          <p class="step-description">Elige cómo quieres pagar tu pedido</p>
+
+          <!-- Payment Methods -->
+          <div class="payment-methods">
+            <div
+              class="payment-option"
+              *ngFor="let method of paymentMethods"
+              [class.selected]="selectedPaymentMethod?.id === method.id"
+              (click)="onPaymentMethodSelect(method)">
+
+              <div class="option-content">
+                <div class="option-header">
+                  <i [class]="method.icon"></i>
+                  <h4 class="option-title">{{ method.name }}</h4>
+                </div>
+                <p class="option-description">{{ method.description }}</p>
+              </div>
+
+              <div class="option-indicator">
+                <i class="pi pi-check" *ngIf="selectedPaymentMethod?.id === method.id"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Credit Card Form -->
+          <form [formGroup]="paymentForm" class="payment-form" *ngIf="selectedPaymentMethod?.id === 'visa'">
+            <h3>Información de la tarjeta</h3>
+
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label for="cardNumber">Número de tarjeta *</label>
+                <input
+                  id="cardNumber"
+                  type="text"
+                  pInputText
+                  formControlName="cardNumber"
+                  [class.p-invalid]="hasFieldError(paymentForm, 'cardNumber')"
+                  placeholder="1234 5678 9012 3456"
+                  maxlength="19" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(paymentForm, 'cardNumber')">
+                  {{ getFieldError(paymentForm, 'cardNumber') }}
+                </small>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="cardName">Nombre en la tarjeta *</label>
+                <input
+                  id="cardName"
+                  type="text"
+                  pInputText
+                  formControlName="cardName"
+                  [class.p-invalid]="hasFieldError(paymentForm, 'cardName')"
+                  placeholder="Nombre como aparece en la tarjeta" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(paymentForm, 'cardName')">
+                  {{ getFieldError(paymentForm, 'cardName') }}
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="expiryDate">Fecha de vencimiento *</label>
+                <input
+                  id="expiryDate"
+                  type="text"
+                  pInputText
+                  formControlName="expiryDate"
+                  [class.p-invalid]="hasFieldError(paymentForm, 'expiryDate')"
+                  placeholder="MM/AA"
+                  maxlength="5" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(paymentForm, 'expiryDate')">
+                  {{ getFieldError(paymentForm, 'expiryDate') }}
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="cvv">CVV *</label>
+                <input
+                  id="cvv"
+                  type="text"
+                  pInputText
+                  formControlName="cvv"
+                  [class.p-invalid]="hasFieldError(paymentForm, 'cvv')"
+                  placeholder="123"
+                  maxlength="4" />
+                <small
+                  class="p-error"
+                  *ngIf="hasFieldError(paymentForm, 'cvv')">
+                  {{ getFieldError(paymentForm, 'cvv') }}
+                </small>
+              </div>
+
+              <div class="form-group full-width">
+                <p-checkbox
+                  formControlName="saveCard"
+                  binary="true"
+                  inputId="saveCard">
+                </p-checkbox>
+                <label for="saveCard" class="checkbox-label">
+                  Guardar tarjeta para futuras compras
+                </label>
+              </div>
+            </div>
+          </form>
+
+          <!-- Other Payment Methods Info -->
+          <div class="payment-info" *ngIf="selectedPaymentMethod?.id !== 'visa' && selectedPaymentMethod">
+            <div class="payment-instructions">
+              <h3>Instrucciones de pago</h3>
+              <div class="instructions-content" [ngSwitch]="selectedPaymentMethod.id">
+
+                <div *ngSwitchCase="'yape'">
+                  <p>Te enviaremos un código QR para realizar el pago con Yape una vez confirmado el pedido.</p>
+                  <ul>
+                    <li>Tendrás 15 minutos para completar el pago</li>
+                    <li>El pedido se procesará automáticamente al confirmar el pago</li>
+                  </ul>
+                </div>
+
+                <div *ngSwitchCase="'plin'">
+                  <p>Te enviaremos un enlace para realizar el pago con Plin una vez confirmado el pedido.</p>
+                  <ul>
+                    <li>Tendrás 15 minutos para completar el pago</li>
+                    <li>Compatible con todos los bancos afiliados a Plin</li>
+                  </ul>
+                </div>
+
+                <div *ngSwitchCase="'bank_transfer'">
+                  <p>Te enviaremos los datos bancarios para realizar la transferencia.</p>
+                  <ul>
+                    <li>Tienes hasta 24 horas para realizar la transferencia</li>
+                    <li>Envía el voucher por WhatsApp al +51 999 123 456</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Order Confirmation -->
+        <div class="checkout-step" *ngIf="currentStep === 3">
+          <h2 class="step-title">Confirmar Pedido</h2>
+          <p class="step-description">Revisa todos los detalles antes de finalizar</p>
+
+          <!-- Order Summary -->
+          <div class="order-summary">
+            <h3>Resumen del pedido</h3>
+
+            <!-- Customer Info -->
+            <div class="summary-section">
+              <h4>Información del cliente</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Nombre:</span>
+                  <span class="info-value">{{ customerForm.get('firstName')?.value }} {{ customerForm.get('lastName')?.value }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Email:</span>
+                  <span class="info-value">{{ customerForm.get('email')?.value }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Teléfono:</span>
+                  <span class="info-value">{{ customerForm.get('phone')?.value }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shipping Info -->
+            <div class="summary-section" *ngIf="hasProducts()">
+              <h4>Información de entrega</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Método:</span>
+                  <span class="info-value">{{ selectedShippingMethod?.name }}</span>
+                </div>
+                <div class="info-item" *ngIf="selectedShippingMethod?.id !== 'pickup'">
+                  <span class="info-label">Dirección:</span>
+                  <span class="info-value">
+                    {{ shippingForm.get('address')?.value }},
+                    {{ shippingForm.get('district')?.value }},
+                    {{ shippingForm.get('city')?.value }}
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Entrega estimada:</span>
+                  <span class="info-value">{{ getEstimatedDeliveryDate() }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Info -->
+            <div class="summary-section">
+              <h4>Método de pago</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Método:</span>
+                  <span class="info-value">{{ selectedPaymentMethod?.name }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Processing Payment -->
+          <div class="processing-payment" *ngIf="processingPayment">
+            <div class="processing-content">
+              <p-progressSpinner styleClass="processing-spinner"></p-progressSpinner>
+              <h3>Procesando tu pedido...</h3>
+              <p>Por favor espera mientras procesamos tu pago y confirmamos tu pedido.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="checkout-navigation" *ngIf="!processingPayment">
+          <p-button
+            label="Anterior"
+            icon="pi pi-arrow-left"
+            [outlined]="true"
+            [disabled]="currentStep === 0"
+            (onClick)="previousStep()">
+          </p-button>
+
+          <p-button
+            [label]="currentStep === 3 ? 'Confirmar Pedido' : 'Continuar'"
+            [icon]="currentStep === 3 ? 'pi pi-check' : 'pi pi-arrow-right'"
+            [iconPos]="currentStep === 3 ? 'left' : 'right'"
+            [disabled]="!validateCurrentStep()"
+            (onClick)="nextStep()">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Order Summary Sidebar -->
+      <div class="checkout-sidebar">
+        <app-cart-summary
+          [cart]="cart"
+          [showActions]="false"
+          [showContinueButton]="false"
+          [appliedCouponCode]="''"
+          (onApplyCoupon)="applyCoupon($event)"
+          (onRemoveCoupon)="cart.discount = 0; cart.total = cart.subtotal + cart.shipping + cart.tax">
+        </app-cart-summary>
+      </div>
+    </div>
+
+    <!-- Order Completed -->
+    <div class="order-completed" *ngIf="orderCompleted">
+      <div class="success-content">
+        <div class="success-icon">
+          <i class="pi pi-check-circle"></i>
+        </div>
+
+        <h1 class="success-title">¡Pedido Confirmado!</h1>
+        <p class="success-message">
+          Tu pedido <strong>#{{ orderId }}</strong> ha sido procesado exitosamente.
+        </p>
+
+        <div class="order-details">
+          <div class="order-total">
+            <span class="total-label">Total pagado:</span>
+            <span class="total-amount">{{ orderTotal | price }}</span>
+          </div>
+        </div>
+
+        <div class="success-actions">
+          <p-button
+            label="Ver Detalles del Pedido"
+            icon="pi pi-eye"
+            (onClick)="viewOrderDetails()">
+          </p-button>
+
+          <p-button
+            label="Continuar Comprando"
+            icon="pi pi-shopping-bag"
+            [outlined]="true"
+            (onClick)="continueShopping()">
+          </p-button>
+        </div>
+
+        <div class="next-steps">
+          <h3>¿Qué sigue?</h3>
+          <div class="steps-info">
+            <div class="step-info">
+              <i class="pi pi-envelope"></i>
+              <div>
+                <h4>Confirmación por email</h4>
+                <p>Te hemos enviado un email con todos los detalles de tu pedido.</p>
+              </div>
+            </div>
+            <div class="step-info" *ngIf="hasProducts()">
+              <i class="pi pi-truck"></i>
+              <div>
+                <h4>Preparación y envío</h4>
+                <p>Prepararemos tu pedido y te notificaremos cuando esté en camino.</p>
+              </div>
+            </div>
+            <div class="step-info" *ngIf="hasServices()">
+              <i class="pi pi-calendar"></i>
+              <div>
+                <h4>Confirmación de cita</h4>
+                <p>Te contactaremos para confirmar los horarios de tus servicios.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,519 @@
+<!-- Cart Page Template -->
+<div class="cart-page">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-section">
+    <div class="container">
+      <p-breadcrumb [model]="breadcrumbItems" [home]="{icon: 'pi pi-home', routerLink: '/shop/home'}"></p-breadcrumb>
+    </div>
+  </div>
+
+  <!-- Cart Steps -->
+  <div class="cart-steps-section">
+    <div class="container">
+      <p-steps [model]="cartSteps" [readonly]="true" styleClass="cart-steps"></p-steps>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Loading State -->
+    <div class="cart-loading" *ngIf="loading">
+      <div class="grid">
+        <div class="col-12 lg:col-8">
+          <p-skeleton height="100px" styleClass="mb-3" *ngFor="let item of [1,2,3]"></p-skeleton>
+        </div>
+        <div class="col-12 lg:col-4">
+          <p-skeleton height="300px"></p-skeleton>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty Cart -->
+    <div class="empty-cart" *ngIf="!loading && cartItems.length === 0">
+      <div class="empty-cart-content">
+        <div class="empty-cart-icon">
+          <i class="pi pi-shopping-cart"></i>
+        </div>
+        <h2 class="empty-cart-title">Tu carrito está vacío</h2>
+        <p class="empty-cart-message">
+          ¡Descubre nuestros increíbles productos y servicios para el cuidado del cabello!
+        </p>
+        <div class="empty-cart-actions">
+          <p-button
+            label="Explorar Productos"
+            icon="pi pi-shopping-bag"
+            routerLink="/shop/products"
+            styleClass="p-button-lg">
+          </p-button>
+          <p-button
+            label="Ver Servicios"
+            icon="pi pi-calendar"
+            routerLink="/shop/services"
+            [outlined]="true"
+            styleClass="p-button-lg">
+          </p-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart Content -->
+    <div class="cart-content" *ngIf="!loading && cartItems.length > 0">
+      <div class="grid">
+
+        <!-- Cart Items -->
+        <div class="col-12 lg:col-8">
+          <div class="cart-items-section">
+
+            <!-- Section Header -->
+            <div class="cart-header">
+              <h1 class="cart-title">
+                Carrito de Compras
+                <span class="item-count">({{ cartItems.length }} producto{{ cartItems.length !== 1 ? 's' : '' }})</span>
+              </h1>
+              <div class="cart-actions">
+                <p-button
+                  label="Continuar Comprando"
+                  icon="pi pi-arrow-left"
+                  [outlined]="true"
+                  (onClick)="continueShopping()">
+                </p-button>
+                <p-button
+                  label="Vaciar Carrito"
+                  icon="pi pi-trash"
+                  severity="danger"
+                  [outlined]="true"
+                  (onClick)="clearCart()"
+                  [disabled]="removingItem">
+                </p-button>
+              </div>
+            </div>
+
+            <!-- Free Shipping Progress -->
+            <div class="free-shipping-banner" *ngIf="!isFreeShippingAvailable() && getRemainingForFreeShipping() <= 50">
+              <div class="banner-content">
+                <i class="pi pi-truck banner-icon"></i>
+                <div class="banner-text">
+                  <span class="banner-message">
+                    ¡Agrega {{ formatPrice(getRemainingForFreeShipping()) }} más y obtén
+                    <strong>envío gratis</strong>!
+                  </span>
+                  <div class="progress-bar">
+                    <div
+                      class="progress-fill"
+                      [style.width.%]="(getSubtotal() / 100) * 100">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Products Section -->
+            <div class="cart-products-section" *ngIf="hasProducts()">
+              <h3 class="section-title">
+                <i class="pi pi-shopping-bag"></i>
+                Productos ({{ getProducts().length }})
+              </h3>
+
+              <div class="cart-items">
+                <div
+                  class="cart-item"
+                  *ngFor="let item of getProducts(); trackBy: trackByItemId"
+                  [class.updating]="updatingQuantity">
+
+                  <!-- Item Image -->
+                  <div class="item-image" (click)="goToProduct(item)">
+                    <img
+                      [src]="getItemImage(item)"
+                      [alt]="item.name"
+                      (error)="onImageError($event)" />
+                  </div>
+
+                  <!-- Item Details -->
+                  <div class="item-details">
+                    <div class="item-header">
+                      <h4 class="item-name" (click)="goToProduct(item)">{{ item.name }}</h4>
+                      <p-button
+                        icon="pi pi-times"
+                        [text]="true"
+                        severity="danger"
+                        size="small"
+                        (onClick)="removeItem(item)"
+                        pTooltip="Eliminar producto"
+                        tooltipPosition="left">
+                      </p-button>
+                    </div>
+
+                    <p class="item-description">{{ getItemDescription(item) }}</p>
+
+                    <!-- Pricing -->
+                    <div class="item-pricing">
+                      <span *ngIf="item.originalPrice && item.originalPrice > item.price" class="original-price">
+                        {{ formatPrice(item.originalPrice) }}
+                      </span>
+                      <span class="current-price">{{ formatPrice(item.price) }}</span>
+                      <span class="price-per-unit">por unidad</span>
+                    </div>
+
+                    <!-- Stock Info -->
+                    <div class="item-stock" *ngIf="item.maxQuantity && item.maxQuantity <= 10">
+                      <p-tag
+                        [value]="'Solo ' + item.maxQuantity + ' disponibles'"
+                        severity="warning"
+                        icon="pi pi-exclamation-triangle">
+                      </p-tag>
+                    </div>
+                  </div>
+
+                  <!-- Quantity Controls -->
+                  <div class="item-quantity">
+                    <label class="quantity-label">Cantidad:</label>
+                    <div class="quantity-controls">
+                      <p-inputNumber
+                        [(ngModel)]="item.quantity"
+                        [min]="1"
+                        [max]="item.maxQuantity"
+                        [showButtons]="true"
+                        buttonLayout="horizontal"
+                        spinnerMode="horizontal"
+                        decrementButtonIcon="pi pi-minus"
+                        incrementButtonIcon="pi pi-plus"
+                        (onInput)="updateQuantity(item, $event.value || 0)"
+                        styleClass="quantity-input">
+                      </p-inputNumber>
+                    </div>
+                  </div>
+
+                  <!-- Item Total -->
+                  <div class="item-total">
+                    <div class="total-price">{{ formatPrice(item.price * item.quantity) }}</div>
+                    <div class="savings" *ngIf="item.originalPrice && item.originalPrice > item.price">
+                      Ahorras: {{ formatPrice((item.originalPrice - item.price) * item.quantity) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Services Section -->
+            <div class="cart-services-section" *ngIf="hasServices()">
+              <h3 class="section-title">
+                <i class="pi pi-calendar"></i>
+                Servicios ({{ getServices().length }})
+              </h3>
+
+              <div class="cart-items">
+                <div
+                  class="cart-item service-item"
+                  *ngFor="let item of getServices(); trackBy: trackByItemId">
+
+                  <!-- Service Image -->
+                  <div class="item-image" (click)="goToProduct(item)">
+                    <img
+                      [src]="getItemImage(item)"
+                      [alt]="item.name"
+                      (error)="onImageError($event)" />
+                    <div class="service-badge">
+                      <i class="pi pi-calendar"></i>
+                    </div>
+                  </div>
+
+                  <!-- Service Details -->
+                  <div class="item-details">
+                    <div class="item-header">
+                      <h4 class="item-name" (click)="goToProduct(item)">{{ item.name }}</h4>
+                      <p-button
+                        icon="pi pi-times"
+                        [text]="true"
+                        severity="danger"
+                        size="small"
+                        (onClick)="removeItem(item)"
+                        pTooltip="Eliminar servicio"
+                        tooltipPosition="left">
+                      </p-button>
+                    </div>
+
+                    <p class="item-description">{{ getItemDescription(item) }}</p>
+
+                    <!-- Service Info -->
+                    <div class="service-info">
+                      <div class="info-item" *ngIf="item.duration">
+                        <i class="pi pi-clock"></i>
+                        <span>Duración: {{ formatDuration(item.duration) }}</span>
+                      </div>
+                      <div class="info-item" *ngIf="item.employeeName">
+                        <i class="pi pi-user"></i>
+                        <span>Especialista: {{ item.employeeName }}</span>
+                      </div>
+                      <div class="info-item" *ngIf="item.appointmentDateTime">
+                        <i class="pi pi-calendar"></i>
+                        <span>Fecha: {{ item.appointmentDateTime | date:'dd/MM/yyyy HH:mm' }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Pricing -->
+                    <div class="item-pricing">
+                      <span class="current-price">{{ formatPrice(item.price) }}</span>
+                      <span class="price-per-unit">por sesión</span>
+                    </div>
+                  </div>
+
+                  <!-- Service Actions -->
+                  <div class="service-actions">
+                    <p-button
+                      label="Reagendar"
+                      icon="pi pi-calendar"
+                      [outlined]="true"
+                      size="small">
+                    </p-button>
+                  </div>
+
+                  <!-- Service Total -->
+                  <div class="item-total">
+                    <div class="total-price">{{ formatPrice(item.price * item.quantity) }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Promo Code Section -->
+            <div class="promo-code-section">
+              <div class="promo-header" (click)="togglePromoCodeInput()">
+                <h3 class="promo-title">
+                  <i class="pi pi-tag"></i>
+                  Código Promocional
+                  <span class="applied-badge" *ngIf="appliedPromoCode">
+                    <i class="pi pi-check"></i>
+                    Aplicado
+                  </span>
+                </h3>
+                <i class="pi" [class]="showPromoCodeInput ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+              </div>
+
+              <!-- Applied Promo Code -->
+              <div class="applied-promo" *ngIf="appliedPromoCode">
+                <div class="applied-promo-content">
+                  <div class="applied-promo-info">
+                    <span class="promo-code">{{ appliedPromoCode.code }}</span>
+                    <span class="promo-description">{{ appliedPromoCode.description }}</span>
+                    <span class="promo-savings">{{ getDiscountSavingsText() }}</span>
+                  </div>
+                  <p-button
+                    icon="pi pi-times"
+                    [text]="true"
+                    severity="danger"
+                    size="small"
+                    (onClick)="removePromoCode()"
+                    pTooltip="Remover código"
+                    tooltipPosition="left">
+                  </p-button>
+                </div>
+              </div>
+
+              <!-- Promo Code Input -->
+              <div class="promo-input-section" *ngIf="showPromoCodeInput && !appliedPromoCode">
+                <div class="promo-input-group">
+                  <input
+                    type="text"
+                    pInputText
+                    placeholder="Ingresa tu código promocional..."
+                    [(ngModel)]="promoCodeInput"
+                    (keyup.enter)="applyPromoCode()"
+                    class="promo-input" />
+                  <p-button
+                    label="Aplicar"
+                    icon="pi pi-check"
+                    [loading]="applyingPromoCode"
+                    (onClick)="applyPromoCode()">
+                  </p-button>
+                </div>
+
+                <!-- Available Promo Codes -->
+                <div class="available-promos">
+                  <h5>Códigos disponibles:</h5>
+                  <div class="promo-suggestions">
+                    <div
+                      class="promo-suggestion"
+                      *ngFor="let promo of availablePromoCodes"
+                      (click)="promoCodeInput = promo.code">
+                      <div class="suggestion-header">
+                        <span class="suggestion-code">{{ promo.code }}</span>
+                        <span class="suggestion-discount" *ngIf="promo.discountType === 'percentage'">
+                          {{ (promo.discountValue * 100).toFixed(0) }}% OFF
+                        </span>
+                        <span class="suggestion-discount" *ngIf="promo.discountType === 'fixed'">
+                          S/{{ promo.discountValue }} OFF
+                        </span>
+                      </div>
+                      <p class="suggestion-description">{{ promo.description }}</p>
+                      <small class="suggestion-minimum" *ngIf="promo.minimumAmount">
+                        Monto mínimo: S/{{ promo.minimumAmount }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="col-12 lg:col-4">
+          <div class="cart-summary-section" [class.sticky]="showSummarySticky">
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+              <h3 class="summary-title">Resumen del Pedido</h3>
+
+              <div class="summary-content">
+                <!-- Subtotal -->
+                <div class="summary-row">
+                  <span class="summary-label">Subtotal ({{ cartItems.length }} productos)</span>
+                  <span class="summary-value">{{ formatPrice(getSubtotal()) }}</span>
+                </div>
+
+                <!-- Shipping -->
+                <div class="summary-row">
+                  <span class="summary-label">Envío</span>
+                  <span class="summary-value">
+                    <span *ngIf="cart?.shipping === 0" class="free-text">GRATIS</span>
+                    <span *ngIf="cart && cart.shipping > 0">{{ formatPrice(cart.shipping) }}</span>
+                  </span>
+                </div>
+
+                <!-- Tax -->
+                <div class="summary-row">
+                  <span class="summary-label">IGV (18%)</span>
+                  <span class="summary-value">{{ formatPrice(cart?.tax || 0) }}</span>
+                </div>
+
+                <!-- Discount -->
+                <div class="summary-row discount-row" *ngIf="cart && cart.discount > 0">
+                  <span class="summary-label">
+                    Descuento
+                    <span class="discount-code" *ngIf="appliedPromoCode">
+                      ({{ appliedPromoCode.code }})
+                    </span>
+                  </span>
+                  <span class="summary-value discount-value">
+                    -{{ formatPrice(cart.discount) }}
+                  </span>
+                </div>
+
+                <!-- Total -->
+                <div class="summary-row total-row">
+                  <span class="summary-label">Total</span>
+                  <span class="summary-value total-value">{{ formatPrice(cart?.total || 0) }}</span>
+                </div>
+              </div>
+
+              <!-- Shipping Options -->
+              <div class="shipping-options">
+                <h4 class="shipping-title">Opciones de Envío</h4>
+                <div class="shipping-list">
+                  <div
+                    class="shipping-option"
+                    *ngFor="let option of shippingOptions"
+                    [class.selected]="selectedShippingOption.id === option.id"
+                    (click)="updateShippingOption(option)">
+
+                    <div class="option-radio">
+                      <p-radioButton
+                        [name]="'shipping'"
+                        [value]="option"
+                        [(ngModel)]="selectedShippingOption">
+                      </p-radioButton>
+                    </div>
+
+                    <div class="option-content">
+                      <div class="option-header">
+                        <i [class]="option.icon" class="option-icon"></i>
+                        <span class="option-name">{{ option.name }}</span>
+                        <span class="option-price">
+                          <span *ngIf="option.price === 0" class="free-text">GRATIS</span>
+                          <span *ngIf="option.price > 0">{{ formatPrice(option.price) }}</span>
+                        </span>
+                      </div>
+                      <p class="option-description">{{ option.description }}</p>
+                      <div class="option-delivery">
+                        <i class="pi pi-clock"></i>
+                        <span>Estimado: {{ getEstimatedDeliveryDate() }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Checkout Button -->
+              <div class="checkout-section">
+                <p-button
+                  label="Proceder al Pago"
+                  icon="pi pi-credit-card"
+                  styleClass="checkout-btn w-full p-button-lg"
+                  (onClick)="proceedToCheckout()"
+                  [disabled]="cartItems.length === 0">
+                </p-button>
+
+                <!-- Security Info -->
+                <div class="security-info">
+                  <div class="security-item">
+                    <i class="pi pi-shield"></i>
+                    <span>Pago 100% seguro</span>
+                  </div>
+                  <div class="security-item">
+                    <i class="pi pi-lock"></i>
+                    <span>Datos protegidos SSL</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="help-section">
+              <h4 class="help-title">¿Necesitas ayuda?</h4>
+              <div class="help-options">
+                <div class="help-option">
+                  <i class="pi pi-phone"></i>
+                  <div class="help-content">
+                    <span class="help-label">Llámanos</span>
+                    <span class="help-value">+51 999 888 777</span>
+                  </div>
+                </div>
+                <div class="help-option">
+                  <i class="pi pi-comment"></i>
+                  <div class="help-content">
+                    <span class="help-label">Chat en vivo</span>
+                    <span class="help-value">Disponible 24/7</span>
+                  </div>
+                </div>
+                <div class="help-option">
+                  <i class="pi pi-envelope"></i>
+                  <div class="help-content">
+                    <span class="help-label">Email</span>
+                    <span class="help-value">soporteangiebraids.com</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Summary (Mobile) -->
+  <div class="sticky-summary" [class.visible]="showSummarySticky" *ngIf="cartItems.length > 0">
+    <div class="sticky-summary-content">
+      <div class="sticky-total">
+        <span class="sticky-label">Total:</span>
+        <span class="sticky-value">{{ formatPrice(cart?.total || 0) }}</span>
+      </div>
+      <p-button
+        label="Pagar"
+        icon="pi pi-credit-card"
+        styleClass="sticky-checkout-btn"
+        (onClick)="proceedToCheckout()">
+      </p-button>
+    </div>
+  </div>
+</div>
