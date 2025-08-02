@@ -82,50 +82,80 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
    * Load all service data
    */
   private loadServiceData(): void {
+    console.log('Loading service data for ID:', this.serviceId);
     this.loading = true;
 
-    forkJoin({
-      service: this.ecommerceService.getServiceDetail(this.serviceId),
-      relatedServices: this.ecommerceService.getFeaturedServices(4)
-    }).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (data) => {
-        this.service = data.service;
-        this.relatedServices = data.relatedServices.filter(s =>
-          s.serviceDTO.serviceId !== this.serviceId
-        );
+    // Cargar servicio primero
+    this.ecommerceService.getServiceDetail(this.serviceId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (service) => {
+          console.log('Service detail loaded successfully:', service);
+          this.service = service;
 
-        // Setup service-specific data
-        this.setupServiceData();
-        this.updateBreadcrumb();
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading service data:', error);
-        this.loading = false;
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo cargar la información del servicio',
-          life: 5000
-        });
-      }
-    });
+          // Setup service-specific data
+          this.setupServiceData();
+          this.updateBreadcrumb();
+
+          // Cargar servicios relacionados por separado
+          this.loadRelatedServices();
+
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading service data:', error);
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo cargar la información del servicio',
+            life: 5000
+          });
+
+          // Redirect back to services list
+          this.router.navigate(['/ecommerce/services']);
+        }
+      });
+  }
+  /**
+   * Load related services separately
+   */
+  private loadRelatedServices(): void {
+    if (!this.service) return;
+
+    this.relatedServicesLoading = true;
+
+    this.ecommerceService.getFeaturedServices(4)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (services) => {
+          this.relatedServices = services.filter(s =>
+            s.serviceDTO.serviceId !== this.serviceId
+          );
+          this.relatedServicesLoading = false;
+          console.log('Related services loaded:', this.relatedServices);
+        },
+        error: (error) => {
+          console.error('Error loading related services:', error);
+          this.relatedServicesLoading = false;
+          // No mostrar error al usuario para servicios relacionados
+        }
+      });
   }
 
   /**
    * Setup service-specific data
    */
   private setupServiceData(): void {
+    console.log('Setting up service data:', this.service);
     if (!this.service) return;
 
-    // Setup reviews
+    // Setup reviews con valores por defecto seguros
     this.reviews = this.service.reviews || [];
     this.totalReviews = this.reviews.length;
     this.averageRating = this.service.averageRating || 0;
 
-    // Setup employees
+    // Setup employees con valores por defecto seguros
     this.availableEmployees = this.service.availableEmployees || [];
     if (this.availableEmployees.length > 0) {
       this.selectedEmployee = this.availableEmployees[0];
@@ -134,6 +164,12 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
     // Setup time slots
     this.availableTimeSlots = this.service.availableTimeSlots || [];
     this.generateTimeSlots();
+
+    console.log('Service data setup complete:', {
+      reviews: this.reviews.length,
+      employees: this.availableEmployees.length,
+      timeSlots: this.availableTimeSlots.length
+    });
   }
 
   /**
@@ -178,7 +214,7 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
       { label: 'Servicios', routerLink: '/ecommerce/services' }
     ];
 
-    if (this.service) {
+    if (this.service && this.service.serviceDTO) {
       this.breadcrumbItems.push({
         label: this.service.serviceDTO.serviceName
       });
@@ -189,9 +225,17 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
    * Add service to cart
    */
   addToCart(): void {
-    if (!this.service) return;
+    if (!this.service || !this.service.serviceDTO) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Error',
+      detail: 'No se pudo agregar el servicio al carrito',
+      life: 3000
+    });
+    return;
+  }
 
-    this.addingToCart = true;
+  this.addingToCart = true;
 
     const cartItem: CartItem = {
       id: `service_${this.service.serviceDTO.serviceId}_${Date.now()}`,
@@ -313,27 +357,40 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
    * Check if service has discount
    */
   hasDiscount(): boolean {
-    return this.service!.responseCategoryWIthoutServices?.promotionDTOList?.length > 0;
+    if (!this.service || !this.service.responseCategoryWIthoutServices) {
+      return false;
+    }
+    return !!(this.service.responseCategoryWIthoutServices.promotionDTOList &&
+              this.service.responseCategoryWIthoutServices.promotionDTOList.length > 0);
   }
-
   /**
    * Get discount percentage
    */
   getDiscountPercentage(): number {
     if (!this.hasDiscount() || !this.service) return 0;
 
-    const promotion = this.service.responseCategoryWIthoutServices.promotionDTOList[0];
-    return Math.round(promotion.promotionDiscountRate * 100);
+    const promotions = this.service.responseCategoryWIthoutServices.promotionDTOList;
+    if (!promotions || promotions.length === 0) return 0;
+
+    const promotion = promotions[0];
+    return Math.round(promotion.promotionDiscountRate);
   }
 
   /**
    * Get discounted price
    */
   getDiscountedPrice(): number {
-    if (!this.hasDiscount() || !this.service) return this.service?.serviceDTO.servicePrice || 0;
+    if (!this.hasDiscount() || !this.service) {
+      return this.service?.serviceDTO.servicePrice || 0;
+    }
+
+    const promotions = this.service.responseCategoryWIthoutServices.promotionDTOList;
+    if (!promotions || promotions.length === 0) {
+      return this.service.serviceDTO.servicePrice;
+    }
 
     const originalPrice = this.service.serviceDTO.servicePrice;
-    const discountRate = this.service.responseCategoryWIthoutServices.promotionDTOList[0].promotionDiscountRate;
+    const discountRate = promotions[0].promotionDiscountRate / 100; // Convertir porcentaje
 
     return originalPrice * (1 - discountRate);
   }
@@ -404,7 +461,7 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
    * Get category name
    */
   getCategoryName(): string {
-    return this.service?.responseCategoryWIthoutServices?.serviceCategoryDTO?.categoryName || '';
+    return this.service?.responseCategoryWIthoutServices?.serviceCategoryDTO?.categoryName || 'Sin categoría';
   }
 
   /**
@@ -459,4 +516,33 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
   trackByServiceId(index: number, service: EcommerceInterfaceService): number {
     return service.serviceDTO.serviceId;
   }
+  /**
+ * Track by function for employees
+ */
+trackByEmployeeId(index: number, employee: EmployeeOption): number {
+  return employee.id;
+}
+
+/**
+ * Check if service can be booked
+ */
+canBookService(): boolean {
+  return !!(this.service &&
+            this.selectedEmployee &&
+            this.selectedTimeSlot &&
+            this.isAvailableForBooking());
+}
+
+/**
+ * Get service duration in minutes
+ */
+getServiceDurationMinutes(): number {
+  if (!this.service || !this.service.serviceDTO.durationTimeAprox) return 0;
+
+  const timeParts = this.service.serviceDTO.durationTimeAprox.split(':');
+  const hours = parseInt(timeParts[0]) || 0;
+  const minutes = parseInt(timeParts[1]) || 0;
+
+  return (hours * 60) + minutes;
+}
 }

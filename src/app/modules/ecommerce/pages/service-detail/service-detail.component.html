@@ -41,13 +41,21 @@
 
         <!-- Service Info -->
         <div class="col-12 md:col-6">
-          <div class="service-info">
+          <div class="service-info" *ngIf="service && service.serviceDTO">
 
             <!-- Category -->
-            <div class="service-category">
-              {{ getCategoryName() }}
+            <div class="service-category" *ngIf="service && service.responseCategoryWIthoutServices">
+              <span class="category-link" [routerLink]="['/ecommerce/services']">
+                {{ getCategoryName() }}
+              </span>
             </div>
-
+            <div class="service-promotions"
+                *ngIf="service && service.responseCategoryWIthoutServices && service.responseCategoryWIthoutServices.promotionDTOList && service.responseCategoryWIthoutServices.promotionDTOList.length > 0">
+              <div class="promotion-item" *ngFor="let promotion of service.responseCategoryWIthoutServices.promotionDTOList">
+                <span class="promotion-name">{{ promotion.promotionName }}</span>
+                <span class="promotion-discount">-{{ promotion.promotionDiscountRate }}%</span>
+              </div>
+            </div>
             <!-- Title -->
             <h1 class="service-title">{{ service.serviceDTO.serviceName }}</h1>
 
@@ -291,7 +299,24 @@
       </div>
     </div>
   </div>
+  <!-- 4. Empleados disponibles - Más defensiva -->
+  <div class="available-employees" *ngIf="availableEmployees && availableEmployees.length > 0">
+    <h3>Selecciona un especialista:</h3>
+    <div class="employee-list">
+      <div class="employee-item"
+          *ngFor="let employee of availableEmployees; trackBy: trackByEmployeeId"
+          [class.selected]="selectedEmployee?.id === employee.id"
+          (click)="onEmployeeSelect(employee)">
+        <span>{{ employee.name }}</span>
+        <span *ngIf="employee.specialty">{{ employee.specialty }}</span>
+      </div>
+    </div>
+  </div>
 
+  <!-- 5. No hay empleados disponibles -->
+  <div class="no-employees" *ngIf="!availableEmployees || availableEmployees.length === 0">
+    <p>No hay especialistas disponibles en este momento.</p>
+  </div>
 </div>
 
 <!-- Loading State -->

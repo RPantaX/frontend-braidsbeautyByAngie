@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable, map, shareReplay, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../../environments/environments.prod';
 import { ApiResponse } from '../../../../@utils/interfaces/ApiResponse';
 import {
@@ -63,7 +63,9 @@ export class EcommerceService {
     return this.http.get<ApiResponse<ProductDetail>>(
       `${this.baseUrlProducts}/${productId}`
     ).pipe(
-      map(response => response.data)
+      map(response => {
+        console.log('Product detail loaded:', response.data);
+        return response.data})
     );
   }
 
@@ -156,10 +158,59 @@ export class EcommerceService {
    * Get service by ID with full details
    */
   getServiceDetail(serviceId: number): Observable<ServiceDetail> {
+    console.log('Service: Getting service detail for ID:', serviceId);
+
     return this.http.get<ApiResponse<ServiceDetail>>(
       `${this.baseUrlServices}/${serviceId}`
     ).pipe(
-      map(response => response.data)
+      tap(response => {
+        console.log('Service: Raw API response:', response);
+      }),
+      map(response => {
+        if (!response || !response.data) {
+          throw new Error('Invalid API response structure');
+        }
+
+        const serviceData = response.data;
+        console.log('Service: Service data extracted:', serviceData);
+
+        // Asegurar que los campos opcionales existan con valores por defecto
+        const enrichedService: ServiceDetail = {
+          ...serviceData,
+          reviews: serviceData.reviews || [],
+          averageRating: serviceData.averageRating || 0,
+          relatedServices: serviceData.relatedServices || [],
+          availableEmployees: serviceData.availableEmployees || [],
+          availableTimeSlots: serviceData.availableTimeSlots || [],
+          // Asegurar que responseCategoryWIthoutServices tenga promotionDTOList
+          responseCategoryWIthoutServices: {
+            ...serviceData.responseCategoryWIthoutServices,
+            promotionDTOList: serviceData.responseCategoryWIthoutServices?.promotionDTOList || [],
+            serviceCategoryDTO: serviceData.responseCategoryWIthoutServices?.serviceCategoryDTO || {
+              categoryId: 0,
+              categoryName: 'Sin categoría'
+            },
+            responseSubCategoryList: serviceData.responseCategoryWIthoutServices?.responseSubCategoryList || []
+          },
+          // Asegurar que serviceDTO existe
+          serviceDTO: {
+            ...serviceData.serviceDTO,
+            serviceId: serviceData.serviceDTO?.serviceId || serviceId,
+            serviceName: serviceData.serviceDTO?.serviceName || 'Servicio sin nombre',
+            serviceDescription: serviceData.serviceDTO?.serviceDescription || '',
+            servicePrice: serviceData.serviceDTO?.servicePrice || 0,
+            serviceImage: serviceData.serviceDTO?.serviceImage || '',
+            durationTimeAprox: serviceData.serviceDTO?.durationTimeAprox || '01:00'
+          }
+        };
+
+        console.log('Service: Enriched service data:', enrichedService);
+        return enrichedService;
+      }),
+      catchError(error => {
+        console.error('Service: Error getting service detail:', error);
+        throw error;
+      })
     );
   }
 

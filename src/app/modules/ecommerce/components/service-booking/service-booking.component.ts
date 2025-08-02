@@ -218,33 +218,34 @@ interface TimePeriod {
 
       <!-- Booking Help -->
       <div class="booking-help">
-        <p-accordionTab header="¿Necesitas ayuda?">
-          <div class="help-content">
-            <div class="help-item">
-              <i class="pi pi-phone"></i>
-              <div>
-                <h5>Llámanos</h5>
-                <p>+51 123 456 789</p>
+        <p-accordion>
+          <p-accordionTab header="¿Necesitas ayuda?">
+            <div class="help-content">
+              <div class="help-item">
+                <i class="pi pi-phone"></i>
+                <div>
+                  <h5>Llámanos</h5>
+                  <p>+51 123 456 789</p>
+                </div>
+              </div>
+              <div class="help-item">
+                <i class="pi pi-envelope"></i>
+                <div>
+                  <h5>Envíanos un email</h5>
+                  <p>reservasangiebraids.com</p>
+                </div>
+              </div>
+              <div class="help-item">
+                <i class="pi pi-question-circle"></i>
+                <div>
+                  <h5>Preguntas frecuentes</h5>
+                  <p>Consulta nuestras FAQ para resolver dudas comunes</p>
+                </div>
               </div>
             </div>
-            <div class="help-item">
-              <i class="pi pi-envelope"></i>
-              <div>
-                <h5>Envíanos un email</h5>
-                <p>reservasangiebraids.com</p>
-              </div>
-            </div>
-            <div class="help-item">
-              <i class="pi pi-question-circle"></i>
-              <div>
-                <h5>Preguntas frecuentes</h5>
-                <p>Consulta nuestras FAQ para resolver dudas comunes</p>
-              </div>
-            </div>
-          </div>
-        </p-accordionTab>
+          </p-accordionTab>
+        </p-accordion>
       </div>
-    </div>
   `,
   //styleUrls: ['./service-booking.component.scss']
 })

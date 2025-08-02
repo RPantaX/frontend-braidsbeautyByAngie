@@ -110,44 +110,61 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
    * Load product detail and related data
    */
   private loadProductDetail(productId: number): void {
+    console.log('Loading product detail for ID:', productId);
     this.loading = true;
 
-    forkJoin({
-      product: this.ecommerceService.getProductDetail(productId),
-      wishlistStatus: this.ecommerceService.isInWishlist(productId)
-    }).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (data) => {
-        this.product = data.product;
-        this.isInWishlist = data.wishlistStatus;
+    // Cargar producto primero
+    this.ecommerceService.getProductDetail(productId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (product) => {
+          console.log('Product detail loaded successfully:', product);
+          this.product = product;
 
-        this.setupProductData();
-        this.loadRelatedProducts();
-        this.updateBreadcrumb();
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading product detail:', error);
-        this.loading = false;
+          // Cargar estado de wishlist por separado
+          this.loadWishlistStatus(productId);
 
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo cargar el producto',
-          life: 5000
-        });
+          // Configurar datos del producto
+          this.setupProductData();
+          this.loadRelatedProducts();
+          this.updateBreadcrumb();
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading product detail:', error);
+          this.loading = false;
 
-        // Redirect back to products list
-        this.router.navigate(['/ecommerce/products']);
-      }
-    });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo cargar el producto',
+            life: 5000
+          });
+
+          // Redirect back to products list
+          this.router.navigate(['/ecommerce/products']);
+        }
+      });
+    }
+    private loadWishlistStatus(productId: number): void {
+    this.ecommerceService.isInWishlist(productId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (isInWishlist) => {
+          this.isInWishlist = isInWishlist;
+        },
+        error: (error) => {
+          console.error('Error loading wishlist status:', error);
+          this.isInWishlist = false; // Default value
+        }
+      });
   }
 
   /**
    * Setup product data after loading
    */
   private setupProductData(): void {
+    console.log('Setting up product data:', this.product);
     if (!this.product) return;
 
     // Setup images
@@ -156,11 +173,14 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     // Setup variations
     this.setupVariations();
 
-    // Setup reviews
+    // Setup reviews (con valores por defecto seguros)
     this.setupReviews();
 
     // Select default item
     this.selectDefaultItem();
+
+    // Track product view
+    this.trackProductView();
   }
 
   /**
@@ -241,9 +261,16 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   private setupReviews(): void {
     if (!this.product) return;
 
+    // Inicializar con valores por defecto seguros
     this.reviews = this.product.reviews || [];
     this.averageRating = this.product.averageRating || 0;
     this.totalReviews = this.reviews.length;
+
+    console.log('Reviews setup:', {
+      reviews: this.reviews,
+      averageRating: this.averageRating,
+      totalReviews: this.totalReviews
+    });
   }
 
   /**
@@ -558,7 +585,11 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
    * Check if product has discount
    */
   hasDiscount(): boolean {
-    return this.product!.responseCategory?.promotionDTOList?.length > 0;
+    if (!this.product || !this.product.responseCategory) {
+      return false;
+    }
+    return !!(this.product.responseCategory.promotionDTOList &&
+              this.product.responseCategory.promotionDTOList.length > 0);
   }
 
   /**
@@ -567,8 +598,11 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   getDiscountPercentage(): number {
     if (!this.hasDiscount() || !this.product) return 0;
 
-    const promotion = this.product.responseCategory.promotionDTOList[0];
-    return Math.round(promotion.promotionDiscountRate * 100);
+    const promotions = this.product.responseCategory.promotionDTOList;
+    if (!promotions || promotions.length === 0) return 0;
+
+    const promotion = promotions[0];
+    return Math.round(promotion.promotionDiscountRate);
   }
 
   /**
@@ -586,7 +620,10 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
     if (!this.hasDiscount() || !this.product) return originalPrice;
 
-    const discountRate = this.product.responseCategory.promotionDTOList[0].promotionDiscountRate;
+    const promotions = this.product.responseCategory.promotionDTOList;
+    if (!promotions || promotions.length === 0) return originalPrice;
+
+    const discountRate = promotions[0].promotionDiscountRate / 100; // Convertir porcentaje
     return originalPrice * (1 - discountRate);
   }
 
