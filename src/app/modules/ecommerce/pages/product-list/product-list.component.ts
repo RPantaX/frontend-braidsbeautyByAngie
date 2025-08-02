@@ -62,7 +62,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
   viewMode: 'grid' | 'list' = 'grid';
   showFilters = false;
   searchTerm = '';
-
+  // Price range for slider - USAR PROPIEDADES SIMPLES
+  priceRangeValues: number[] = [0, 1000];
+  currentSortOptionValue: SortOption = SortOption.NAME_ASC;
   // Price range for slider
   private _priceRangeValues: number[] = [0, 1000];
 
@@ -114,8 +116,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
       this.viewMode = savedViewMode;
     }
 
-    this.setupRouteSubscription();
-    //this.loadFilterOptions();
+
+    this.loadFilterOptions();
   }
 
   ngOnDestroy(): void {
@@ -161,8 +163,34 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
     // Update active filters for UI
     this.updateActiveFilters();
+    this.updateCurrentSortOption();
   }
+  private updateCurrentSortOption(): void {
+    const current = `${this.currentFilters.sortBy}_${this.currentFilters.sortDirection}`;
 
+    switch (current.toLowerCase()) {
+      case 'name_asc':
+        this.currentSortOptionValue = SortOption.NAME_ASC;
+        break;
+      case 'name_desc':
+        this.currentSortOptionValue = SortOption.NAME_DESC;
+        break;
+      case 'price_asc':
+        this.currentSortOptionValue = SortOption.PRICE_ASC;
+        break;
+      case 'price_desc':
+        this.currentSortOptionValue = SortOption.PRICE_DESC;
+        break;
+      case 'newest_desc':
+        this.currentSortOptionValue = SortOption.NEWEST;
+        break;
+      case 'rating_desc':
+        this.currentSortOptionValue = SortOption.RATING_DESC;
+        break;
+      default:
+        this.currentSortOptionValue = SortOption.NAME_ASC;
+    }
+  }
   /**
    * Update active filters object for UI display
    */
@@ -171,16 +199,25 @@ export class ProductListComponent implements OnInit, OnDestroy {
       categories: this.currentFilters.categoryIds || [],
       priceRange: {
         min: this.currentFilters.minPrice || 0,
-        max: this.currentFilters.maxPrice || 1000
+        max: this.currentFilters.maxPrice || (this.filterOptions?.priceRange?.max || 1000)
       },
       inStock: this.currentFilters.inStock || false,
       hasPromotion: this.currentFilters.hasPromotion || false,
       variations: [] // TODO: Parse variation filters
     };
-    this._priceRangeValues = [
-    this.activeFilters.priceRange.min,
-    this.activeFilters.priceRange.max
+
+    // Update price range values
+    this.priceRangeValues = [
+      this.activeFilters.priceRange.min,
+      this.activeFilters.priceRange.max
     ];
+
+    // Update category selection state ONLY if filterOptions is available
+    if (this.filterOptions?.categories) {
+      this.filterOptions.categories.forEach(category => {
+        category.selected = this.currentFilters.categoryIds?.includes(category.id) || false;
+      });
+    }
   }
 
   /**
@@ -203,17 +240,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
         next: (options) => {
           console.log('Filter options loaded:', options);
           this.filterOptions = options;
-          // Initialize selected state for categories
-          if (this.filterOptions?.categories) {
-            this.filterOptions.categories.forEach(category => {
-              category.selected = this.currentFilters.categoryIds?.includes(category.id) || false;
-            });
-          }
+
           if (this.filterOptions?.priceRange) {
             this.activeFilters.priceRange.max = this.filterOptions.priceRange.max;
-            this._priceRangeValues[1] = this.filterOptions.priceRange.max;
+            this.priceRangeValues = [
+              this.filterOptions.priceRange.min || 0,
+              this.filterOptions.priceRange.max || 1000
+            ];
           }
           this.filtersLoading = false;
+
+          this.setupRouteSubscription();
         },
         error: (error) => {
           console.error('Error loading filter options:', error);
@@ -224,6 +261,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
             detail: 'No se pudieron cargar las opciones de filtro',
             life: 5000
           });
+          this.setupRouteSubscription();
         }
       });
   }
@@ -449,11 +487,6 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.updateActiveFilters();
 
     // Update category selection state
-    if (this.filterOptions?.categories) {
-      this.filterOptions.categories.forEach(category => {
-        category.selected = this.currentFilters.categoryIds?.includes(category.id) || false;
-      });
-    }
 
     // Convert filters to query params
     const queryParams: any = {};
@@ -727,20 +760,39 @@ export class ProductListComponent implements OnInit, OnDestroy {
    * Handle price range change
    */
   onPriceRangeChange(event: any): void {
+    console.log('💰 Price range changed:', event);
     if (event && event.values && Array.isArray(event.values)) {
-      this._priceRangeValues = event.values;
+      this.priceRangeValues = [...event.values]; // Create new array
       this.activeFilters.priceRange = {
         min: event.values[0],
         max: event.values[1]
       };
-      this.onFiltersChange(this.activeFilters);
+
+      // Debounce this call to avoid too many updates
+      this.debouncedFilterUpdate();
     }
   }
-
+    /**
+   * Debounced filter update to avoid too many calls
+   */
+  private debouncedFilterUpdate = this.debounce(() => {
+    this.onFiltersChange(this.activeFilters);
+  }, 500);
+  private debounce(func: Function, wait: number) {
+    let timeout: any;
+    return function executedFunction(...args: any[]) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
   /**
    * Get current sort option for dropdown
    */
-  get currentSortOption(): SortOption {
+  /*get currentSortOption(): SortOption {
     const current = `${this.currentFilters.sortBy}_${this.currentFilters.sortDirection}`;
 
     switch (current.toLowerCase()) {
@@ -752,7 +804,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       case 'rating_desc': return SortOption.RATING_DESC;
       default: return SortOption.NAME_ASC;
     }
-  }
+  }*/
 
   /**
    * Set current sort option
@@ -764,23 +816,23 @@ export class ProductListComponent implements OnInit, OnDestroy {
   /**
    * Get price range values for slider
    */
-  get priceRangeValues(): number[] {
+  /*get priceRangeValues(): number[] {
     return [
       this.activeFilters.priceRange.min,
       this.activeFilters.priceRange.max
     ];
-  }
+  }*/
 
   /**
    * Set price range values from slider
    */
-  set priceRangeValues(values: number[]) {
+  /*set priceRangeValues(values: number[]) {
     this._priceRangeValues = values;
     this.activeFilters.priceRange = {
       min: values[0],
       max: values[1]
     };
-  }
+  }*/
   /**
    * Check if category name should be displayed
    */

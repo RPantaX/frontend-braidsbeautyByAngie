@@ -174,8 +174,8 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
    */
   private updateBreadcrumb(): void {
     this.breadcrumbItems = [
-      { label: 'Inicio', routerLink: '/shop/home' },
-      { label: 'Servicios', routerLink: '/shop/services' }
+      { label: 'Inicio', routerLink: '/ecommerce/home' },
+      { label: 'Servicios', routerLink: '/ecommerce/services' }
     ];
 
     if (this.service) {
@@ -236,7 +236,7 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
     }
 
     this.addToCart();
-    this.router.navigate(['/shop/checkout']);
+    this.router.navigate(['/ecommerce/checkout']);
   }
 
   /**
@@ -269,14 +269,14 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
    * Navigate to related service
    */
   goToRelatedService(service: EcommerceInterfaceService): void {
-    this.router.navigate(['/shop/services', service.serviceDTO.serviceId]);
+    this.router.navigate(['/ecommerce/services', service.serviceDTO.serviceId]);
   }
 
   /**
    * Go back to services list
    */
   goBackToServices(): void {
-    this.router.navigate(['/shop/services']);
+    this.router.navigate(['/ecommerce/services']);
   }
 
   /**

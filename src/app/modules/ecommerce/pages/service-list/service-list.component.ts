@@ -62,6 +62,11 @@ export class ServiceListComponent implements OnInit, OnDestroy {
   showFilters = false;
   searchTerm = '';
 
+  // USAR PROPIEDADES SIMPLES EN LUGAR DE GETTERS/SETTERS
+  priceRangeValues: number[] = [0, 500];
+  durationRangeValues: number[] = [0, 240];
+  currentSortOptionValue: string = 'name_asc';
+
   // Options
   viewModes: ViewMode[] = [
     { value: 'grid', label: 'Cuadrícula', icon: 'pi pi-th-large' },
@@ -104,15 +109,13 @@ export class ServiceListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.setupRouteSubscription();
-    this.loadFilterOptions();
-    this.setupSearchDebounce();
 
     // Load view mode from localStorage
     const savedViewMode = localStorage.getItem('service-view-mode') as 'grid' | 'list';
     if (savedViewMode) {
       this.viewMode = savedViewMode;
     }
+    this.loadFilterOptions();
   }
 
   ngOnDestroy(): void {
@@ -158,31 +161,52 @@ export class ServiceListComponent implements OnInit, OnDestroy {
     this.pageSize = this.currentFilters.pageSize || 12;
 
     this.updateActiveFilters();
+    this.updateCurrentSortOption();
   }
-
-  /**
+  private updateCurrentSortOption(): void {
+    this.currentSortOptionValue = `${this.currentFilters.sortBy}_${this.currentFilters.sortDirection}`;
+  }
+   /**
    * Update active filters object for UI display
    */
   private updateActiveFilters(): void {
-    this.activeFilters = {
-      categories: this.currentFilters.categoryIds || [],
+    // Create new object to avoid circular references
+    const newActiveFilters = {
+      categories: [...(this.currentFilters.categoryIds || [])],
       priceRange: {
         min: this.currentFilters.minPrice || 0,
-        max: this.currentFilters.maxPrice || 500
+        max: this.currentFilters.maxPrice || (this.filterOptions?.priceRange?.max || 500)
       },
       durationRange: {
         min: this.currentFilters.minDuration || 0,
-        max: this.currentFilters.maxDuration || 240
+        max: this.currentFilters.maxDuration || (this.filterOptions?.durationRange?.maxMinutes || 240)
       },
       isAvailable: this.currentFilters.isAvailable || false,
       hasPromotion: this.currentFilters.hasPromotion || false
     };
 
-    // Update filter options selected state
-    if (this.filterOptions?.categories) {
-      this.filterOptions.categories.forEach(category => {
-        category.selected = this.activeFilters.categories.includes(category.id);
-      });
+    // Assign all at once to avoid multiple updates
+    this.activeFilters = newActiveFilters;
+
+    // Update range values safely
+    this.priceRangeValues = [
+      this.activeFilters.priceRange.min,
+      this.activeFilters.priceRange.max
+    ];
+
+    this.durationRangeValues = [
+      this.activeFilters.durationRange.min,
+      this.activeFilters.durationRange.max
+    ];
+
+    // Update category selection state ONLY if filterOptions is available
+    if (this.filterOptions?.categories?.length) {
+      // Use setTimeout to avoid change detection issues
+      setTimeout(() => {
+        this.filterOptions!.categories.forEach(category => {
+          category.selected = this.currentFilters.categoryIds?.includes(category.id) || false;
+        });
+      }, 0);
     }
   }
 
@@ -206,8 +230,26 @@ export class ServiceListComponent implements OnInit, OnDestroy {
         next: (options) => {
           console.log('Filter options loaded:', options);
           this.filterOptions = options;
-          this.updateActiveFilters(); // Update selected state
+          if (this.filterOptions?.priceRange) {
+            this.activeFilters.priceRange.max = this.filterOptions.priceRange.max;
+            this.priceRangeValues = [
+              this.filterOptions.priceRange.min || 0,
+              this.filterOptions.priceRange.max || 500
+            ];
+          }
+
+          if (this.filterOptions?.durationRange) {
+            this.activeFilters.durationRange.max = this.filterOptions.durationRange.maxMinutes;
+            this.durationRangeValues = [
+              this.filterOptions.durationRange.minMinutes || 0,
+              this.filterOptions.durationRange.maxMinutes || 240
+            ];
+          }
+
           this.filtersLoading = false;
+
+          // NOW setup route subscription after filter options are loaded
+          this.setupRouteSubscription();
         },
         error: (error) => {
           console.error('Error loading filter options:', error);
@@ -218,6 +260,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
             detail: 'No se pudieron cargar las opciones de filtro',
             life: 5000
           });
+          this.setupRouteSubscription();
         }
       });
   }
@@ -306,7 +349,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
    */
   private updateBreadcrumb(): void {
     this.breadcrumbItems = [
-      { label: 'Inicio', routerLink: '/shop/home' },
+      { label: 'Inicio', routerLink: '/ecommerce/home' },
       { label: 'Servicios' }
     ];
 
@@ -392,31 +435,88 @@ export class ServiceListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle category change - Added missing method
+   * Handle category change
    */
   onCategoryChange(category: CategoryOption): void {
-    // Update the categories in activeFilters
-    const currentCategories = [...this.activeFilters.categories];
+    if (!category || typeof category.id !== 'number') {
+      console.warn('Invalid category object provided to onCategoryChange');
+      return;
+    }
+
+    const currentCategories = [...(this.activeFilters.categories || [])];
 
     if (category.selected) {
-      // Add category if not already present
       if (!currentCategories.includes(category.id)) {
         currentCategories.push(category.id);
       }
     } else {
-      // Remove category
       const index = currentCategories.indexOf(category.id);
       if (index > -1) {
         currentCategories.splice(index, 1);
       }
     }
 
-    this.activeFilters.categories = currentCategories;
+    this.activeFilters = {
+      ...this.activeFilters,
+      categories: currentCategories
+    };
 
-    // Apply the filter
     this.onFiltersChange(this.activeFilters);
   }
+  /**
+   * Handle price range change
+   */
+  onPriceRangeChange(event: any): void {
+    console.log('💰 Price range changed:', event);
+    if (event && event.values && Array.isArray(event.values)) {
+      this.priceRangeValues = [...event.values]; // Create new array
+      this.activeFilters.priceRange = {
+        min: event.values[0],
+        max: event.values[1]
+      };
 
+      // Debounce this call to avoid too many updates
+      this.debouncedFilterUpdate();
+    }
+  }
+
+  /**
+   * Handle duration range change
+   */
+  onDurationRangeChange(event: any): void {
+    console.log('⏱️ Duration range changed:', event);
+    if (event && event.values && Array.isArray(event.values)) {
+      this.durationRangeValues = [...event.values]; // Create new array
+      this.activeFilters.durationRange = {
+        min: event.values[0],
+        max: event.values[1]
+      };
+
+      // Debounce this call to avoid too many updates
+      this.debouncedFilterUpdate();
+    }
+  }
+    /**
+   * Debounced filter update to avoid too many calls
+   */
+  debouncedFilterUpdate = this.debounce(() => {
+    this.onFiltersChange(this.activeFilters);
+  }, 500);
+
+    /**
+   * Simple debounce function
+   */
+  private debounce(func: Function, wait: number) {
+    let timeout: any;
+    return function executedFunction(...args: any[]) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
   /**
    * Handle filter changes from filter component
    */
@@ -442,11 +542,15 @@ export class ServiceListComponent implements OnInit, OnDestroy {
     this.searchTerm = '';
     this.activeFilters = {
       categories: [],
-      priceRange: { min: 0, max: 500 },
-      durationRange: { min: 0, max: 240 },
+      priceRange: { min: 0, max: this.filterOptions?.priceRange?.max || 500 },
+      durationRange: { min: 0, max: this.filterOptions?.durationRange?.maxMinutes || 240 },
       isAvailable: false,
       hasPromotion: false
     };
+
+    // Reset range values
+    this.priceRangeValues = [0, this.filterOptions?.priceRange?.max || 500];
+    this.durationRangeValues = [0, this.filterOptions?.durationRange?.maxMinutes || 240];
 
     // Reset category selections
     if (this.filterOptions?.categories) {
@@ -509,7 +613,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
    * Navigate to service detail
    */
   goToServiceDetail(service: EcommerceInterfaceService): void {
-    this.router.navigate(['/shop/services', service.serviceDTO.serviceId]);
+    this.router.navigate(['/ecommerce/services', service.serviceDTO.serviceId]);
   }
 
   /**
@@ -630,59 +734,5 @@ export class ServiceListComponent implements OnInit, OnDestroy {
    */
   trackByServiceId(index: number, service: EcommerceInterfaceService): number {
     return service.serviceDTO.serviceId;
-  }
-
-  /**
-   * Get current sort option for dropdown
-   */
-  get currentSortOption(): string {
-    return `${this.currentFilters.sortBy}_${this.currentFilters.sortDirection}`;
-  }
-
-  /**
-   * Set current sort option
-   */
-  set currentSortOption(value: string) {
-    // This setter is needed for the dropdown binding
-  }
-
-  /**
-   * Get price range values for slider
-   */
-  get priceRangeValues(): number[] {
-    return [
-      this.activeFilters.priceRange.min,
-      this.activeFilters.priceRange.max
-    ];
-  }
-
-  /**
-   * Set price range values from slider
-   */
-  set priceRangeValues(values: number[]) {
-    this.activeFilters.priceRange = {
-      min: values[0],
-      max: values[1]
-    };
-  }
-
-  /**
-   * Get duration range values for slider
-   */
-  get durationRangeValues(): number[] {
-    return [
-      this.activeFilters.durationRange.min,
-      this.activeFilters.durationRange.max
-    ];
-  }
-
-  /**
-   * Set duration range values from slider
-   */
-  set durationRangeValues(values: number[]) {
-    this.activeFilters.durationRange = {
-      min: values[0],
-      max: values[1]
-    };
   }
 }

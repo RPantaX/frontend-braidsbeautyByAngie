@@ -126,12 +126,12 @@ import { ServiceFilterOptions } from '../../../../shared/models/ecommerce/ecomme
         <h4 class="filter-title">Especialistas</h4>
         <div class="employee-filters">
           <div class="employee-item" *ngFor="let employee of filterOptions?.employees">
-            <!--<p-checkbox
+            <p-checkbox
               [(ngModel)]="employee.selected"
               binary="true"
               [inputId]="'emp-' + employee.id"
               (onChange)="onEmployeeChange(employee)">
-            </p-checkbox> -->
+            </p-checkbox>
             <label [for]="'emp-' + employee.id" class="employee-label">
               {{ employee.name }}
               <span class="employee-specialty" *ngIf="employee.specialty">

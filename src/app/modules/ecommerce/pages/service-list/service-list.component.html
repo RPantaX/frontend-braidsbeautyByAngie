@@ -4,7 +4,7 @@
   <!-- Breadcrumb -->
   <div class="breadcrumb-section">
     <div class="container">
-      <!--<app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>-->
+      <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
     </div>
   </div>
 
@@ -109,14 +109,13 @@
                 </p-checkbox>
                 <label [for]="'cat-' + category.id" class="category-label">
                   {{ category.name }}
-                  <span class="category-count" *ngIf="category.serviceCount">
+                  <span class="category-count" *ngIf="category.serviceCount && category.serviceCount > 0">
                     ({{ category.serviceCount }})
                   </span>
                 </label>
               </div>
             </div>
           </div>
-
           <!-- Price Range Filter -->
           <div class="filter-section">
             <h4 class="filter-section-title">Rango de Precio</h4>
@@ -131,6 +130,7 @@
                     currencyDisplay="symbol"
                     [min]="0"
                     [max]="activeFilters.priceRange.max"
+                    (onInput)="debouncedFilterUpdate()"
                     styleClass="price-input">
                   </p-inputNumber>
                 </div>
@@ -142,19 +142,25 @@
                     currency="PEN"
                     currencyDisplay="symbol"
                     [min]="activeFilters.priceRange.min"
+                    (onInput)="debouncedFilterUpdate()"
                     styleClass="price-input">
                   </p-inputNumber>
                 </div>
               </div>
               <p-slider
-                [(ngModel)]="priceRangeValues"
+                [ngModel]="priceRangeValues"
                 [range]="true"
-                [min]="filterOptions.priceRange.min"
-                [max]="filterOptions.priceRange.max"
+                [min]="filterOptions?.priceRange?.min || 0"
+                [max]="filterOptions?.priceRange?.max || 500"
                 [step]="10"
-                (onChange)="onFiltersChange(activeFilters)"
+                (onChange)="onPriceRangeChange($event)"
                 styleClass="price-slider">
               </p-slider>
+
+              <!-- Display current values -->
+              <div class="price-display">
+                <span>S/{{ priceRangeValues[0] || 0 }} - S/{{ priceRangeValues[1] || 500 }}</span>
+              </div>
             </div>
           </div>
 
@@ -170,6 +176,7 @@
                     [min]="0"
                     [max]="activeFilters.durationRange.max"
                     suffix=" min"
+                    (onInput)="debouncedFilterUpdate()"
                     styleClass="duration-input">
                   </p-inputNumber>
                 </div>
@@ -179,19 +186,25 @@
                     [(ngModel)]="activeFilters.durationRange.max"
                     [min]="activeFilters.durationRange.min"
                     suffix=" min"
+                    (onInput)="debouncedFilterUpdate()"
                     styleClass="duration-input">
                   </p-inputNumber>
                 </div>
               </div>
               <p-slider
-                [(ngModel)]="durationRangeValues"
+                [ngModel]="durationRangeValues"
                 [range]="true"
-                [min]="filterOptions.durationRange.minMinutes"
-                [max]="filterOptions.durationRange.maxMinutes"
+                [min]="filterOptions?.durationRange?.minMinutes || 0"
+                [max]="filterOptions?.durationRange?.maxMinutes || 240"
                 [step]="15"
-                (onChange)="onFiltersChange(activeFilters)"
+                (onChange)="onDurationRangeChange($event)"
                 styleClass="duration-slider">
               </p-slider>
+
+              <!-- Display current values -->
+              <div class="duration-display">
+                <span>{{ durationRangeValues[0] || 0 }} min - {{ durationRangeValues[1] || 240 }} min</span>
+              </div>
             </div>
           </div>
 
@@ -255,7 +268,7 @@
               <label class="sort-label">Ordenar por:</label>
               <p-dropdown
                 [options]="sortOptions"
-                [(ngModel)]="currentSortOption"
+                [(ngModel)]="currentSortOptionValue"
                 optionLabel="label"
                 optionValue="value"
                 (onChange)="onSortChange($event.value)"
@@ -309,11 +322,11 @@
                 class="col-12 md:col-6 lg:col-4"
                 *ngFor="let service of services; trackBy: trackByServiceId">
 
-                <!--<app-service-card
+                <app-service-card
                   [service]="service"
                   (onViewDetails)="goToServiceDetail($event)"
                   (onAddToCart)="addToCart($event)">
-                </app-service-card>-->
+                </app-service-card>
               </div>
             </div>
           </div>

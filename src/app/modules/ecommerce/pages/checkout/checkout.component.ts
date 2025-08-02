@@ -187,7 +187,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
         // Check if cart is empty
         if (cart.items.length === 0) {
-          this.router.navigate(['/shop/cart']);
+          this.router.navigate(['/ecommerce/cart']);
         }
       });
   }
@@ -368,7 +368,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    * Continue shopping
    */
   continueShopping(): void {
-    this.router.navigate(['/shop/products']);
+    this.router.navigate(['/ecommerce/products']);
   }
 
   /**

@@ -239,6 +239,9 @@ export interface EmployeeOption {
   id: number;
   name: string;
   specialty?: string;
+  yearsExperience? : number;
+  rating?: number;
+  selected?: boolean;
 }
 
 // ============================================================================
@@ -268,6 +271,12 @@ export interface Review {
   comment: string;
   date: Date;
   verified?: boolean;
+  helpfulCount?: number;
+  images?: string[]; // URLs of review images
+  storeResponse?: {
+    message: string;
+    date : Date;
+  };
 }
 
 export interface ProductSpecification {

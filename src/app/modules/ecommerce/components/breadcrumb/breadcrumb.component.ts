@@ -13,7 +13,7 @@ interface BreadcrumbItem {
     <nav class="breadcrumb-nav" aria-label="Breadcrumb">
       <ol class="breadcrumb-list">
         <li class="breadcrumb-item">
-          <a routerLink="/shop/home" class="breadcrumb-link">
+          <a routerLink="/ecommerce/home" class="breadcrumb-link">
             <i class="pi pi-home"></i>
             <span class="sr-only">Inicio</span>
           </a>

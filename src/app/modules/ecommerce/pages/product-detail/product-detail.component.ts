@@ -139,7 +139,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
         });
 
         // Redirect back to products list
-        this.router.navigate(['/shop/products']);
+        this.router.navigate(['/ecommerce/products']);
       }
     });
   }
@@ -403,11 +403,11 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     if (!this.product) return;
 
     this.breadcrumbItems = [
-      { label: 'Inicio', routerLink: '/shop/home' },
-      { label: 'Productos', routerLink: '/shop/products' },
+      { label: 'Inicio', routerLink: '/ecommerce/home' },
+      { label: 'Productos', routerLink: '/ecommerce/products' },
       {
         label: this.product.responseCategory.productCategoryName,
-        routerLink: '/shop/products',
+        routerLink: '/ecommerce/products',
         queryParams: { category: this.product.responseCategory.productCategoryId }
       },
       { label: this.product.productName }
@@ -484,7 +484,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       acceptLabel: 'Ir al Carrito',
       rejectLabel: 'Seguir Comprando',
       accept: () => {
-        this.router.navigate(['/shop/cart']);
+        this.router.navigate(['/ecommerce/cart']);
       }
     });
   }
@@ -495,7 +495,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   buyNow(): void {
     this.addToCart();
     setTimeout(() => {
-      this.router.navigate(['/shop/cart']);
+      this.router.navigate(['/ecommerce/cart']);
     }, 500);
   }
 
@@ -530,7 +530,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
    * Navigate to related product
    */
   goToRelatedProduct(product: EcommerceProduct): void {
-    this.router.navigate(['/shop/products', product.productId]);
+    this.router.navigate(['/ecommerce/products', product.productId]);
   }
 
   /**

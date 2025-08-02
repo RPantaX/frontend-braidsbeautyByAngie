@@ -119,7 +119,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
   // Breadcrumb
   breadcrumbItems = [
-    { label: 'Inicio', routerLink: '/shop/home' },
+    { label: 'Inicio', routerLink: '/ecommerce/home' },
     { label: 'Carrito de Compras' }
   ];
 
@@ -441,9 +441,9 @@ export class CartComponent implements OnInit, OnDestroy {
    */
   goToProduct(item: CartItem): void {
     if (item.type === 'product' && item.productId) {
-      this.router.navigate(['/shop/products', item.productId]);
+      this.router.navigate(['/ecommerce/products', item.productId]);
     } else if (item.type === 'service' && item.serviceId) {
-      this.router.navigate(['/shop/services', item.serviceId]);
+      this.router.navigate(['/ecommerce/services', item.serviceId]);
     }
   }
 
@@ -451,7 +451,7 @@ export class CartComponent implements OnInit, OnDestroy {
    * Continue shopping
    */
   continueShopping(): void {
-    this.router.navigate(['/shop/products']);
+    this.router.navigate(['/ecommerce/products']);
   }
 
   /**
@@ -468,7 +468,7 @@ export class CartComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.router.navigate(['/shop/checkout']);
+    this.router.navigate(['/ecommerce/checkout']);
   }
 
   /**
@@ -836,7 +836,7 @@ export class CartComponent implements OnInit, OnDestroy {
    * Share cart with someone
    */
   shareCart(): void {
-    const cartUrl = `${window.location.origin}/shop/cart?shared=${btoa(JSON.stringify({
+    const cartUrl = `${window.location.origin}/ecommerce/cart?shared=${btoa(JSON.stringify({
       items: this.cartItems.map(item => ({
         type: item.type,
         id: item.productId || item.serviceId,

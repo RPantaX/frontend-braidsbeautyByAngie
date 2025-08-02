@@ -58,7 +58,7 @@ interface TimePeriod {
               <p class="employee-specialty" *ngIf="employee.specialty">
                 {{ employee.specialty }}
               </p>
-              <!--<div class="employee-rating" *ngIf="employee.rating">
+              <div class="employee-rating" *ngIf="employee.rating">
                 <p-rating
                   [(ngModel)]="employee.rating"
                   [readonly]="true"
@@ -69,7 +69,7 @@ interface TimePeriod {
               </div>
               <p class="employee-experience" *ngIf="employee.yearsExperience">
                 {{ employee.yearsExperience }} años de experiencia
-              </p> -->
+              </p>
             </div>
 
             <div class="selection-indicator" *ngIf="selectedEmployee?.id === employee.id">

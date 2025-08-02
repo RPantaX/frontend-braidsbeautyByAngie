@@ -51,7 +51,7 @@ export class EcommerceHomeComponent implements OnInit, OnDestroy {
     subtitle: 'Explora nuestra colección premium de productos y servicios para el cuidado del cabello',
     backgroundImage: 'assets/images/hero-bg.jpg',
     ctaText: 'Explorar Productos',
-    ctaLink: '/shop/products'
+    ctaLink: '/ecommerce/products'
   };
 
   // Collections (categorías destacadas)
@@ -61,7 +61,7 @@ export class EcommerceHomeComponent implements OnInit, OnDestroy {
       title: 'Hombres',
       description: 'Explora nuestros distintivos estilos de trenzas para hombres.',
       image: 'assets/images/collections/men.jpg',
-      link: '/shop/hairstyles/men',
+      link: '/ecommerce/hairstyles/men',
       categoryId: 1
     },
     {
@@ -69,7 +69,7 @@ export class EcommerceHomeComponent implements OnInit, OnDestroy {
       title: 'Premium',
       description: 'Explora nuestros distintivos estilos de trenzas para hombres.',
       image: 'assets/images/collections/premium.jpg',
-      link: '/shop/hairstyles/premium',
+      link: '/ecommerce/hairstyles/premium',
       categoryId: 2
     },
     {
@@ -77,7 +77,7 @@ export class EcommerceHomeComponent implements OnInit, OnDestroy {
       title: 'Afro Naturals',
       description: 'Explora nuestros distintivos estilos de trenzas para hombres.',
       image: 'assets/images/collections/afro-naturals.jpg',
-      link: '/shop/hairstyles/afro-naturals',
+      link: '/ecommerce/hairstyles/afro-naturals',
       categoryId: 3
     },
     {
@@ -85,7 +85,7 @@ export class EcommerceHomeComponent implements OnInit, OnDestroy {
       title: 'Kids',
       description: 'Explora nuestros distintivos estilos de trenzas para hombres.',
       image: 'assets/images/collections/kids.jpg',
-      link: '/shop/hairstyles/kids',
+      link: '/ecommerce/hairstyles/kids',
       categoryId: 4
     },
     {
@@ -93,7 +93,7 @@ export class EcommerceHomeComponent implements OnInit, OnDestroy {
       title: 'Coralego',
       description: 'Explora nuestros distintivos estilos de trenzas para hombres.',
       image: 'assets/images/collections/coralego.jpg',
-      link: '/shop/hairstyles/coralego',
+      link: '/ecommerce/hairstyles/coralego',
       categoryId: 5
     }
   ];
@@ -430,7 +430,7 @@ export class EcommerceHomeComponent implements OnInit, OnDestroy {
    * Navigate to shop with search
    */
   searchProducts(searchTerm: string): void {
-    this.router.navigate(['/shop/products'], {
+    this.router.navigate(['/ecommerce/products'], {
       queryParams: { search: searchTerm }
     });
   }

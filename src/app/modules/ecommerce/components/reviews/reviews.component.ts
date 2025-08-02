@@ -194,7 +194,7 @@ import { Review } from '../../../../shared/models/ecommerce/ecommerce.interface'
               <p class="review-comment">{{ review.comment }}</p>
 
               <!-- Review Images -->
-              <!--<div class="review-images" *ngIf="review.images && review.images.length > 0">
+              <div class="review-images" *ngIf="review.images && review.images.length > 0">
                 <div class="image-grid">
                   <img
                     *ngFor="let image of review.images"
@@ -204,17 +204,17 @@ import { Review } from '../../../../shared/models/ecommerce/ecommerce.interface'
                     (click)="openImageGallery(review.images, image)" />
                 </div>
               </div>
-            </div> -->
+            </div>
 
             <!-- Store Response -->
-            <!--<div class="store-response" *ngIf="review.storeResponse">
+            <div class="store-response" *ngIf="review.storeResponse">
               <div class="response-header">
                 <i class="pi pi-reply"></i>
                 <strong>Respuesta del vendedor</strong>
                 <span class="response-date">{{ formatDate(review.storeResponse.date) }}</span>
               </div>
               <p class="response-content">{{ review.storeResponse.message }}</p>
-            </div>-->
+            </div>
           </div>
         </div>
 
@@ -416,10 +416,10 @@ export class ReviewsComponent {
    */
   likeReview(review: Review): void {
     // Implement like functionality
-    /*if (!review.helpfulCount) {
+    if (!review.helpfulCount) {
       review.helpfulCount = 0;
     }
-    review.helpfulCount++;*/
+    review.helpfulCount++;
   }
 
   /**
