@@ -1,0 +1,582 @@
+// service-booking-container.component.scss
+.service-booking-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  // ========== HEADER ==========
+  .booking-header {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+
+    .service-info {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+
+      .service-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 1px solid #e5e7eb;
+      }
+
+      .service-details {
+        flex: 1;
+
+        .service-name {
+          font-size: 1.75rem;
+          font-weight: 600;
+          color: #1f2937;
+          margin: 0 0 0.5rem 0;
+        }
+
+        .service-description {
+          color: #6b7280;
+          margin: 0 0 1rem 0;
+          line-height: 1.5;
+        }
+
+        .service-meta {
+          display: flex;
+          align-items: center;
+          gap: 2rem;
+
+          .service-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #059669;
+          }
+
+          .service-duration {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
+
+  // ========== PROGRESS STEPS ==========
+  .booking-progress {
+    margin-bottom: 2rem;
+
+    .progress-steps {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 25%;
+        right: 25%;
+        height: 2px;
+        background: #e5e7eb;
+        z-index: 1;
+      }
+
+      .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        position: relative;
+        z-index: 2;
+
+        .step-indicator {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: #e5e7eb;
+          color: #6b7280;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          transition: all 0.3s ease;
+
+          .step-number {
+            font-size: 0.875rem;
+          }
+        }
+
+        .step-label {
+          font-size: 0.875rem;
+          color: #6b7280;
+          text-align: center;
+          font-weight: 500;
+        }
+
+        &.active {
+          .step-indicator {
+            background: #3b82f6;
+            color: white;
+          }
+          .step-label {
+            color: #3b82f6;
+            font-weight: 600;
+          }
+        }
+
+        &.completed {
+          .step-indicator {
+            background: #10b981;
+            color: white;
+          }
+          .step-label {
+            color: #10b981;
+          }
+        }
+      }
+    }
+  }
+
+  // ========== MAIN CONTENT ==========
+  .booking-content {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 2rem;
+
+    .booking-main {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .booking-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+  }
+
+  // ========== CART SECTION ==========
+  .cart-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+
+    .cart-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0 0 1rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        color: #3b82f6;
+      }
+    }
+
+    .current-cart {
+      margin-bottom: 1.5rem;
+
+      h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #374151;
+        margin: 0 0 1rem 0;
+      }
+
+      .cart-items {
+        .cart-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem 0;
+          border-bottom: 1px solid #f3f4f6;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .item-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+
+            .item-image {
+              width: 40px;
+              height: 40px;
+              border-radius: 6px;
+              object-fit: cover;
+              border: 1px solid #e5e7eb;
+            }
+
+            .item-details {
+              .item-name {
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: #1f2937;
+                margin: 0 0 0.25rem 0;
+              }
+
+              .item-price {
+                font-size: 0.75rem;
+                color: #059669;
+                font-weight: 600;
+                margin: 0;
+              }
+            }
+          }
+
+          .item-quantity {
+            ::ng-deep .p-inputnumber {
+              .p-inputnumber-input {
+                width: 60px;
+                text-align: center;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #6b7280;
+
+      i {
+        font-size: 2rem;
+        color: #d1d5db;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        margin: 0.5rem 0;
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  // ========== ORDER SUMMARY ==========
+  .order-summary {
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0 0 1rem 0;
+    }
+
+    .summary-items {
+      margin-bottom: 1rem;
+
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .item-info {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          i {
+            color: #6b7280;
+            font-size: 0.875rem;
+          }
+
+          .item-name {
+            font-size: 0.875rem;
+            color: #374151;
+          }
+        }
+
+        .item-price {
+          font-weight: 600;
+          color: #1f2937;
+        }
+
+        &.service-item {
+          .item-info i {
+            color: #3b82f6;
+          }
+        }
+
+        &.product-item {
+          .item-info i {
+            color: #059669;
+          }
+        }
+      }
+    }
+
+    .summary-total {
+      border-top: 2px solid #e5e7eb;
+      padding-top: 1rem;
+      margin-bottom: 1.5rem;
+
+      .total-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .total-label {
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: #1f2937;
+        }
+
+        .total-amount {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #059669;
+        }
+      }
+    }
+
+    .order-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+
+  // ========== HELP SECTION ==========
+  .help-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0 0 1rem 0;
+    }
+
+    .help-options {
+      .help-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f3f4f6;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        i {
+          color: #3b82f6;
+          font-size: 1.25rem;
+          margin-top: 0.25rem;
+        }
+
+        div {
+          strong {
+            display: block;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+          }
+
+          p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 0.875rem;
+          }
+        }
+      }
+    }
+  }
+
+  // ========== SUCCESS MODAL ==========
+  ::ng-deep .success-dialog {
+    .p-dialog-content {
+      padding: 2rem;
+    }
+
+    .success-content {
+      text-align: center;
+
+      .success-icon {
+        margin-bottom: 1.5rem;
+
+        i {
+          font-size: 4rem;
+          color: #10b981;
+        }
+      }
+
+      h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 0.5rem 0;
+      }
+
+      p {
+        color: #6b7280;
+        margin: 0 0 2rem 0;
+      }
+
+      .order-details {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: left;
+
+        .detail-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 0;
+          border-bottom: 1px solid #e5e7eb;
+
+          &:last-child {
+            border-bottom: none;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            border-top: 2px solid #d1d5db;
+          }
+
+          .label {
+            color: #6b7280;
+            font-weight: 500;
+          }
+
+          .value {
+            color: #1f2937;
+            font-weight: 600;
+
+            &.total {
+              font-size: 1.25rem;
+              color: #059669;
+            }
+          }
+        }
+      }
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding-top: 1rem;
+    }
+  }
+
+  // ========== RESPONSIVE DESIGN ==========
+  @media (max-width: 1024px) {
+    .booking-content {
+      grid-template-columns: 1fr;
+
+      .booking-sidebar {
+        order: -1;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .booking-header {
+      padding: 1.5rem;
+
+      .service-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+
+        .service-image {
+          width: 100px;
+          height: 100px;
+        }
+
+        .service-details {
+          .service-name {
+            font-size: 1.5rem;
+          }
+
+          .service-meta {
+            justify-content: center;
+            gap: 1rem;
+
+            .service-price {
+              font-size: 1.25rem;
+            }
+          }
+        }
+      }
+    }
+
+    .booking-progress {
+      .progress-steps {
+        &::before {
+          display: none;
+        }
+
+        .step {
+          .step-indicator {
+            width: 32px;
+            height: 32px;
+          }
+
+          .step-label {
+            font-size: 0.75rem;
+          }
+        }
+      }
+    }
+
+    .cart-section,
+    .help-section {
+      padding: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .booking-header {
+      .service-info {
+        .service-details {
+          .service-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+        }
+      }
+    }
+
+    .cart-section {
+      .cart-items {
+        .cart-item {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0.75rem;
+
+          .item-quantity {
+            align-self: center;
+          }
+        }
+      }
+    }
+  }
+}

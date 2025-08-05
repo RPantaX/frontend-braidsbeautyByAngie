@@ -195,7 +195,8 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
               endTime: `${(hour + 1).toString().padStart(2, '0')}:00`,
               available: Math.random() > 0.3, // 70% chance of being available
               employeeId: employee.id,
-              employeeName: employee.name
+              employeeName: employee.name,
+              scheduleId: Math.floor(Math.random() * 1000) // Mock schedule ID
             });
           });
         }

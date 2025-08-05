@@ -235,18 +235,10 @@
           <!-- Booking Tab -->
           <p-tabPanel header="Reservar Cita" leftIcon="pi pi-calendar">
             <div class="tab-content booking-tab">
-              <app-service-booking
+              <app-service-booking-container
                 [service]="service"
-                [availableEmployees]="availableEmployees"
-                [availableTimeSlots]="availableTimeSlots"
-                [(selectedEmployee)]="selectedEmployee"
-                [(selectedTimeSlot)]="selectedTimeSlot"
-                [(selectedDate)]="selectedDate"
-                (onEmployeeChange)="onEmployeeSelect($event)"
-                (onTimeSlotChange)="onTimeSlotSelect($event)"
-                (onDateChange)="onDateChange($event)"
-                (onBookAppointment)="bookAppointment()">
-              </app-service-booking>
+                *ngIf="service">
+              </app-service-booking-container>
             </div>
           </p-tabPanel>
 

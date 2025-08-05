@@ -68,6 +68,8 @@ import { AvatarModule } from 'primeng/avatar';
 import { DialogModule } from 'primeng/dialog';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ServiceBookingContainerComponent } from './components/service-booking-container/service-booking-container.component';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 @NgModule({
   declarations: [
@@ -88,6 +90,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     CartSummaryComponent,
     ProductImageGalleryComponent,
     ServiceBookingComponent,
+    ServiceBookingContainerComponent,
     RelatedProductsComponent,
     ReviewsComponent,
     BreadcrumbComponent,
@@ -138,9 +141,11 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     AvatarModule,
     DialogModule,
     SelectButtonModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
   ],
   providers: [
+    MessageService,
+    ConfirmationService
     // Services are provided in root, no need to add here
   ]
 })

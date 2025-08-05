@@ -11,7 +11,8 @@ import {
   CategoryOption,
   CartItem,
   SortByServiceType,
-  SortDirectionType
+  SortDirectionType,
+  ServiceDetail
 } from '../../../../shared/models/ecommerce/ecommerce.interface';
 
 interface ViewMode {
@@ -615,7 +616,12 @@ export class ServiceListComponent implements OnInit, OnDestroy {
   goToServiceDetail(service: EcommerceInterfaceService): void {
     this.router.navigate(['/ecommerce/services', service.serviceDTO.serviceId]);
   }
-
+  quickBookService(service: EcommerceInterfaceService): void {
+    // Navigate to service detail with booking focus
+    this.router.navigate(['/ecommerce/services', service.serviceDTO.serviceId], {
+      fragment: 'booking'
+    });
+  }
   /**
    * Add service to cart
    */

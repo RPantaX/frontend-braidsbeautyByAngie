@@ -291,6 +291,7 @@ export interface TimeSlot {
   available: boolean;
   employeeId: number;
   employeeName: string;
+  scheduleId: number;
 }
 
 // ============================================================================
