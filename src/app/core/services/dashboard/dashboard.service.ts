@@ -19,7 +19,7 @@ export class DashboardService {
 
   constructor(private http: HttpClient) { }
 
-  /*getDashboardSummary(): Observable<DashboardSummary> {
+  getDashboardSummary(): Observable<DashboardSummary> {
     return this.http.get<ApiResponse<DashboardSummary>>(`${this.baseUrl}/summary`).pipe(
       map(response => response.data)
     );
@@ -60,8 +60,8 @@ export class DashboardService {
     return this.http.get<ApiResponse<TopProduct[]>>(`${this.baseUrl}/top-products`, { params }).pipe(
       map(response => response.data)
     );
-  }*/
-   getDashboardSummary(): Observable<DashboardSummary> {
+  }
+  /* getDashboardSummary(): Observable<DashboardSummary> {
     // Mock data temporalmente
     const mockData: DashboardSummary = {
       totalSalesThisMonth: 15482.50,
@@ -132,5 +132,5 @@ export class DashboardService {
     ];
 
     return of(mockData).pipe(delay(700));
-  }
+  }*/
 }

@@ -215,7 +215,7 @@ export class CartComponent implements OnInit, OnDestroy {
     this.ecommerceService.updateCartItemQuantity(item.id, quantity);
 
     // Simulate API delay
-    setTimeout(() => {
+    /*setTimeout(() => {
       this.updatingQuantity = false;
       this.messageService.add({
         severity: 'success',
@@ -223,7 +223,7 @@ export class CartComponent implements OnInit, OnDestroy {
         detail: `Cantidad de ${item.name} actualizada`,
         life: 2000
       });
-    }, 500);
+    }, 500);*/
   }
 
   /**
@@ -475,7 +475,7 @@ export class CartComponent implements OnInit, OnDestroy {
    * Get item image
    */
   getItemImage(item: CartItem): string {
-    return item.image || 'assets/images/product-placeholder.jpg';
+    return item.image || 'assets/no-image.png';
   }
 
   /**
@@ -622,7 +622,7 @@ export class CartComponent implements OnInit, OnDestroy {
   /**
    * Track by function for ngFor performance
    */
-  trackByItemId(index: number, item: CartItem): string {
+  trackByItemId(index: number, item: CartItem): number {
     return item.id;
   }
 

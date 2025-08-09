@@ -273,7 +273,7 @@ export class EcommerceHomeComponent implements OnInit, OnDestroy {
     }
 
     const cartItem: CartItem = {
-      id: `product_${product.productId}_${firstItem.productItemId}`,
+      id: firstItem.productItemId,
       type: 'product',
       productId: product.productId,
       productItemId: firstItem.productItemId,
@@ -304,7 +304,7 @@ export class EcommerceHomeComponent implements OnInit, OnDestroy {
    */
   addServiceToCart(service: ServiceModel): void {
     const cartItem: CartItem = {
-      id: `service_${service.serviceDTO.serviceId}`,
+      id: service.serviceDTO.serviceId,
       type: 'service',
       serviceId: service.serviceDTO.serviceId,
       name: service.serviceDTO.serviceName,

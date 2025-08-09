@@ -562,7 +562,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     }
 
     const cartItem: CartItem = {
-      id: `product_${product.productId}_${firstItem.productItemId}`,
+      id: firstItem.productItemId,
       type: 'product',
       productId: product.productId,
       productItemId: firstItem.productItemId,

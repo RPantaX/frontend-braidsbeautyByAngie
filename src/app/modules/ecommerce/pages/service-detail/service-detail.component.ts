@@ -239,7 +239,7 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
   this.addingToCart = true;
 
     const cartItem: CartItem = {
-      id: `service_${this.service.serviceDTO.serviceId}_${Date.now()}`,
+      id: this.service.serviceDTO.serviceId,
       type: 'service',
       serviceId: this.service.serviceDTO.serviceId,
       name: this.service.serviceDTO.serviceName,

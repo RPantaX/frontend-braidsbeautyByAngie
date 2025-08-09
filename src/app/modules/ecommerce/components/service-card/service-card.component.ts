@@ -40,7 +40,7 @@ import { EcommerceInterfaceService } from '../../../../shared/models/ecommerce/e
       <div class="service-info" (click)="viewDetails()">
         <div class="service-meta">
           <span class="service-category">
-            {{ service.responseCategoryWIthoutServices?.serviceCategoryDTO?.categoryName }}
+            {{ service.responseCategoryWIthoutServices.serviceCategoryDTO.categoryName || 'Sin categoría' }}
           </span>
           <span class="service-duration">
             {{ formatDuration(service.serviceDTO.durationTimeAprox) }}

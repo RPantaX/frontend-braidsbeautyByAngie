@@ -1,0 +1,386 @@
+<!-- Order Detail Template -->
+<div class="order-detail-container" *ngIf="!loading() && hasOrder()">
+  <!-- Header Section -->
+  <div class="page-header mb-4">
+    <div class="flex justify-content-between align-items-start">
+      <div>
+        <div class="flex align-items-center gap-3 mb-2">
+          <p-button
+            icon="pi pi-arrow-left"
+            [rounded]="true"
+            [outlined]="true"
+            (onClick)="goBack()"
+            pTooltip="Volver"
+            tooltipPosition="bottom">
+          </p-button>
+          <h1 class="text-3xl font-bold text-900 m-0">
+            Orden #{{ orderDetail()?.shopOrderId }}
+          </h1>
+          <p-tag
+            [value]="getStatusLabel(orderStatus())"
+            [severity]="getStatusSeverity(orderStatus())"
+            [icon]="getStatusIcon(orderStatus())"
+            [rounded]="true"
+            styleClass="text-sm">
+          </p-tag>
+        </div>
+        <p class="text-600 text-lg m-0">
+          Creada el {{ formatDate(orderDetail()?.sopOrderDate || '') }}
+        </p>
+      </div>
+
+      <div class="flex gap-2">
+        <p-button
+          label="Actualizar"
+          icon="pi pi-refresh"
+          [outlined]="true"
+          (onClick)="refreshOrder()">
+        </p-button>
+        <p-button
+          label="Imprimir"
+          icon="pi pi-print"
+          [outlined]="true"
+          (onClick)="printOrder()">
+        </p-button>
+        <p-button
+          label="Descargar Factura"
+          icon="pi pi-download"
+          severity="help"
+          (onClick)="downloadInvoice()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Left Column -->
+    <div class="col-12 lg:col-8">
+      <!-- Order Items -->
+      <p-card class="mb-4" *ngIf="hasProducts()">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3">
+            <i class="pi pi-shopping-bag text-primary"></i>
+            <span class="font-semibold text-xl">Productos</span>
+          </div>
+        </ng-template>
+
+        <div class="order-items">
+          <div class="item-row"
+               *ngFor="let product of orderDetail()?.responseProductItemDetailList; trackBy: trackByProductId">
+            <div class="flex align-items-center gap-4 p-3 border-bottom-1 surface-border">
+              <!-- Product Image -->
+              <div class="product-image">
+                <img
+                  [src]="getProductById(product.productItemId)?.productItemImage || 'assets/images/product-placeholder.jpg'"
+                  [alt]="'Producto ' + product.productItemId"
+                  class="w-4rem h-4rem border-round object-cover">
+              </div>
+
+              <!-- Product Info -->
+              <div class="flex-1">
+                <div class="flex justify-content-between align-items-start">
+                  <div>
+                    <h4 class="font-semibold text-900 mb-1">
+                      Producto #{{ product.productItemId }}
+                    </h4>
+                    <p class="text-600 mb-2">
+                      SKU: {{ getProductById(product.productItemId)?.productItemSKU }}
+                    </p>
+                    <div class="flex align-items-center gap-4">
+                      <span class="text-600">
+                        Cantidad: <strong>to do</strong>
+                      </span>
+                      <span class="text-600">
+                        Precio: <strong>{{ formatCurrency(product.productItemPrice) }}</strong>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xl font-bold text-900">
+                      {{ formatCurrency(product.productItemPrice) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Services -->
+      <p-card class="mb-4" *ngIf="hasServices()">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3">
+            <i class="pi pi-scissors text-primary"></i>
+            <span class="font-semibold text-xl">Servicios</span>
+          </div>
+        </ng-template>
+
+        <div class="services-list">
+          <div class="service-item"
+               *ngFor="let serviceDetail of orderDetail()?.responseReservationDetail?.responseWorkServiceDetails">
+            <div class="flex align-items-center gap-4 p-3 border-bottom-1 surface-border">
+              <!-- Service Image -->
+              <div class="service-image">
+                <img
+                  [src]="serviceDetail.serviceDTO.serviceImage || 'assets/images/service-placeholder.jpg'"
+                  [alt]="serviceDetail.serviceDTO.serviceName"
+                  class="w-4rem h-4rem border-round object-cover">
+              </div>
+
+              <!-- Service Info -->
+              <div class="flex-1">
+                <div class="flex justify-content-between align-items-start">
+                  <div>
+                    <h4 class="font-semibold text-900 mb-1">
+                      {{ serviceDetail.serviceDTO.serviceName }}
+                    </h4>
+                    <p class="text-600 mb-2">
+                      {{ serviceDetail.serviceDTO.serviceDescription }}
+                    </p>
+                    <div class="flex align-items-center gap-4">
+                      <span class="text-600">
+                        <i class="pi pi-clock mr-1"></i>
+                        {{ serviceDetail.serviceDTO.durationTimeAprox }}
+                      </span>
+                      <span class="text-600">
+                        <i class="pi pi-calendar mr-1"></i>
+                        {{ formatDate(serviceDetail.scheduleDTO.scheduleDate + 'T' + serviceDetail.scheduleDTO.scheduleHourStart) }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xl font-bold text-900">
+                      {{ formatCurrency(serviceDetail.serviceDTO.servicePrice) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Order Timeline -->
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3">
+            <i class="pi pi-history text-primary"></i>
+            <span class="font-semibold text-xl">Historial de la Orden</span>
+          </div>
+        </ng-template>
+
+        <p-timeline
+          [value]="timeline()"
+          align="left"
+          styleClass="customized-timeline">
+
+          <ng-template pTemplate="marker" let-event>
+            <span class="custom-marker border-circle"
+                  [style.background-color]="event.color">
+              <i [class]="event.icon" class="text-white"></i>
+            </span>
+          </ng-template>
+
+          <ng-template pTemplate="content" let-event>
+            <p-card styleClass="timeline-card">
+              <div class="flex justify-content-between align-items-start">
+                <div>
+                  <h5 class="font-semibold text-900 mb-1">{{ event.status }}</h5>
+                  <p class="text-600 mb-0">{{ event.description }}</p>
+                </div>
+                <small class="text-500">{{ formatDate(event.date) }}</small>
+              </div>
+            </p-card>
+          </ng-template>
+        </p-timeline>
+      </p-card>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-12 lg:col-4">
+      <!-- Order Summary -->
+      <p-card class="mb-4" styleClass="order-summary-card">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3">
+            <i class="pi pi-receipt text-primary"></i>
+            <span class="font-semibold text-xl">Resumen</span>
+          </div>
+        </ng-template>
+
+        <div class="order-summary">
+          <!-- Subtotal -->
+          <div class="flex justify-content-between align-items-center py-2">
+            <span class="text-600">Subtotal:</span>
+            <span class="font-semibold">{{ formatCurrency(calculateSubtotal()) }}</span>
+          </div>
+
+          <!-- Shipping -->
+          <div class="flex justify-content-between align-items-center py-2">
+            <span class="text-600">Envío:</span>
+            <span class="font-semibold">{{ formatCurrency(getShippingCost()) }}</span>
+          </div>
+
+          <!-- Tax -->
+          <div class="flex justify-content-between align-items-center py-2">
+            <span class="text-600">IGV (18%):</span>
+            <span class="font-semibold">{{ formatCurrency(getTaxAmount()) }}</span>
+          </div>
+
+          <p-divider></p-divider>
+
+          <!-- Total -->
+          <div class="flex justify-content-between align-items-center py-2">
+            <span class="text-900 font-bold text-lg">Total:</span>
+            <span class="text-primary font-bold text-xl">{{ formatCurrency(orderTotal()) }}</span>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Customer Information -->
+      <p-card class="mb-4">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3">
+            <i class="pi pi-user text-primary"></i>
+            <span class="font-semibold text-xl">Cliente</span>
+          </div>
+        </ng-template>
+
+        <div class="customer-info">
+          <div class="info-item mb-3">
+            <label class="text-600 font-medium">Información de contacto:</label>
+            <div class="mt-1">
+              <div class="text-900">Cliente ID: {{ orderDetail()?.paymentDTO?.userId }}</div>
+            </div>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Shipping Information -->
+      <p-card class="mb-4">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3">
+            <i class="pi pi-truck text-primary"></i>
+            <span class="font-semibold text-xl">Entrega</span>
+          </div>
+        </ng-template>
+
+        <div class="shipping-info">
+          <div class="info-item mb-3">
+            <label class="text-600 font-medium">Método de envío:</label>
+            <div class="mt-1">
+              <div class="text-900">{{ orderDetail()?.shippingMethod }}</div>
+            </div>
+          </div>
+
+          <div class="info-item mb-3">
+            <label class="text-600 font-medium">Dirección:</label>
+            <div class="mt-1">
+              <div class="text-900">{{ orderDetail()?.addressDTO?.addressStreet }}</div>
+              <div class="text-600">
+                {{ orderDetail()?.addressDTO?.addressCity }},
+                {{ orderDetail()?.addressDTO?.addressState }}
+              </div>
+              <div class="text-600">{{ orderDetail()?.addressDTO?.addressPostalCode }}</div>
+              <div class="text-600">{{ orderDetail()?.addressDTO?.addressCountry }}</div>
+            </div>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Payment Information -->
+      <p-card class="mb-4">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3">
+            <i class="pi pi-credit-card text-primary"></i>
+            <span class="font-semibold text-xl">Pago</span>
+          </div>
+        </ng-template>
+
+        <div class="payment-info">
+          <div class="info-item mb-3">
+            <label class="text-600 font-medium">Método de pago:</label>
+            <div class="mt-1">
+              <div class="text-900">{{ orderDetail()?.paymentDTO?.paymentType }}</div>
+            </div>
+          </div>
+
+          <div class="info-item mb-3">
+            <label class="text-600 font-medium">Proveedor:</label>
+            <div class="mt-1">
+              <div class="text-900">{{ orderDetail()?.paymentDTO?.paymentProvider }}</div>
+            </div>
+          </div>
+
+          <div class="info-item mb-3" *ngIf="orderDetail()?.paymentDTO?.paymentAccountNumber">
+            <label class="text-600 font-medium">Número de cuenta:</label>
+            <div class="mt-1">
+              <div class="text-900">{{ formatAccountNumber(orderDetail()?.paymentDTO?.paymentAccountNumber) }}</div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <label class="text-600 font-medium">Total pagado:</label>
+            <div class="mt-1">
+              <div class="text-primary font-bold text-lg">
+                {{ formatCurrency(orderDetail()?.paymentDTO?.paymentTotalPrice || 0) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Action Buttons -->
+      <p-card *ngIf="orderStatus() === 'CREATED'">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3">
+            <i class="pi pi-cog text-primary"></i>
+            <span class="font-semibold text-xl">Acciones</span>
+          </div>
+        </ng-template>
+
+        <div class="action-buttons">
+          <p-button
+            label="Aprobar Orden"
+            icon="pi pi-check"
+            severity="success"
+            class="w-full mb-2"
+            (onClick)="updateOrderStatus(this.shopOrderStatusEnum.APPROVED)">
+          </p-button>
+
+          <p-button
+            label="Rechazar Orden"
+            icon="pi pi-times"
+            severity="danger"
+            class="w-full"
+            [outlined]="true"
+            (onClick)="updateOrderStatus(this.shopOrderStatusEnum.REJECTED)">
+          </p-button>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="loading()">
+  <div class="flex flex-column align-items-center justify-content-center" style="height: 50vh;">
+    <p-progressSpinner styleClass="mb-4"></p-progressSpinner>
+    <h3 class="text-600">Cargando detalles de la orden...</h3>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div class="empty-state" *ngIf="!loading() && !hasOrder()">
+  <div class="flex flex-column align-items-center justify-content-center" style="height: 50vh;">
+    <i class="pi pi-exclamation-triangle text-6xl text-400 mb-4"></i>
+    <h3 class="text-600 mb-2">Orden no encontrada</h3>
+    <p class="text-500 mb-4">La orden que buscas no existe o ha sido eliminada.</p>
+    <p-button
+      label="Volver a órdenes"
+      icon="pi pi-arrow-left"
+      [outlined]="true"
+      (onClick)="goBack()">
+    </p-button>
+  </div>
+</div>

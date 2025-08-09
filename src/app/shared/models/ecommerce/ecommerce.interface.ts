@@ -136,8 +136,8 @@ export interface FilterVariation {
 // ============================================================================
 
 export interface CartItem {
-  id: string; // Unique identifier for cart item
-  type: 'product' | 'service';
+  id: number; // Unique identifier for cart item
+  type: 'product' | 'service' ;
   productId?: number;
   serviceId?: number;
   productItemId?: number; // For specific product variant

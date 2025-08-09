@@ -46,12 +46,12 @@ const routes: Routes = [
         data: { rol: EnumRolesUsuario.ADMIN },
         loadChildren: () => import('./modules/reservations/reservations.module').then(m => m.ReservationsModule),
       },
-      /*{
+      {
         path: 'orders',
         canActivate: [AuthGuard, UserGuard],
         data: { rol: EnumRolesUsuario.ADMIN },
         loadChildren: () => import('./modules/orders/orders.module').then(m => m.OrdersModule),
-      },*/
+      },
       {
         path: 'users',
         canActivate: [AuthGuard, UserGuard],

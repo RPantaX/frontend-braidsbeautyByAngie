@@ -126,8 +126,7 @@
                 icon="pi pi-shopping-cart"
                 [outlined]="true"
                 [loading]="addingToCart"
-                [disabled]="!isAvailableForBooking()"
-                (onClick)="addToCart()">
+                [disabled]="!isAvailableForBooking()">
               </p-button>
 
               <p-button
@@ -265,8 +264,7 @@
                     <app-service-card
                       [service]="relatedService"
                       [compact]="true"
-                      (onViewDetails)="goToRelatedService($event)"
-                      (onAddToCart)="addToCart()">
+                      (onViewDetails)="goToRelatedService($event)">
                     </app-service-card>
                   </div>
                 </div>

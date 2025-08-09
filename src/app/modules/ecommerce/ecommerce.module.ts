@@ -70,6 +70,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ServiceBookingContainerComponent } from './components/service-booking-container/service-booking-container.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
   declarations: [
@@ -142,6 +143,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
     DialogModule,
     SelectButtonModule,
     ProgressSpinnerModule,
+    ConfirmDialogModule
   ],
   providers: [
     MessageService,

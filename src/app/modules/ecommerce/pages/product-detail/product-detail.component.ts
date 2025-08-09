@@ -475,7 +475,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     this.addingToCart = true;
 
     const cartItem: CartItem = {
-      id: `product_${this.product.productId}_${this.selectedItem.productItemId}`,
+      id: this.selectedItem.productItemId,
       type: 'product',
       productId: this.product.productId,
       productItemId: this.selectedItem.productItemId,

@@ -190,7 +190,7 @@ export class BookingStateService {
     }
   }
 
-  removeBookingProduct(productId: string): void {
+  removeBookingProduct(productId: number): void {
     const currentProducts = this._bookingProducts();
     const currentQuantities = this._bookingQuantities();
 
@@ -201,7 +201,7 @@ export class BookingStateService {
     this._bookingQuantities.set(updatedQuantities);
   }
 
-  updateProductQuantity(productId: string, quantity: number): void {
+  updateProductQuantity(productId: number, quantity: number): void {
     if (quantity <= 0) {
       this.removeBookingProduct(productId);
       return;

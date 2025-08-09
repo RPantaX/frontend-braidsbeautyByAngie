@@ -50,7 +50,8 @@ import { EcommerceProduct } from '../../../../shared/models/ecommerce/ecommerce.
       <!-- Product Info -->
       <div class="product-info" (click)="viewDetails()">
         <div class="product-category">
-          {{ product.responseCategory?.productCategoryName }}
+          {{ product.responseCategory.productCategoryName || 'Sin categoría' }}
+
         </div>
         <h3 class="product-name">{{ product.productName }}</h3>
 

@@ -1,0 +1,367 @@
+// Orders Module Styles
+
+// Order List Styles
+.order-list-container {
+  .page-header {
+    h1 {
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: var(--text-color-secondary);
+      margin: 0;
+    }
+  }
+
+  .filter-card {
+    .p-card-body {
+      padding: 1rem;
+    }
+  }
+
+  .results-summary {
+    background: var(--surface-50);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--surface-border);
+
+    .small-spinner {
+      width: 1.5rem !important;
+      height: 1.5rem !important;
+    }
+  }
+
+  .orders-table-card {
+    .p-datatable {
+      .order-row {
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: var(--surface-hover) !important;
+        }
+
+        &.highlight {
+          background-color: var(--surface-50);
+        }
+      }
+
+      .p-datatable-tbody > tr > td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+      }
+
+      .p-tag {
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .quick-stats {
+    .stat-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-icon {
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+// Order Detail Styles
+.order-detail-container {
+  .page-header {
+    h1 {
+      color: var(--text-color);
+    }
+  }
+
+  .order-items,
+  .services-list {
+    .item-row,
+    .service-item {
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: var(--surface-hover);
+      }
+
+      .product-image,
+      .service-image {
+        img {
+          border: 2px solid var(--surface-border);
+          transition: border-color 0.2s ease;
+        }
+
+        &:hover img {
+          border-color: var(--primary-color);
+        }
+      }
+    }
+  }
+
+  .order-summary-card {
+    .order-summary {
+      .py-2 {
+        padding: 0.75rem 0;
+      }
+    }
+  }
+
+  .timeline-card {
+    margin-bottom: 0.5rem;
+
+    .p-card-body {
+      padding: 1rem;
+    }
+  }
+
+  .custom-marker {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .info-item {
+    label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-color-secondary);
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  .action-buttons {
+    .p-button {
+      justify-content: center;
+    }
+  }
+}
+
+// Loading and Empty States
+.loading-container,
+.empty-state {
+  .p-progressspinner {
+    .p-progressspinner-circle {
+      stroke: var(--primary-color);
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .order-list-container {
+    .page-header {
+      .flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+    }
+
+    .filter-form {
+      .formgrid {
+        .field {
+          &.col-12 {
+            &.md\\:col-3,
+            &.md\\:col-2,
+            &.md\\:col-1 {
+              margin-bottom: 1rem;
+            }
+          }
+        }
+      }
+    }
+
+    .orders-table-card {
+      .p-datatable {
+        font-size: 0.875rem;
+
+        .p-datatable-tbody > tr > td {
+          padding: 0.75rem 0.5rem;
+        }
+      }
+    }
+
+    .quick-stats {
+      .grid {
+        .col-12 {
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
+
+  .order-detail-container {
+    .page-header {
+      .flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+
+        .flex.gap-2 {
+          flex-wrap: wrap;
+          width: 100%;
+        }
+      }
+    }
+
+    .order-items,
+    .services-list {
+      .item-row,
+      .service-item {
+        .flex {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem !important;
+        }
+
+        .product-image,
+        .service-image {
+          align-self: center;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .order-list-container {
+    .results-summary {
+      .flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+    }
+  }
+
+  .order-detail-container {
+    .page-header {
+      h1 {
+        font-size: 1.75rem;
+      }
+    }
+  }
+}
+
+// Custom Timeline Styles
+.customized-timeline {
+  .p-timeline-event-marker {
+    border: none !important;
+    background: transparent !important;
+  }
+
+  .p-timeline-event-connector {
+    background-color: var(--surface-border) !important;
+  }
+
+  .p-timeline-event-content {
+    padding-left: 1rem;
+  }
+}
+
+// Animation Classes
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Utility Classes
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.transition-all {
+  transition: all 0.2s ease;
+}
+
+// Status-specific styles
+.status-created {
+  background-color: var(--blue-50) !important;
+  color: var(--blue-700) !important;
+  border: 1px solid var(--blue-200) !important;
+}
+
+.status-approved {
+  background-color: var(--green-50) !important;
+  color: var(--green-700) !important;
+  border: 1px solid var(--green-200) !important;
+}
+
+.status-rejected {
+  background-color: var(--red-50) !important;
+  color: var(--red-700) !important;
+  border: 1px solid var(--red-200) !important;
+}
+
+// Print Styles
+@media print {
+  .order-detail-container {
+    .page-header {
+      .flex {
+        justify-content: space-between !important;
+
+        .flex.gap-2 {
+          display: none !important;
+        }
+      }
+    }
+
+    .action-buttons {
+      display: none !important;
+    }
+
+    .p-card {
+      box-shadow: none !important;
+      border: 1px solid #ddd !important;
+    }
+  }
+}

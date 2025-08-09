@@ -11,10 +11,11 @@ import { ScheduleService } from '../../../../core/services/reservations/schedule
 import { ReservationService } from '../../../../core/services/reservations/reservation.service';
 
 // Interfaces
-import { ServiceDetail, EmployeeOption, TimeSlot } from '../../../../shared/models/ecommerce/ecommerce.interface';
+import { ServiceDetail, EmployeeOption, TimeSlot, CartItem } from '../../../../shared/models/ecommerce/ecommerce.interface';
 import { ResponseScheduleWithEmployee } from '../../../../shared/models/reservations/schedule.interface';
 import { RequestReservation } from '../../../../shared/models/reservations/reservation.interface';
 import { EmployeeDto } from '../../../../shared/models/users/employee.interface';
+import { EcommerceService } from '../../../../core/services/ecommerce/ecommerce.service';
 
 interface BookingData {
   service: ServiceDetail | null;
@@ -314,6 +315,7 @@ export class ServiceBookingComponent implements OnInit, OnDestroy {
   private readonly reservationService = inject(ReservationService);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
+  private readonly ecommerceService = inject(EcommerceService);
   private readonly destroy$ = new Subject<void>();
 
   // Input properties
@@ -558,7 +560,15 @@ export class ServiceBookingComponent implements OnInit, OnDestroy {
             reservationId: reservation.reservationId,
             bookingData: bookingData
           });
+         const cartItem: CartItem = {
+               id: reservation.reservationId,
+               name: "reservation",
+               type: 'service',
+               price: 0,
+               quantity: 1
+             };
 
+          this.ecommerceService.addToCart(cartItem);
           this.messageService.add({
             severity: 'success',
             summary: 'Reserva Confirmada',

@@ -1,10 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, finalize, Observable } from 'rxjs';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { EcommerceService } from '../../../../core/services/ecommerce/ecommerce.service';
+import { OrderService } from '../../../../core/services/orders/order.service';
 import { Cart, CartItem } from '../../../../shared/models/ecommerce/ecommerce.interface';
+import { RequestShopOrder, ProductRequest, RequestAddress } from '../../../../shared/models/orders/order.interface';
+import { User } from '../../../../shared/models/auth/auth.interface';
+import { Store } from '@ngrx/store';
+import { SecurityState } from '../../../../../@security/interfaces/SecurityState';
 
 interface CheckoutStep {
   id: number;
@@ -26,6 +31,7 @@ interface ShippingMethod {
   description: string;
   price: number;
   estimatedDays: string;
+  shoppingMethodId: number; // Added for API integration
 }
 
 @Component({
@@ -34,16 +40,21 @@ interface ShippingMethod {
   styleUrls: ['./checkout.component.scss']
 })
 export class CheckoutComponent implements OnInit, OnDestroy {
-
   private destroy$ = new Subject<void>();
 
-  // Forms
-  customerForm!: FormGroup;
-  shippingForm!: FormGroup;
-  paymentForm!: FormGroup;
-
-  // Data
-  cart: Cart = {
+  // Injected services using new Angular patterns
+  private fb = inject(FormBuilder);
+  private ecommerceService = inject(EcommerceService);
+  private orderService = inject(OrderService);
+  private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmationService);
+  private router = inject(Router);
+  private store: Store<SecurityState> = inject(Store);
+  // User data
+  currentUser$: Observable<User | null>;
+  currentUser: User | null = null;
+  // Signals for reactive state management
+  cart = signal<Cart>({
     items: [],
     subtotal: 0,
     shipping: 0,
@@ -51,10 +62,29 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     discount: 0,
     total: 0,
     itemCount: 0
-  };
+  });
 
-  // Checkout process
-  currentStep = 0;
+  currentStep = signal(0);
+  loading = signal(false);
+  processingPayment = signal(false);
+  orderCompleted = signal(false);
+  selectedPaymentMethod = signal<PaymentMethod | null>(null);
+  selectedShippingMethod = signal<ShippingMethod | null>(null);
+  orderId = signal('');
+  orderTotal = signal(0);
+
+  // Computed values
+  canProceed = computed(() => this.validateCurrentStep());
+  isLastStep = computed(() => this.currentStep() === this.steps.length - 1);
+  hasProducts = computed(() => this.cart().items.some(item => item.type === 'product'));
+  hasServices = computed(() => this.cart().items.some(item => item.type === 'service'));
+
+  // Forms
+  customerForm!: FormGroup;
+  shippingForm!: FormGroup;
+  paymentForm!: FormGroup;
+
+  // Static data
   steps: CheckoutStep[] = [
     { id: 0, label: 'Información', icon: 'pi pi-user', completed: false },
     { id: 1, label: 'Envío', icon: 'pi pi-truck', completed: false },
@@ -62,7 +92,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     { id: 3, label: 'Confirmación', icon: 'pi pi-check', completed: false }
   ];
 
-  // Options
   paymentMethods: PaymentMethod[] = [
     {
       id: 'visa',
@@ -96,46 +125,37 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       name: 'Envío Estándar',
       description: 'Entrega a domicilio',
       price: 15.00,
-      estimatedDays: '3-5 días'
+      estimatedDays: '3-5 días',
+      shoppingMethodId: 1
     },
     {
       id: 'express',
       name: 'Envío Express',
       description: 'Entrega rápida',
       price: 25.00,
-      estimatedDays: '1-2 días'
+      estimatedDays: '1-2 días',
+      shoppingMethodId: 2
     },
     {
       id: 'pickup',
       name: 'Recojo en Tienda',
       description: 'Retira en nuestro local',
       price: 0.00,
-      estimatedDays: 'Mismo día'
+      estimatedDays: 'Mismo día',
+      shoppingMethodId: 4
     }
   ];
-
-  // UI State
-  loading = false;
-  processingPayment = false;
-  orderCompleted = false;
-  selectedPaymentMethod: PaymentMethod | null = null;
-  selectedShippingMethod: ShippingMethod | null = null;
-
-  // Order details
-  orderId: string = '';
-  orderTotal = 0;
-
-  constructor(
-    private fb: FormBuilder,
-    private ecommerceService: EcommerceService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
-    private router: Router
-  ) {
-    this.initializeForms();
+  constructor() {
+    this.currentUser$ = this.store.select(state => state.userState.user);
   }
-
   ngOnInit(): void {
+
+    this.currentUser$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(user => {
+      this.currentUser = user;
+    });
+    this.initializeForms();
     this.loadCart();
     this.setDefaultSelections();
   }
@@ -145,9 +165,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Initialize all forms
-   */
   private initializeForms(): void {
     this.customerForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -176,137 +193,129 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Load cart data
-   */
   private loadCart(): void {
     this.ecommerceService.cart$
       .pipe(takeUntil(this.destroy$))
       .subscribe(cart => {
-        this.cart = cart;
-
-        // Check if cart is empty
+        this.cart.set(cart);
         if (cart.items.length === 0) {
           this.router.navigate(['/ecommerce/cart']);
         }
       });
   }
 
-  /**
-   * Set default selections
-   */
   private setDefaultSelections(): void {
-    this.selectedPaymentMethod = this.paymentMethods[0];
-    this.selectedShippingMethod = this.shippingMethods[0];
+    this.selectedPaymentMethod.set(this.paymentMethods[0]);
+    this.selectedShippingMethod.set(this.shippingMethods[0]);
     this.updateShippingCost();
   }
 
-  /**
-   * Update shipping cost
-   */
   private updateShippingCost(): void {
-    if (this.selectedShippingMethod) {
-      this.cart.shipping = this.selectedShippingMethod.price;
-      this.cart.total = this.cart.subtotal + this.cart.shipping + this.cart.tax - this.cart.discount;
+    const shippingMethod = this.selectedShippingMethod();
+    if (shippingMethod) {
+      const currentCart = this.cart();
+      const updatedCart = {
+        ...currentCart,
+        shipping: shippingMethod.price,
+        total: currentCart.subtotal + shippingMethod.price + currentCart.tax - currentCart.discount
+      };
+      this.cart.set(updatedCart);
     }
   }
 
-  /**
-   * Navigate to next step
-   */
   nextStep(): void {
+    console.log("validateCurrentStep: ",this.validateCurrentStep());
     if (this.validateCurrentStep()) {
-      this.steps[this.currentStep].completed = true;
-      if (this.currentStep < this.steps.length - 1) {
-        this.currentStep++;
+      const currentStepIndex = this.currentStep();
+      this.steps[currentStepIndex].completed = true;
+
+      if (currentStepIndex === 3) {
+        console.log("Processing order...");
+        this.processOrder();
+      } else if (currentStepIndex < this.steps.length - 1) {
+        this.currentStep.set(currentStepIndex + 1);
       }
     }
   }
 
-  /**
-   * Navigate to previous step
-   */
   previousStep(): void {
-    if (this.currentStep > 0) {
-      this.currentStep--;
+    const currentStepIndex = this.currentStep();
+    if (currentStepIndex > 0) {
+      this.currentStep.set(currentStepIndex - 1);
     }
   }
 
-  /**
-   * Go to specific step
-   */
   goToStep(stepIndex: number): void {
-    if (stepIndex <= this.currentStep || this.steps[stepIndex - 1]?.completed) {
-      this.currentStep = stepIndex;
+    const currentStepIndex = this.currentStep();
+    if (stepIndex <= currentStepIndex || this.steps[stepIndex - 1]?.completed) {
+      this.currentStep.set(stepIndex);
     }
   }
 
-  /**
-   * Validate current step
-   */
   validateCurrentStep(): boolean {
-    switch (this.currentStep) {
+    const step = this.currentStep();
+    switch (step) {
       case 0:
         return this.customerForm.valid;
       case 1:
-        return this.shippingForm.valid && this.selectedShippingMethod !== null;
+        return this.shippingForm.valid && this.selectedShippingMethod() !== null;
       case 2:
-        return this.selectedPaymentMethod !== null && this.validatePaymentForm();
-      default:
+        return this.selectedPaymentMethod() !== null && this.validatePaymentForm();
+      case 3:
         return true;
+      default:
+        return false;
     }
   }
 
-  /**
-   * Validate payment form based on selected method
-   */
-    private validatePaymentForm(): boolean {
-    if (!this.selectedPaymentMethod) return false;
+  private validatePaymentForm(): boolean {
+    const paymentMethod = this.selectedPaymentMethod();
+    if (!paymentMethod) return false;
 
-    if (this.selectedPaymentMethod.id === 'visa') {
-      return !!(this.paymentForm.get('cardNumber')?.valid &&
-               this.paymentForm.get('cardName')?.valid &&
-               this.paymentForm.get('expiryDate')?.valid &&
-               this.paymentForm.get('cvv')?.valid);
+    if (paymentMethod.id === 'visa') {
+      return !!(
+        this.paymentForm.get('cardNumber')?.valid &&
+        this.paymentForm.get('cardName')?.valid &&
+        this.paymentForm.get('expiryDate')?.valid &&
+        this.paymentForm.get('cvv')?.valid
+      );
     }
-
-    return true; // Other payment methods don't require card validation
+    return true;
   }
 
-  /**
-   * Handle payment method selection
-   */
   onPaymentMethodSelect(method: PaymentMethod): void {
-    this.selectedPaymentMethod = method;
+    this.selectedPaymentMethod.set(method);
 
-    // Update form validators based on payment method
     if (method.id === 'visa') {
-      this.paymentForm.get('cardNumber')?.setValidators([Validators.required, Validators.pattern(/^[0-9]{16}$/)]);
+      this.paymentForm.get('cardNumber')?.setValidators([
+        Validators.required,
+        Validators.pattern(/^[0-9]{16}$/)
+      ]);
       this.paymentForm.get('cardName')?.setValidators([Validators.required]);
-      this.paymentForm.get('expiryDate')?.setValidators([Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)]);
-      this.paymentForm.get('cvv')?.setValidators([Validators.required, Validators.pattern(/^[0-9]{3,4}$/)]);
+      this.paymentForm.get('expiryDate')?.setValidators([
+        Validators.required,
+        Validators.pattern(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)
+      ]);
+      this.paymentForm.get('cvv')?.setValidators([
+        Validators.required,
+        Validators.pattern(/^[0-9]{3,4}$/)
+      ]);
     } else {
       this.paymentForm.get('cardNumber')?.clearValidators();
       this.paymentForm.get('cardName')?.clearValidators();
       this.paymentForm.get('expiryDate')?.clearValidators();
       this.paymentForm.get('cvv')?.clearValidators();
     }
-
     this.paymentForm.updateValueAndValidity();
   }
 
-  /**
-   * Handle shipping method selection
-   */
   onShippingMethodSelect(method: ShippingMethod): void {
-    this.selectedShippingMethod = method;
+    this.selectedShippingMethod.set(method);
     this.updateShippingCost();
   }
 
-  /**
-   * Process order
-   */
   processOrder(): void {
+    console.log("validateCurrentStep: ", this.validateCurrentStep());
     if (!this.validateCurrentStep()) {
       this.messageService.add({
         severity: 'warn',
@@ -319,69 +328,111 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     this.confirmationService.confirm({
       header: 'Confirmar Pedido',
-      message: `¿Estás seguro de procesar el pedido por S/${this.cart.total.toFixed(2)}?`,
+      message: `¿Estás seguro de procesar el pedido por S/${this.cart().total.toFixed(2)}?`,
       icon: 'pi pi-question-circle',
       acceptLabel: 'Sí, procesar',
       rejectLabel: 'Cancelar',
       accept: () => {
+        console.log('Order confirmed, submitting...');
         this.submitOrder();
       }
     });
   }
 
-  /**
-   * Submit order
-   */
   private submitOrder(): void {
-    this.processingPayment = true;
+    this.processingPayment.set(true);
+    this.loading.set(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      this.orderId = this.generateOrderId();
-      this.orderTotal = this.cart.total;
+    const orderRequest = this.buildOrderRequest();
 
-      // Clear cart
-      this.ecommerceService.clearCart();
+    this.orderService.createOrder(orderRequest)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.processingPayment.set(false);
+          this.loading.set(false);
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.orderId.set(response.shopOrderId.toString());
+          this.orderTotal.set(this.cart().total);
 
-      this.processingPayment = false;
-      this.orderCompleted = true;
-      this.currentStep = 3;
-      this.steps[3].completed = true;
+          // Clear cart
+          this.ecommerceService.clearCart();
 
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Pedido Confirmado',
-        detail: `Tu pedido #${this.orderId} ha sido procesado exitosamente`,
-        life: 8000
+          this.orderCompleted.set(true);
+          this.currentStep.set(3);
+          this.steps[3].completed = true;
+
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Pedido Confirmado',
+            detail: `Tu pedido #${this.orderId()} ha sido procesado exitosamente`,
+            life: 8000
+          });
+        },
+        error: (error) => {
+          console.error('Error creating order:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error al procesar pedido',
+            detail: 'Hubo un problema al procesar tu pedido. Por favor intenta nuevamente.',
+            life: 8000
+          });
+        }
       });
-    }, 3000);
   }
 
-  /**
-   * Generate order ID
-   */
-  private generateOrderId(): string {
-    return 'ORD-' + Date.now().toString().slice(-8).toUpperCase();
+  private buildOrderRequest(): RequestShopOrder {
+    const cart = this.cart();
+    const shippingMethod = this.selectedShippingMethod();
+    console.log("Selected Shipping Method: ", shippingMethod);
+    console.log("Cart Items: ", cart.items);
+    // Build product list from cart
+    const productList: ProductRequest[] = cart.items
+      .filter(item => item.type === 'product')
+      .map(item => ({
+        productId: item.id,
+        productQuantity: item.quantity
+      }));
+
+    // Build address from shipping form
+    const address: RequestAddress = {
+      adressStreet: this.shippingForm.get('address')?.value || '',
+      adressCity: this.shippingForm.get('city')?.value || '',
+      adressState: this.shippingForm.get('district')?.value || '',
+      adressCountry: 'Perú',
+      adressPostalCode: this.shippingForm.get('postalCode')?.value || ''
+    };
+
+    return {
+      productRequestList: productList,
+      reservationId: this.getReservationId(), // Get from cart if exists
+      userId: this.getCurrentUserId(), // Get from auth service
+      requestAdress: address,
+      shoppingMethodId: shippingMethod?.shoppingMethodId || 1
+    };
   }
 
-  /**
-   * Continue shopping
-   */
+  private getReservationId(): number {
+    // Extract reservation ID from cart if it contains services
+    const serviceItem = this.cart().items.find(item => item.type === 'service');
+    return serviceItem ? serviceItem.id : 0;
+  }
+
+  private getCurrentUserId(): number {
+    return Number(this.currentUser?.idUser) || 0;
+  }
+
   continueShopping(): void {
     this.router.navigate(['/ecommerce/products']);
   }
 
-  /**
-   * View order details
-   */
   viewOrderDetails(): void {
-    // Navigate to order details page
-    this.router.navigate(['/orders', this.orderId]);
+    this.router.navigate(['/orders', this.orderId()]);
   }
 
-  /**
-   * Update item quantity
-   */
   updateQuantity(item: CartItem, quantity: number): void {
     if (quantity <= 0) {
       this.removeItem(item);
@@ -390,9 +441,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Remove item from cart
-   */
   removeItem(item: CartItem): void {
     this.confirmationService.confirm({
       header: 'Remover Producto',
@@ -412,19 +460,22 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Apply coupon code
-   */
   applyCoupon(couponCode: string): void {
     if (!couponCode.trim()) return;
 
-    // Simulate coupon validation
     const validCoupons = ['WELCOME10', 'SAVE20', 'FIRST15'];
-
     if (validCoupons.includes(couponCode.toUpperCase())) {
       const discountPercent = parseInt(couponCode.slice(-2));
-      this.cart.discount = this.cart.subtotal * (discountPercent / 100);
-      this.cart.total = this.cart.subtotal + this.cart.shipping + this.cart.tax - this.cart.discount;
+      const currentCart = this.cart();
+      const discount = currentCart.subtotal * (discountPercent / 100);
+
+      const updatedCart = {
+        ...currentCart,
+        discount: discount,
+        total: currentCart.subtotal + currentCart.shipping + currentCart.tax - discount
+      };
+
+      this.cart.set(updatedCart);
 
       this.messageService.add({
         severity: 'success',
@@ -442,9 +493,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Get form control error message
-   */
   getFieldError(formGroup: FormGroup, fieldName: string): string {
     const field = formGroup.get(fieldName);
     if (field?.errors && field.touched) {
@@ -456,45 +504,22 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  /**
-   * Check if field has error
-   */
   hasFieldError(formGroup: FormGroup, fieldName: string): boolean {
     const field = formGroup.get(fieldName);
     return !!(field?.errors && field.touched);
   }
 
-  /**
-   * Get cart item total
-   */
   getItemTotal(item: CartItem): number {
     return item.price * item.quantity;
   }
 
-  /**
-   * Check if cart has products (not just services)
-   */
-  hasProducts(): boolean {
-    return this.cart.items.some(item => item.type === 'product');
-  }
-
-  /**
-   * Check if cart has services
-   */
-  hasServices(): boolean {
-    return this.cart.items.some(item => item.type === 'service');
-  }
-
-  /**
-   * Get estimated delivery date
-   */
   getEstimatedDeliveryDate(): string {
-    if (!this.selectedShippingMethod) return '';
+    const shippingMethod = this.selectedShippingMethod();
+    if (!shippingMethod) return '';
 
     const today = new Date();
-    const days = this.selectedShippingMethod.id === 'express' ? 2 :
-                 this.selectedShippingMethod.id === 'pickup' ? 0 : 5;
-
+    const days = shippingMethod.id === 'express' ? 2 :
+                 shippingMethod.id === 'pickup' ? 0 : 5;
     const deliveryDate = new Date(today);
     deliveryDate.setDate(today.getDate() + days);
 
@@ -506,10 +531,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Track by function for ngFor performance
-   */
-  trackByItemId(index: number, item: CartItem): string {
+  trackByItemId(index: number, item: CartItem): number {
     return item.id;
   }
 }

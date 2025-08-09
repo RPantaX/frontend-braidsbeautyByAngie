@@ -150,8 +150,8 @@
               <p-slider
                 [ngModel]="priceRangeValues"
                 [range]="true"
-                [min]="filterOptions?.priceRange?.min || 0"
-                [max]="filterOptions?.priceRange?.max || 500"
+                [min]="filterOptions.priceRange.min || 0"
+                [max]="filterOptions.priceRange.max || 500"
                 [step]="10"
                 (onChange)="onPriceRangeChange($event)"
                 styleClass="price-slider">
@@ -194,8 +194,8 @@
               <p-slider
                 [ngModel]="durationRangeValues"
                 [range]="true"
-                [min]="filterOptions?.durationRange?.minMinutes || 0"
-                [max]="filterOptions?.durationRange?.maxMinutes || 240"
+                [min]="filterOptions.durationRange.minMinutes || 0"
+                [max]="filterOptions.durationRange.maxMinutes || 240"
                 [step]="15"
                 (onChange)="onDurationRangeChange($event)"
                 styleClass="duration-slider">
@@ -365,7 +365,7 @@
               <div class="list-service-details" (click)="goToServiceDetail(service)">
                 <div class="list-service-header">
                   <div class="service-category">
-                    {{ service.responseCategoryWIthoutServices?.serviceCategoryDTO?.categoryName }}
+                    {{ service.responseCategoryWIthoutServices.serviceCategoryDTO.categoryName || 'Sin categoría' }}
                   </div>
                   <h3 class="service-name">{{ service.serviceDTO.serviceName }}</h3>
 

@@ -627,7 +627,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
    */
   addToCart(service: EcommerceInterfaceService): void {
     const cartItem: CartItem = {
-      id: `service_${service.serviceDTO.serviceId}_${Date.now()}`,
+      id: service.serviceDTO.serviceId,
       type: 'service',
       serviceId: service.serviceDTO.serviceId,
       name: service.serviceDTO.serviceName,

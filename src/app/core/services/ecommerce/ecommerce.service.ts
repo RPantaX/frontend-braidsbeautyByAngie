@@ -293,7 +293,7 @@ export class EcommerceService {
   /**
    * Remove item from cart
    */
-  removeFromCart(itemId: string): void {
+  removeFromCart(itemId: number): void {
     const currentCart = this.cartSubject.value;
     currentCart.items = currentCart.items.filter(item => item.id !== itemId);
     this.updateCart(currentCart);
@@ -302,7 +302,7 @@ export class EcommerceService {
   /**
    * Update item quantity in cart
    */
-  updateCartItemQuantity(itemId: string, quantity: number): void {
+  updateCartItemQuantity(itemId: number, quantity: number): void {
     const currentCart = this.cartSubject.value;
     const itemIndex = currentCart.items.findIndex(item => item.id === itemId);
 

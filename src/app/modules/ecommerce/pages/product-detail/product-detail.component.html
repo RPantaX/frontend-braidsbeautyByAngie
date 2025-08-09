@@ -21,8 +21,8 @@
             <!-- Main Image -->
             <div class="main-image-container">
               <img
-                [src]="productImages[selectedImageIndex]?.src"
-                [alt]="productImages[selectedImageIndex]?.alt"
+                [src]="productImages[selectedImageIndex].src || 'assets/no-image.png'"
+                [alt]="productImages[selectedImageIndex].alt || 'assets/no-image.png'"
                 class="main-image"
                 (click)="openImageGallery()" />
 
@@ -505,7 +505,7 @@
               <!-- Product Info -->
               <div class="related-product-info">
                 <div class="related-product-category">
-                  {{ relatedProduct.responseCategory?.productCategoryName }}
+                  {{ relatedProduct?.responseCategory?.productCategoryName }}
                 </div>
                 <h4 class="related-product-name">{{ relatedProduct.productName }}</h4>
 

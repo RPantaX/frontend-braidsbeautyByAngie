@@ -348,7 +348,7 @@
                   <!-- Product Info -->
                   <div class="product-info" (click)="goToProductDetail(product)">
                     <div class="product-category">
-                      {{ product.responseCategory?.productCategoryName }}
+                      {{ product.responseCategory.productCategoryName || 'Sin categoría' }}
                     </div>
                     <h3 class="product-name">{{ product.productName }}</h3>
 
@@ -430,7 +430,7 @@
               <div class="list-product-details" (click)="goToProductDetail(product)">
                 <div class="list-product-header">
                   <div class="product-category">
-                    {{ product.responseCategory?.productCategoryName }}
+                    {{ product.responseCategory.productCategoryName || 'Sin categoría' }}
                   </div>
                   <h3 class="product-name">{{ product.productName }}</h3>
 

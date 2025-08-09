@@ -1,0 +1,358 @@
+<!-- Order List Template -->
+<div class="order-list-container">
+  <!-- Header Section -->
+  <div class="page-header mb-4">
+    <div class="flex justify-content-between align-items-center">
+      <div>
+        <h1 class="text-3xl font-bold text-900 mb-2">Gestión de Órdenes</h1>
+        <p class="text-600 text-lg">Administra y monitorea todas las órdenes del sistema</p>
+      </div>
+      <div class="flex gap-2">
+        <p-button
+          label="Actualizar"
+          icon="pi pi-refresh"
+          [outlined]="true"
+          (onClick)="refreshData()"
+          [loading]="loading()">
+        </p-button>
+        <p-button
+          label="Exportar"
+          icon="pi pi-download"
+          [outlined]="true"
+          (onClick)="exportOrders()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <p-card class="mb-4" styleClass="filter-card">
+    <ng-template pTemplate="header">
+      <div class="flex align-items-center gap-2 p-3">
+        <i class="pi pi-filter text-primary"></i>
+        <span class="font-semibold">Filtros de Búsqueda</span>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="filterForm" class="filter-form">
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-3">
+          <label for="searchTerm" class="font-medium text-900">Buscar</label>
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-search"></i>
+            <input
+              id="searchTerm"
+              type="text"
+              pInputText
+              formControlName="searchTerm"
+              placeholder="ID, factura, ciudad..."
+              class="w-full" />
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <label for="status" class="font-medium text-900">Estado</label>
+          <p-dropdown
+            id="status"
+            formControlName="status"
+            [options]="statusOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Todos"
+            class="w-full">
+          </p-dropdown>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <label for="dateFrom" class="font-medium text-900">Desde</label>
+          <p-calendar
+            id="dateFrom"
+            formControlName="dateFrom"
+            placeholder="Fecha inicial"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            class="w-full">
+          </p-calendar>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <label for="dateTo" class="font-medium text-900">Hasta</label>
+          <p-calendar
+            id="dateTo"
+            formControlName="dateTo"
+            placeholder="Fecha final"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            class="w-full">
+          </p-calendar>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <label for="pageSize" class="font-medium text-900">Mostrar</label>
+          <p-dropdown
+            id="pageSize"
+            [ngModel]="pageSize()"
+            (ngModelChange)="pageSize.set($event); loadOrders()"
+            [options]="pageSizeOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-full">
+          </p-dropdown>
+        </div>
+
+        <div class="field col-12 md:col-1 flex align-items-end">
+          <p-button
+            label="Limpiar"
+            icon="pi pi-times"
+            [outlined]="true"
+            severity="secondary"
+            (onClick)="clearFilters()"
+            class="w-full">
+          </p-button>
+        </div>
+      </div>
+    </form>
+  </p-card>
+
+  <!-- Results Summary -->
+  <div class="results-summary mb-3">
+    <div class="flex justify-content-between align-items-center">
+      <div class="flex align-items-center gap-2">
+        <i class="pi pi-info-circle text-primary"></i>
+        <span class="text-600">
+          Mostrando {{ orders().length }} de {{ totalRecords() }} órdenes
+        </span>
+      </div>
+      <div class="flex align-items-center gap-2" *ngIf="loading()">
+        <p-progressSpinner
+          styleClass="small-spinner"
+          strokeWidth="4"
+          animationDuration="1s">
+        </p-progressSpinner>
+        <span class="text-600">Cargando...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Table -->
+  <p-card styleClass="orders-table-card">
+    <p-table
+      #ordersTable
+      [value]="orders()"
+      [columns]="cols"
+      [loading]="loading()"
+      [paginator]="true"
+      [rows]="pageSize()"
+      [totalRecords]="totalRecords()"
+      [lazy]="true"
+      [sortMode]="'single'"
+      [globalFilterFields]="['shopOrderDTO.shopOrderId', 'addressDTO.adressCity', 'factureNumber']"
+      (onLazyLoad)="loadOrders($event)"
+      responsiveLayout="scroll"
+      styleClass="p-datatable-sm p-datatable-striped"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} órdenes"
+      [showCurrentPageReport]="true">
+
+      <!-- Loading Template -->
+      <ng-template pTemplate="loadingbody">
+        <tr>
+          <td colspan="8">
+            <div class="flex justify-content-center align-items-center p-4">
+              <p-progressSpinner strokeWidth="4" animationDuration="1s"></p-progressSpinner>
+              <span class="ml-2">Cargando órdenes...</span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty Template -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8">
+            <div class="text-center p-4">
+              <i class="pi pi-inbox text-4xl text-400 mb-3"></i>
+              <div class="text-900 font-medium text-xl mb-2">No se encontraron órdenes</div>
+              <div class="text-600">No hay órdenes que coincidan con los filtros aplicados</div>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Header Template -->
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let col of columns"
+              [pSortableColumn]="col.sortable ? col.field : null"
+              [style.width]="col.width">
+            <div class="flex align-items-center">
+              {{ col.header }}
+              <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+
+      <!-- Body Template -->
+      <ng-template pTemplate="body" let-order let-rowIndex="rowIndex">
+        <tr class="order-row" [class.highlight]="rowIndex % 2 === 0">
+          <!-- Order ID -->
+          <td>
+            <div class="flex align-items-center">
+              <span class="font-medium text-primary cursor-pointer"
+                    (click)="viewOrderDetail(order)"
+                    pTooltip="Ver detalle">
+                #{{ order.shopOrderDTO.shopOrderId }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Date -->
+          <td>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-calendar text-500"></i>
+              <span>{{ formatDate(order.shopOrderDTO.shopOrderDate) }}</span>
+            </div>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <p-tag
+              [value]="getStatusLabel(order.shopOrderDTO.shopOrderStatus)"
+              [severity]="getStatusSeverity(order.shopOrderDTO.shopOrderStatus)"
+              [rounded]="true">
+            </p-tag>
+          </td>
+
+          <!-- Total -->
+          <td>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-dollar text-green-500"></i>
+              <span class="font-semibold">
+                {{ formatCurrency(order.shopOrderDTO.shopOrderTotal) }}
+              </span>
+            </div>
+          </td>
+
+          <!-- City -->
+          <td>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-map-marker text-500"></i>
+              <span>{{ order.addressDTO.adressCity }}</span>
+            </div>
+          </td>
+
+          <!-- Shipping Method -->
+          <td>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-truck text-500"></i>
+              <span>{{ order.shoppingMethodDTO.shoppingMethodName }}</span>
+            </div>
+          </td>
+
+          <!-- Invoice Number -->
+          <td>
+            <div class="flex align-items-center gap-2" *ngIf="order.factureNumber">
+              <i class="pi pi-receipt text-500"></i>
+              <span>#{{ order.factureNumber }}</span>
+            </div>
+            <span class="text-400" *ngIf="!order.factureNumber">Sin factura</span>
+          </td>
+
+          <!-- Actions -->
+          <td>
+            <div class="flex gap-1">
+              <p-button
+                icon="pi pi-eye"
+                [rounded]="true"
+                [outlined]="true"
+                size="small"
+                severity="info"
+                pTooltip="Ver detalle"
+                tooltipPosition="top"
+                (onClick)="viewOrderDetail(order)">
+              </p-button>
+
+              <p-button
+                icon="pi pi-download"
+                [rounded]="true"
+                [outlined]="true"
+                size="small"
+                severity="help"
+                pTooltip="Descargar factura"
+                tooltipPosition="top"
+                [disabled]="!order.factureNumber">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Quick Stats Footer -->
+  <div class="quick-stats mt-4" *ngIf="hasOrders()">
+    <div class="grid">
+      <div class="col-12 md:col-3">
+        <p-card styleClass="stat-card">
+          <div class="flex align-items-center gap-3">
+            <div class="stat-icon bg-blue-100 text-blue-600">
+              <i class="pi pi-shopping-cart text-2xl"></i>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-900">{{ totalRecords() }}</div>
+              <div class="text-600">Total Órdenes</div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <p-card styleClass="stat-card">
+          <div class="flex align-items-center gap-3">
+            <div class="stat-icon bg-green-100 text-green-600">
+              <i class="pi pi-check-circle text-2xl"></i>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-900">
+                {{ approvedOrdersCount()  }}
+              </div>
+              <div class="text-600">Aprobadas</div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <p-card styleClass="stat-card">
+          <div class="flex align-items-center gap-3">
+            <div class="stat-icon bg-orange-100 text-orange-600">
+              <i class="pi pi-clock text-2xl"></i>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-900">
+                {{ createdOrdersCount()  }}
+              </div>
+              <div class="text-600">Pendientes</div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <p-card styleClass="stat-card">
+          <div class="flex align-items-center gap-3">
+            <div class="stat-icon bg-red-100 text-red-600">
+              <i class="pi pi-times-circle text-2xl"></i>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-900">
+                {{ rejectedOrdersCount() }}
+              </div>
+              <div class="text-600">Rechazadas</div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </div>
+  </div>
+</div>

@@ -2,15 +2,15 @@
 <div class="checkout-page">
 
   <!-- Checkout Steps -->
-  <div class="checkout-steps" *ngIf="!orderCompleted">
+  <div class="checkout-steps" *ngIf="!orderCompleted()">
     <div class="container">
       <div class="steps-nav">
         <div
           class="step"
           *ngFor="let step of steps; let i = index"
-          [class.active]="currentStep === i"
+          [class.active]="currentStep() === i"
           [class.completed]="step.completed"
-          [class.clickable]="step.completed || i <= currentStep"
+          [class.clickable]="step.completed || i <= currentStep()"
           (click)="goToStep(i)">
 
           <div class="step-indicator">
@@ -25,13 +25,13 @@
   </div>
 
   <div class="container">
-    <div class="checkout-container" *ngIf="!orderCompleted">
+    <div class="checkout-container" *ngIf="!orderCompleted()">
 
       <!-- Main Content -->
       <div class="checkout-main">
 
         <!-- Step 0: Customer Information -->
-        <div class="checkout-step" *ngIf="currentStep === 0">
+        <div class="checkout-step" *ngIf="currentStep() === 0">
           <h2 class="step-title">Información Personal</h2>
           <p class="step-description">Completa tus datos para procesar el pedido</p>
 
@@ -121,7 +121,7 @@
         </div>
 
         <!-- Step 1: Shipping Information -->
-        <div class="checkout-step" *ngIf="currentStep === 1 && hasProducts()">
+        <div class="checkout-step" *ngIf="currentStep() === 1 && hasProducts()">
           <h2 class="step-title">Información de Envío</h2>
           <p class="step-description">¿Dónde quieres recibir tu pedido?</p>
 
@@ -132,7 +132,7 @@
               <div
                 class="shipping-option"
                 *ngFor="let method of shippingMethods"
-                [class.selected]="selectedShippingMethod?.id === method.id"
+                [class.selected]="selectedShippingMethod()?.id === method.id"
                 (click)="onShippingMethodSelect(method)">
 
                 <div class="option-content">
@@ -147,14 +147,14 @@
                 </div>
 
                 <div class="option-indicator">
-                  <i class="pi pi-check" *ngIf="selectedShippingMethod?.id === method.id"></i>
+                  <i class="pi pi-check" *ngIf="selectedShippingMethod()?.id === method.id"></i>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Shipping Address Form -->
-          <form [formGroup]="shippingForm" class="shipping-form" *ngIf="selectedShippingMethod?.id !== 'pickup'">
+          <form [formGroup]="shippingForm" class="shipping-form" *ngIf="selectedShippingMethod()?.id !== 'pickup'">
             <h3>Dirección de entrega</h3>
 
             <div class="form-grid">
@@ -246,7 +246,7 @@
           </form>
 
           <!-- Pickup Location Info -->
-          <div class="pickup-info" *ngIf="selectedShippingMethod?.id === 'pickup'">
+          <div class="pickup-info" *ngIf="selectedShippingMethod()?.id === 'pickup'">
             <h3>Información de recojo</h3>
             <div class="pickup-details">
               <div class="pickup-location">
@@ -264,7 +264,7 @@
           </div>
 
           <!-- Estimated Delivery -->
-          <div class="delivery-estimate" *ngIf="selectedShippingMethod">
+          <div class="delivery-estimate" *ngIf="selectedShippingMethod()">
             <div class="estimate-card">
               <i class="pi pi-truck"></i>
               <div class="estimate-info">
@@ -276,7 +276,7 @@
         </div>
 
         <!-- Step 2: Payment Information -->
-        <div class="checkout-step" *ngIf="currentStep === 2">
+        <div class="checkout-step" *ngIf="currentStep() === 2">
           <h2 class="step-title">Método de Pago</h2>
           <p class="step-description">Elige cómo quieres pagar tu pedido</p>
 
@@ -285,7 +285,7 @@
             <div
               class="payment-option"
               *ngFor="let method of paymentMethods"
-              [class.selected]="selectedPaymentMethod?.id === method.id"
+              [class.selected]="selectedPaymentMethod()?.id === method.id"
               (click)="onPaymentMethodSelect(method)">
 
               <div class="option-content">
@@ -297,13 +297,13 @@
               </div>
 
               <div class="option-indicator">
-                <i class="pi pi-check" *ngIf="selectedPaymentMethod?.id === method.id"></i>
+                <i class="pi pi-check" *ngIf="selectedPaymentMethod()?.id === method.id"></i>
               </div>
             </div>
           </div>
 
           <!-- Credit Card Form -->
-          <form [formGroup]="paymentForm" class="payment-form" *ngIf="selectedPaymentMethod?.id === 'visa'">
+          <form [formGroup]="paymentForm" class="payment-form" *ngIf="selectedPaymentMethod()?.id === 'visa'">
             <h3>Información de la tarjeta</h3>
 
             <div class="form-grid">
@@ -388,10 +388,10 @@
           </form>
 
           <!-- Other Payment Methods Info -->
-          <div class="payment-info" *ngIf="selectedPaymentMethod?.id !== 'visa' && selectedPaymentMethod">
+          <div class="payment-info" *ngIf="selectedPaymentMethod()?.id !== 'visa' && selectedPaymentMethod()">
             <div class="payment-instructions">
               <h3>Instrucciones de pago</h3>
-              <div class="instructions-content" [ngSwitch]="selectedPaymentMethod.id">
+              <div class="instructions-content" [ngSwitch]="selectedPaymentMethod()?.id">
 
                 <div *ngSwitchCase="'yape'">
                   <p>Te enviaremos un código QR para realizar el pago con Yape una vez confirmado el pedido.</p>
@@ -422,7 +422,7 @@
         </div>
 
         <!-- Step 3: Order Confirmation -->
-        <div class="checkout-step" *ngIf="currentStep === 3">
+        <div class="checkout-step" *ngIf="currentStep() === 3">
           <h2 class="step-title">Confirmar Pedido</h2>
           <p class="step-description">Revisa todos los detalles antes de finalizar</p>
 
@@ -455,9 +455,9 @@
               <div class="info-grid">
                 <div class="info-item">
                   <span class="info-label">Método:</span>
-                  <span class="info-value">{{ selectedShippingMethod?.name }}</span>
+                  <span class="info-value">{{ selectedShippingMethod()?.name }}</span>
                 </div>
-                <div class="info-item" *ngIf="selectedShippingMethod?.id !== 'pickup'">
+                <div class="info-item" *ngIf="selectedShippingMethod()?.id !== 'pickup'">
                   <span class="info-label">Dirección:</span>
                   <span class="info-value">
                     {{ shippingForm.get('address')?.value }},
@@ -478,14 +478,14 @@
               <div class="info-grid">
                 <div class="info-item">
                   <span class="info-label">Método:</span>
-                  <span class="info-value">{{ selectedPaymentMethod?.name }}</span>
+                  <span class="info-value">{{ selectedPaymentMethod()?.name }}</span>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Processing Payment -->
-          <div class="processing-payment" *ngIf="processingPayment">
+          <div class="processing-payment" *ngIf="processingPayment()">
             <div class="processing-content">
               <p-progressSpinner styleClass="processing-spinner"></p-progressSpinner>
               <h3>Procesando tu pedido...</h3>
@@ -495,19 +495,19 @@
         </div>
 
         <!-- Navigation Buttons -->
-        <div class="checkout-navigation" *ngIf="!processingPayment">
+        <div class="checkout-navigation" *ngIf="!processingPayment()">
           <p-button
             label="Anterior"
             icon="pi pi-arrow-left"
             [outlined]="true"
-            [disabled]="currentStep === 0"
+            [disabled]="currentStep() === 0"
             (onClick)="previousStep()">
           </p-button>
 
           <p-button
-            [label]="currentStep === 3 ? 'Confirmar Pedido' : 'Continuar'"
-            [icon]="currentStep === 3 ? 'pi pi-check' : 'pi pi-arrow-right'"
-            [iconPos]="currentStep === 3 ? 'left' : 'right'"
+            [label]="currentStep() === 3 ? 'Confirmar Pedido' : 'Continuar'"
+            [icon]="currentStep() === 3 ? 'pi pi-check' : 'pi pi-arrow-right'"
+            [iconPos]="currentStep() === 3 ? 'left' : 'right'"
             [disabled]="!validateCurrentStep()"
             (onClick)="nextStep()">
           </p-button>
@@ -517,18 +517,18 @@
       <!-- Order Summary Sidebar -->
       <div class="checkout-sidebar">
         <app-cart-summary
-          [cart]="cart"
+          [cart]="cart()"
           [showActions]="false"
           [showContinueButton]="false"
           [appliedCouponCode]="''"
           (onApplyCoupon)="applyCoupon($event)"
-          (onRemoveCoupon)="cart.discount = 0; cart.total = cart.subtotal + cart.shipping + cart.tax">
+          (onRemoveCoupon)="cart().discount = 0; cart().total = cart().subtotal + cart().shipping + cart().tax">
         </app-cart-summary>
       </div>
     </div>
 
     <!-- Order Completed -->
-    <div class="order-completed" *ngIf="orderCompleted">
+    <div class="order-completed" *ngIf="orderCompleted()">
       <div class="success-content">
         <div class="success-icon">
           <i class="pi pi-check-circle"></i>
@@ -536,13 +536,13 @@
 
         <h1 class="success-title">¡Pedido Confirmado!</h1>
         <p class="success-message">
-          Tu pedido <strong>#{{ orderId }}</strong> ha sido procesado exitosamente.
+          Tu pedido <strong>#{{ orderId() }}</strong> ha sido procesado exitosamente.
         </p>
 
         <div class="order-details">
           <div class="order-total">
             <span class="total-label">Total pagado:</span>
-            <span class="total-amount">{{ orderTotal | price }}</span>
+            <span class="total-amount">{{ orderTotal() | price }}</span>
           </div>
         </div>
 
@@ -591,3 +591,12 @@
     </div>
   </div>
 </div>
+
+<p-confirmDialog
+  [style]="{width: '450px'}"
+  [baseZIndex]="10000"
+  rejectButtonStyleClass="p-button-text p-button-secondary"
+  acceptButtonStyleClass="p-button">
+</p-confirmDialog>
+
+<p-toast position="top-right"></p-toast>
